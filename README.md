@@ -1,7 +1,7 @@
 # P2P Messaging Flutter
 
 # Peer-to-Peer Messaging Application
->To push: git push origin
+
 
 GSoC pitch 2021.
 # Chosen Idea:
@@ -113,9 +113,6 @@ There are 6 main parts the above idea can be broken into,
  Once the message has been delivered, it'll be marked as delivered.
   
 ### To-Do
-- Each message should be broken into pieces and be able to assemble at destination
-
-
 - when the message reaches its intended destination, it should be reassembled and displayed, and a response must be sent to the sender telling it that the message has been delivered
 
 - Refining User interface .
