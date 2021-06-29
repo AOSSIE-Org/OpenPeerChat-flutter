@@ -1,0 +1,31 @@
+name: flutter_nearby_connections_example
+description: Demonstrates how to use the flutter_nearby_connections plugin.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_styled_toast: ^2.0.0
+
+  flutter_nearby_connections:
+    path: ../
+
+  cupertino_icons: ^1.0.2
+  device_info: ^2.0.0
+  flutter_udid: ^2.0.0
+  bubble: ^1.2.1
+  nanoid: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

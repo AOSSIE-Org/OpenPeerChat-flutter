@@ -1,0 +1,4 @@
+io/flutter/plugins/GeneratedPluginRegistrant.java
+ io.flutter.plugins.GeneratedPluginRegistrant
+com/nankai/flutter_nearby_connections_example/BuildConfig.java
+ com.nankai.flutter_nearby_connections_example.BuildConfig
