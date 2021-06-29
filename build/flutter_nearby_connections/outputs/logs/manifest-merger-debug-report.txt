@@ -1,0 +1,77 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:1:1-27:12
+INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:1:1-27:12
+INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:1:1-27:12
+	package
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:2:5-52
+		INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml
+		INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:1:11-69
+uses-permission#android.permission.BLUETOOTH
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:4:5-68
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:4:22-65
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:5:5-74
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:5:22-71
+uses-permission#android.permission.ACCESS_WIFI_STATE
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:7:5-76
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:7:22-73
+uses-permission#android.permission.CHANGE_WIFI_STATE
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:8:5-76
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:8:22-73
+uses-permission#android.permission.CHANGE_NETWORK_STATE
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:9:5-79
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:9:22-76
+uses-permission#android.permission.INTERNET
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:10:5-67
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:10:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:11:5-79
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:11:22-76
+uses-feature#android.hardware.wifi.direct
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:13:5-65
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:13:19-62
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:15:5-81
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:15:22-78
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:16:5-79
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:16:22-76
+uses-permission#android.permission.WAKE_LOCK
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:18:5-67
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:18:22-65
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:19:5-77
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:19:22-74
+application
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:21:5-26:19
+service#com.nankai.flutter_nearby_connections.NearbyService
+ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:22:9-25:39
+	android:enabled
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:24:13-35
+	android:exported
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:25:13-36
+	android:name
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml:23:13-42
+uses-sdk
+INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml
+INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml
+		ADDED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml
+		INJECTED from /media/tokoyama/Data/Documents/flutter_nearby_connections/android/src/main/AndroidManifest.xml
