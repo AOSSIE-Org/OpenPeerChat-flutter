@@ -98,9 +98,9 @@ packages:
   flutter_nearby_connections:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      name: flutter_nearby_connections
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "1.0.11"
   flutter_styled_toast:
     dependency: "direct main"

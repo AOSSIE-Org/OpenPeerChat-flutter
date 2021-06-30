@@ -2,8 +2,9 @@ import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_nearby_connections_example/Payload.dart';
 import 'package:nanoid/nanoid.dart';
-
+import 'package:intl/intl.dart';
 import 'Conversation.dart';
 import 'Msg.dart';
 import 'Global.dart';
@@ -93,18 +94,21 @@ class _ChatPageState extends State<ChatPage> {
                       onPressed: () {
                         var msgId= nanoid(21);
                         var data={
-                          "sender":Global.myName,
-                          "receiver":widget.device.deviceName,
-                          "message":myController.text,
-                          "id":msgId
+                          "sender": "$Global.myName",
+                          "receiver":"$widget.device.deviceName",
+                          "message":"$myController.text",
+                          "id":"$msgId",
+                          "Timestamp": "$DateTime.now().toUtc().toString()",
+                          "type":"Payload"
                         };
                       var   Mesagedata= data.toString();
                         // Global.nearbyService!
                         //     .sendMessage(widget.device.deviceId, Mesagedata);
-                        Global.devices.forEach((element) {
-                          Global.nearbyService!
-                              .sendMessage(element.deviceId, Mesagedata);
-                        });
+                        Global.cache[msgId]=Payload(Global.myName, widget.device.deviceName,myController.text,DateTime.now().toUtc().toString());
+                        // Global.devices.forEach((element) {
+                        //   Global.nearbyService!
+                        //       .sendMessage(element.deviceId, Mesagedata);
+                        // });
                         // Global.nearbyService!
                         //     .sendMessage(widget.device.deviceId, myController.text);
                         setState(() {

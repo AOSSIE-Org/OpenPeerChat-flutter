@@ -14,8 +14,8 @@ dependencies:
 
   flutter_styled_toast: ^2.0.0
 
-  flutter_nearby_connections:
-    path: ../
+  flutter_nearby_connections: ^1.0.11
+
 
   cupertino_icons: ^1.0.2
   device_info: ^2.0.0

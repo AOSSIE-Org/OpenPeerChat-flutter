@@ -12,43 +12,43 @@
 12         to allow setting breakpoints, to provide hot reload, etc.
 13    -->
 14    <uses-permission android:name="android.permission.INTERNET" />
-14-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/debug/AndroidManifest.xml:6:5-66
-14-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/debug/AndroidManifest.xml:6:22-64
+14-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/debug/AndroidManifest.xml:6:5-66
+14-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/debug/AndroidManifest.xml:6:22-64
 15    <uses-permission android:name="android.permission.BLUETOOTH" />
-15-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:7:5-68
-15-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:7:22-65
+15-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:7:5-68
+15-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:7:22-65
 16    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-16-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:8:5-74
-16-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:8:22-71
+16-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:8:5-74
+16-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:8:22-71
 17    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-17-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:9:5-76
-17-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:9:22-73
+17-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:9:5-76
+17-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:9:22-73
 18    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-18-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:10:5-76
-18-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:10:22-73
+18-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:10:5-76
+18-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:10:22-73
 19    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-19-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:11:5-79
-19-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:11:22-76
+19-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:11:5-79
+19-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:11:22-76
 20    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-20-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:13:5-79
-20-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:13:22-76
+20-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:13:5-79
+20-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:13:22-76
 21
 22    <uses-feature android:name="android.hardware.wifi.direct" />
-22-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:15:5-65
-22-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:15:19-62
+22-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:15:5-65
+22-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:15:19-62
 23
 24    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-24-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:17:5-81
-24-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:17:22-78
+24-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:17:5-81
+24-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:17:22-78
 25    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-25-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:18:5-79
-25-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:18:22-76
+25-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:18:5-79
+25-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:18:22-76
 26    <uses-permission android:name="android.permission.WAKE_LOCK" />
-26-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:19:5-68
-26-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:19:22-65
+26-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:19:5-68
+26-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:19:22-65
 27    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-27-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:20:5-77
-27-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:20:22-74
+27-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:20:5-77
+27-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:20:22-74
 28    <!--
 29 io.flutter.app.FlutterApplication is an android.app.Application that
 30         calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -57,30 +57,30 @@
 33         FlutterApplication and put your custom class here.
 34    -->
 35    <application
-35-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:8:5-46:19
+35-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:8:5-46:19
 36        android:name="io.flutter.app.FlutterApplication"
-36-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:9:9-57
+36-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:9:9-57
 37        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-37-->[androidx.core:core:1.6.0-beta02] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/a61c3edadd3f19edbf8ca1d8d40a2394/core-1.6.0-beta02/AndroidManifest.xml:24:18-86
+37-->[androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:24:18-86
 38        android:debuggable="true"
 39        android:icon="@mipmap/ic_launcher"
-39-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:11:9-43
+39-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:11:9-43
 40        android:label="flutter_nearby_connections_example" >
-40-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:10:9-59
+40-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:10:9-59
 41        <activity
-41-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:12:9-40:20
+41-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:12:9-40:20
 42            android:name="com.nankai.flutter_nearby_connections_example.MainActivity"
-42-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:13:13-41
+42-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:13:13-41
 43            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-43-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:16:13-163
+43-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:16:13-163
 44            android:hardwareAccelerated="true"
-44-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:17:13-47
+44-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:17:13-47
 45            android:launchMode="singleTop"
-45-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:14:13-43
+45-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:14:13-43
 46            android:theme="@style/LaunchTheme"
-46-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:15:13-47
+46-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:15:13-47
 47            android:windowSoftInputMode="adjustResize" >
-47-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:18:13-55
+47-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:18:13-55
 48
 49            <!--
 50                 Specifies an Android theme to apply to this Activity as soon as
@@ -89,11 +89,11 @@
 53                 to determine the Window background behind the Flutter UI.
 54            -->
 55            <meta-data
-55-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:23:13-26:17
+55-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:23:13-26:17
 56                android:name="io.flutter.embedding.android.NormalTheme"
-56-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:24:15-70
+56-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:24:15-70
 57                android:resource="@style/NormalTheme" />
-57-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:25:15-52
+57-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:25:15-52
 58            <!--
 59                 Displays an Android View that continues showing the launch screen
 60                 Drawable until Flutter paints its first frame, then this splash
@@ -102,21 +102,21 @@
 63                 Flutter's first frame.
 64            -->
 65            <meta-data
-65-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:32:13-35:17
+65-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:32:13-35:17
 66                android:name="io.flutter.embedding.android.SplashScreenDrawable"
-66-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:33:15-79
+66-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:33:15-79
 67                android:resource="@drawable/launch_background" />
-67-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:34:15-61
+67-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:34:15-61
 68
 69            <intent-filter>
-69-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:36:13-39:29
+69-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:36:13-39:29
 70                <action android:name="android.intent.action.MAIN" />
-70-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:37:17-68
-70-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:37:25-66
+70-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:37:17-68
+70-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:37:25-66
 71
 72                <category android:name="android.intent.category.LAUNCHER" />
-72-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:38:17-76
-72-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:38:27-74
+72-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:38:17-76
+72-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:38:27-74
 73            </intent-filter>
 74        </activity>
 75        <!--
@@ -124,20 +124,20 @@
 77             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
 78        -->
 79        <meta-data
-79-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:43:9-45:33
+79-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:43:9-45:33
 80            android:name="flutterEmbedding"
-80-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:44:13-44
+80-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:44:13-44
 81            android:value="2" />
-81-->/media/tokoyama/Data/Documents/flutter_nearby_connections/example/android/app/src/main/AndroidManifest.xml:45:13-30
+81-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:45:13-30
 82
 83        <service
-83-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:23:9-26:39
+83-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:23:9-26:39
 84            android:name="com.nankai.flutter_nearby_connections.NearbyService"
-84-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:24:13-79
+84-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:24:13-79
 85            android:enabled="true"
-85-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:25:13-35
+85-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:25:13-35
 86            android:exported="true" />
-86-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/flutter_nearby_connections/example/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:26:13-36
+86-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:26:13-36
 87
 88        <activity
 88-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:23:9-26:75

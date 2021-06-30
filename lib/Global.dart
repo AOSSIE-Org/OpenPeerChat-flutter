@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
+import 'Payload.dart';
 
 import 'Msg.dart';
 import 'Conversation.dart';
@@ -17,4 +18,5 @@ class Global {
   ];
   static Map<String, Conversation> conversations = Map();
   static String myName='';
+  static Map<String,dynamic> cache=Map();
 }

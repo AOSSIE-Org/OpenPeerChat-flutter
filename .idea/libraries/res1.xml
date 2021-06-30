@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="res1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/flutter_udid/intermediates/library_java_res/debug/res.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
