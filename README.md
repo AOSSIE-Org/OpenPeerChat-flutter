@@ -1,6 +1,7 @@
 # P2P Messaging Flutter
 
 # Peer-to-Peer Messaging Application
+>To push: git push origin
 
 What I have till now
 
