@@ -3,20 +3,6 @@
 # Peer-to-Peer Messaging Application
 >To push: git push origin
 
-What I have till now
-
-- Direct message transfer btw connected devices
-- Message transfer btw 2 devices which is not directly connected through a common connected device 
-	* Version 1 : any message that comes to a device which is not addressed to it, is broadcasted to all its connected devices (non optimal) . done.
-	* Version 2: make a map called cache, all messages form this map will be broadcasted at regular intervals
-		* this will have map key as msgid and will be mapped to payload
-		* the payload can be of 2 types, message payload and Acks. If theres a message payoad mapped to a particular id and then the ack of that message id comes, then that message doesnt need to be broadcasted anymore so we delete it from the cache after transmitting its Ack (needs more impovement in this, maybe if get acks from majority of connected devices we can stop broadcasting acks?) 
-		* so we start with an empty cache, if we receive a message of type message, then we add it directly to the cache and if we get a message  of type ack, we check if we already have a payload of message mapped to that ID, if it exists then we handle it as mentioned in the previous point.
-		* what happens if u get an ack of an id and then get the message of that id after it. then we kill the message and dont add it to the cache. 
-		* Any other case?
-- Cron job: the contents of the cache need to be broadcasted in regular intervals to all nearby devices. ToDo decide optimum interval (5 mins? or 2 mins? or 1 min?)
-- Improve time complexity of broadcasting, so all messages in the cache addressed to one device can be grouped together and sent as one json list and then separated at the other end? ToDo
-	 
 
 
 GSoC pitch 2021.
