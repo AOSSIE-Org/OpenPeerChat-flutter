@@ -6,29 +6,29 @@ INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/s
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:1:1-47:12
 MERGED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:1:1-47:12
 MERGED from [:flutter_udid] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_udid/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
-MERGED from [:device_info] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/device_info/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-29:12
-MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b5ede97c61c3fa28ffb23118bf9bd65b/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:2:1-11:12
-MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/485dd4bf7e4d8b22947581d726fe31d2/jetified-play-services-location-17.1.0/AndroidManifest.xml:2:1-9:12
-MERGED from [androidx.core:core-ktx:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/390bf54b40e8728e178d58b38062a300/jetified-core-ktx-1.6.0-rc01/AndroidManifest.xml:2:1-9:12
-MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:17:1-29:12
-MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1a013ba7a4c8b1c4425543c856207afb/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:2:1-9:12
-MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8e0a6dfb5591595b96f7267c0595bdb1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:17:1-24:12
-MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:17:1-28:12
-MERGED from [androidx.fragment:fragment:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c48ec40912ace98ef767a9ef481749db/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.viewpager:viewpager:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b502c4485c477091661a0abd8719f789/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.loader:loader:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/33cbaa35d26a09368a947c625d232cbc/loader-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.activity:activity:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/3def4eff4da5f9aa8da2410e13ab1879/jetified-activity-1.0.0/AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.customview:customview:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/e5e0cd3c9e63a6b86c25da02d24ecefb/customview-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:17:1-26:12
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/2c0aca75419af953f5b68024797c3334/lifecycle-runtime-2.2.0/AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.savedstate:savedstate:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/871dbd97facfe1233c7889a9b1a9f796/jetified-savedstate-1.0.0/AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b307746bdd91f6183e622eb3134833d/lifecycle-livedata-2.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/aba40c873d0c6b66be1e3f0b79a854c7/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b19828b326b56df03b22095c42db98c/core-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/a028e4130fe4b9df9c7aeab2abeb2c55/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/63eee6dae17f80a53a65e25cbfb6f20e/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/73dc86ab266ee1130b8de358823b2aff/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.multidex:multidex:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/49aada15a0281e208dd96bc549862073/multidex-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:2:1-11:12
+MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/f7cb67f63c22c211d0eddf3e8d8e9507/jetified-play-services-location-17.1.0/AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.core:core-ktx:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/d1f47412c404c3419b20bbdf0fa1697f/jetified-core-ktx-1.7.0-alpha01/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:17:1-29:12
+MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/9a905da250aa33a6888bcd59fbb1dc20/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ab8f29dfc8f8aca94d1130ac114e1af1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:17:1-28:12
+MERGED from [androidx.fragment:fragment:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c4d37c399fce99cf1dcb827271bd0eb0/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ea2d4dd55f2057eacddfab290451ee62/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b837d0b31b2dbb67a31074ab1fb9f131/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/2d5951cf2a1bc9cbfd0c70a82255b73c/jetified-activity-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b8f1547cef42a58bafee2782f6e86af/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/d16c63ef99278cfa90a022956e14aac1/lifecycle-runtime-2.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8f416eff14497fb63d25456e8c14b0a3/jetified-savedstate-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/307f354767e9dda0aa691accc86574df/lifecycle-livedata-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c1b76a3cd701f8996d56d44378932e7e/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/38941239eba171796cdc4b66e18f9434/core-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c9090c51b266a19e689708b4a4060be7/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/18eb0a192d433bcdedca12a80a325d46/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/27d6585375910f6a3d720d3296ea801d/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:17:1-24:12
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/debug/AndroidManifest.xml:1:1-7:12
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/debug/AndroidManifest.xml:1:1-7:12
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/debug/AndroidManifest.xml:1:1-7:12
@@ -50,24 +50,24 @@ application
 ADDED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:8:5-46:19
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:22:5-27:19
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:22:5-27:19
-MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b5ede97c61c3fa28ffb23118bf9bd65b/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:9:5-20
-MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b5ede97c61c3fa28ffb23118bf9bd65b/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:9:5-20
-MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/485dd4bf7e4d8b22947581d726fe31d2/jetified-play-services-location-17.1.0/AndroidManifest.xml:7:5-20
-MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/485dd4bf7e4d8b22947581d726fe31d2/jetified-play-services-location-17.1.0/AndroidManifest.xml:7:5-20
-MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:22:5-27:19
-MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:22:5-27:19
-MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1a013ba7a4c8b1c4425543c856207afb/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:7:5-20
-MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1a013ba7a4c8b1c4425543c856207afb/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:7:5-20
-MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8e0a6dfb5591595b96f7267c0595bdb1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:22:5-20
-MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8e0a6dfb5591595b96f7267c0595bdb1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:22:5-20
-MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:22:5-26:19
-MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:22:5-26:19
-MERGED from [androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:24:5-89
-MERGED from [androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:24:5-89
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/a028e4130fe4b9df9c7aeab2abeb2c55/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/a028e4130fe4b9df9c7aeab2abeb2c55/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:9:5-20
+MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:9:5-20
+MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/f7cb67f63c22c211d0eddf3e8d8e9507/jetified-play-services-location-17.1.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/f7cb67f63c22c211d0eddf3e8d8e9507/jetified-play-services-location-17.1.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/9a905da250aa33a6888bcd59fbb1dc20/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/9a905da250aa33a6888bcd59fbb1dc20/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ab8f29dfc8f8aca94d1130ac114e1af1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ab8f29dfc8f8aca94d1130ac114e1af1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:22:5-26:19
+MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.core:core:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/AndroidManifest.xml:24:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c9090c51b266a19e689708b4a4060be7/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c9090c51b266a19e689708b4a4060be7/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
 	android:appComponentFactory
-		ADDED from [androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:24:18-86
+		ADDED from [androidx.core:core:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/AndroidManifest.xml:24:18-86
 	android:label
 		ADDED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:10:9-59
 	android:icon
@@ -122,52 +122,52 @@ INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/s
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml
 MERGED from [:flutter_udid] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_udid/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:flutter_udid] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_udid/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
-MERGED from [:device_info] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/device_info/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
-MERGED from [:device_info] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/device_info/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
-MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b5ede97c61c3fa28ffb23118bf9bd65b/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:5:5-44
-MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b5ede97c61c3fa28ffb23118bf9bd65b/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:5:5-44
-MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/485dd4bf7e4d8b22947581d726fe31d2/jetified-play-services-location-17.1.0/AndroidManifest.xml:5:5-44
-MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/485dd4bf7e4d8b22947581d726fe31d2/jetified-play-services-location-17.1.0/AndroidManifest.xml:5:5-44
-MERGED from [androidx.core:core-ktx:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/390bf54b40e8728e178d58b38062a300/jetified-core-ktx-1.6.0-rc01/AndroidManifest.xml:5:5-7:41
-MERGED from [androidx.core:core-ktx:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/390bf54b40e8728e178d58b38062a300/jetified-core-ktx-1.6.0-rc01/AndroidManifest.xml:5:5-7:41
-MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:20:5-44
-MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:20:5-44
-MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1a013ba7a4c8b1c4425543c856207afb/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:5:5-44
-MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1a013ba7a4c8b1c4425543c856207afb/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:5:5-44
-MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8e0a6dfb5591595b96f7267c0595bdb1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8e0a6dfb5591595b96f7267c0595bdb1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:20:5-44
-MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.fragment:fragment:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c48ec40912ace98ef767a9ef481749db/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.fragment:fragment:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c48ec40912ace98ef767a9ef481749db/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.viewpager:viewpager:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b502c4485c477091661a0abd8719f789/viewpager-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.viewpager:viewpager:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b502c4485c477091661a0abd8719f789/viewpager-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.loader:loader:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/33cbaa35d26a09368a947c625d232cbc/loader-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.loader:loader:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/33cbaa35d26a09368a947c625d232cbc/loader-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.activity:activity:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/3def4eff4da5f9aa8da2410e13ab1879/jetified-activity-1.0.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.activity:activity:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/3def4eff4da5f9aa8da2410e13ab1879/jetified-activity-1.0.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.customview:customview:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/e5e0cd3c9e63a6b86c25da02d24ecefb/customview-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.customview:customview:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/e5e0cd3c9e63a6b86c25da02d24ecefb/customview-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/2c0aca75419af953f5b68024797c3334/lifecycle-runtime-2.2.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/2c0aca75419af953f5b68024797c3334/lifecycle-runtime-2.2.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.savedstate:savedstate:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/871dbd97facfe1233c7889a9b1a9f796/jetified-savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.savedstate:savedstate:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/871dbd97facfe1233c7889a9b1a9f796/jetified-savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b307746bdd91f6183e622eb3134833d/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b307746bdd91f6183e622eb3134833d/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/aba40c873d0c6b66be1e3f0b79a854c7/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/aba40c873d0c6b66be1e3f0b79a854c7/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b19828b326b56df03b22095c42db98c/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b19828b326b56df03b22095c42db98c/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/a028e4130fe4b9df9c7aeab2abeb2c55/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/a028e4130fe4b9df9c7aeab2abeb2c55/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/63eee6dae17f80a53a65e25cbfb6f20e/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/63eee6dae17f80a53a65e25cbfb6f20e/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/73dc86ab266ee1130b8de358823b2aff/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/73dc86ab266ee1130b8de358823b2aff/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.multidex:multidex:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/49aada15a0281e208dd96bc549862073/multidex-2.0.0/AndroidManifest.xml:20:5-43
+MERGED from [androidx.multidex:multidex:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/49aada15a0281e208dd96bc549862073/multidex-2.0.0/AndroidManifest.xml:20:5-43
+MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/f7cb67f63c22c211d0eddf3e8d8e9507/jetified-play-services-location-17.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-location:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/f7cb67f63c22c211d0eddf3e8d8e9507/jetified-play-services-location-17.1.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/d1f47412c404c3419b20bbdf0fa1697f/jetified-core-ktx-1.7.0-alpha01/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.core:core-ktx:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/d1f47412c404c3419b20bbdf0fa1697f/jetified-core-ktx-1.7.0-alpha01/AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/9a905da250aa33a6888bcd59fbb1dc20/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-tasks:17.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/9a905da250aa33a6888bcd59fbb1dc20/jetified-play-services-tasks-17.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ab8f29dfc8f8aca94d1130ac114e1af1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-places-placereport:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ab8f29dfc8f8aca94d1130ac114e1af1/jetified-play-services-places-placereport-17.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c4d37c399fce99cf1dcb827271bd0eb0/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c4d37c399fce99cf1dcb827271bd0eb0/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ea2d4dd55f2057eacddfab290451ee62/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/ea2d4dd55f2057eacddfab290451ee62/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b837d0b31b2dbb67a31074ab1fb9f131/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b837d0b31b2dbb67a31074ab1fb9f131/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/2d5951cf2a1bc9cbfd0c70a82255b73c/jetified-activity-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/2d5951cf2a1bc9cbfd0c70a82255b73c/jetified-activity-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b8f1547cef42a58bafee2782f6e86af/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/0b8f1547cef42a58bafee2782f6e86af/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/d16c63ef99278cfa90a022956e14aac1/lifecycle-runtime-2.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/d16c63ef99278cfa90a022956e14aac1/lifecycle-runtime-2.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8f416eff14497fb63d25456e8c14b0a3/jetified-savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/8f416eff14497fb63d25456e8c14b0a3/jetified-savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/307f354767e9dda0aa691accc86574df/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/307f354767e9dda0aa691accc86574df/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c1b76a3cd701f8996d56d44378932e7e/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c1b76a3cd701f8996d56d44378932e7e/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/38941239eba171796cdc4b66e18f9434/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/38941239eba171796cdc4b66e18f9434/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c9090c51b266a19e689708b4a4060be7/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/c9090c51b266a19e689708b4a4060be7/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/18eb0a192d433bcdedca12a80a325d46/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/18eb0a192d433bcdedca12a80a325d46/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/27d6585375910f6a3d720d3296ea801d/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/27d6585375910f6a3d720d3296ea801d/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/debug/AndroidManifest.xml
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/debug/AndroidManifest.xml
 	android:targetSdkVersion
@@ -204,8 +204,8 @@ ADDED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-mess
 		ADDED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:11:22-76
 uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:13:5-79
-MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b5ede97c61c3fa28ffb23118bf9bd65b/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:7:5-79
-MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/b5ede97c61c3fa28ffb23118bf9bd65b/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:7:5-79
+MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:7:5-79
+MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:7:5-79
 	android:name
 		ADDED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:13:22-76
 uses-feature#android.hardware.wifi.direct
@@ -237,16 +237,16 @@ ADDED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-mess
 	android:name
 		ADDED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:24:13-79
 activity#com.google.android.gms.common.api.GoogleApiActivity
-ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:23:9-26:75
+ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:23:9-26:75
 	android:exported
-		ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:25:13-37
+		ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:25:13-37
 	android:theme
-		ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:26:13-72
+		ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:26:13-72
 	android:name
-		ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:24:13-79
+		ADDED from [com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:24:13-79
 meta-data#com.google.android.gms.version
-ADDED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:23:9-25:69
+ADDED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:23:9-25:69
 	android:value
-		ADDED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:25:13-66
+		ADDED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:25:13-66
 	android:name
-		ADDED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:24:13-58
+		ADDED from [com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:24:13-58

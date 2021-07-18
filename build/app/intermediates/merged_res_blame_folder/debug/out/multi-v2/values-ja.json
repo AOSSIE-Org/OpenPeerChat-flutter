@@ -4,7 +4,7 @@
             "outputFile": "/media/tokoyama/Data/Documents/p2p-messaging-flutter/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-ja/values-ja.xml",
             "map": [
                 {
-                    "source": "/home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/res/values-ja/values.xml",
+                    "source": "/home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/res/values-ja/values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -21,24 +21,7 @@
                     }
                 },
                 {
-                    "source": "/home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/res/values-ja/values.xml",
-                    "from": {
-                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
-                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-                        "startOffsets": "245,347,513,631,735,926,1044,1175,1299,1492,1591,1755,1872,2051,2197,2283,2368",
-                        "endColumns": "101,165,117,103,190,117,130,123,192,98,163,116,178,145,85,84,95",
-                        "endOffsets": "346,512,630,734,925,1043,1174,1298,1491,1590,1754,1871,2050,2196,2282,2367,2463"
-                    },
-                    "to": {
-                        "startLines": "2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,211,377,499,607,798,920,1055,1364,1557,1660,1824,1945,2124,2274,2364,2453",
-                        "endColumns": "105,165,121,107,190,121,134,127,192,102,163,120,178,149,89,88,99",
-                        "endOffsets": "206,372,494,602,793,915,1050,1178,1552,1655,1819,1940,2119,2269,2359,2448,2548"
-                    }
-                },
-                {
-                    "source": "/home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/res/values-ja/values-ja.xml",
+                    "source": "/home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/res/values-ja/values-ja.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -52,6 +35,23 @@
                         "startOffsets": "2553",
                         "endColumns": "100",
                         "endOffsets": "2649"
+                    }
+                },
+                {
+                    "source": "/home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/res/values-ja/values.xml",
+                    "from": {
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "245,347,513,631,735,926,1044,1175,1299,1492,1591,1755,1872,2051,2197,2283,2368",
+                        "endColumns": "101,165,117,103,190,117,130,123,192,98,163,116,178,145,85,84,95",
+                        "endOffsets": "346,512,630,734,925,1043,1174,1298,1491,1590,1754,1871,2050,2196,2282,2367,2463"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,211,377,499,607,798,920,1055,1364,1557,1660,1824,1945,2124,2274,2364,2453",
+                        "endColumns": "105,165,121,107,190,121,134,127,192,102,163,120,178,149,89,88,99",
+                        "endOffsets": "206,372,494,602,793,915,1050,1178,1552,1655,1819,1940,2119,2269,2359,2448,2548"
                     }
                 }
             ]

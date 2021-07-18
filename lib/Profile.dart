@@ -37,7 +37,8 @@ class Profile extends StatelessWidget {
               height: 20,
             ),
             ElevatedButton(onPressed: () {
-              Global.myName = myName.text+custom_length_id;
+              // Global.myName = myName.text+custom_length_id;
+              Global.myName = myName.text;
               Navigator.of(context).push(
                   MaterialPageRoute(
                       builder: (_) => DevicesListScreen(deviceType: DeviceType.browser)));

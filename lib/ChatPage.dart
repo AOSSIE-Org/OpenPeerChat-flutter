@@ -104,7 +104,7 @@ class _ChatPageState extends State<ChatPage> {
                       var   Mesagedata= data.toString();
                         // Global.nearbyService!
                         //     .sendMessage(widget.device.deviceId, Mesagedata);
-                        Global.cache[msgId]=Payload(Global.myName, widget.device.deviceName,myController.text,DateTime.now().toUtc().toString());
+                        Global.cache[msgId]=Payload(msgId,Global.myName, widget.device.deviceName,myController.text,DateTime.now().toUtc().toString());
                         // Global.devices.forEach((element) {
                         //   Global.nearbyService!
                         //       .sendMessage(element.deviceId, Mesagedata);

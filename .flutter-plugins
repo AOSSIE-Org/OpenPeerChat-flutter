@@ -1,4 +1,8 @@
 # This is a generated file; do not edit or check into version control.
-device_info=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-2.0.2/
 flutter_nearby_connections=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_nearby_connections-1.0.11/
 flutter_udid=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_udid-2.0.0/
+path_provider=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-2.0.2/
+path_provider_linux=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.0.0/
+path_provider_macos=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.0/
+path_provider_windows=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.0.1/
+sqflite=/home/tokoyama/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/sqflite-2.0.0+3/

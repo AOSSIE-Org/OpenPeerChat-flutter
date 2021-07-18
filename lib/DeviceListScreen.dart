@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:device_info/device_info.dart';
+
+// import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_nearby_connections_example/Payload.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'Global.dart';
 
 import 'Msg.dart';
 import 'ChatPage.dart';
+import 'AdhocHousekeeping.dart';
 
 enum DeviceType { advertiser, browser }
 
@@ -127,7 +129,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                           )),
                           // Request connect
                           GestureDetector(
-                            onTap: () => _connectToDevice(device),
+                            onTap: () => connectToDevice(device),
                             child: Container(
                               margin: EdgeInsets.symmetric(horizontal: 8.0),
                               padding: EdgeInsets.all(8.0),
@@ -180,137 +182,16 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     );
   }
 
-  String getStateName(SessionState state) {
-    switch (state) {
-      case SessionState.notConnected:
-        return "disconnected";
-      case SessionState.connecting:
-        return "waiting";
-      default:
-        return "connected";
-    }
-  }
 
-  String getButtonStateName(SessionState state) {
-    switch (state) {
-      case SessionState.notConnected:
-      case SessionState.connecting:
-        return "Connect";
-      default:
-        return "Disconnect";
-    }
-  }
 
-  Color getStateColor(SessionState state) {
-    switch (state) {
-      case SessionState.notConnected:
-        return Colors.black;
-      case SessionState.connecting:
-        return Colors.grey;
-      default:
-        return Colors.green;
-    }
-  }
 
-  Color getButtonColor(SessionState state) {
-    switch (state) {
-      case SessionState.notConnected:
-      case SessionState.connecting:
-        return Colors.green;
-      default:
-        return Colors.red;
-    }
-  }
-
-  int getItemCount() {
-    return Global.devices.length;
-  }
-
-  _connectToDevice(Device device) {
-    switch (device.state) {
-      case SessionState.notConnected:
-        Global.nearbyService!.invitePeer(
-          deviceID: device.deviceId,
-          deviceName: device.deviceName,
-        );
-        break;
-      case SessionState.connected:
-        Global.nearbyService!.disconnectPeer(deviceID: device.deviceId);
-        break;
-      case SessionState.connecting:
-        break;
-    }
-  }
-
-  void startBrowsing() async {
-    await Global.nearbyService!.stopBrowsingForPeers();
-    await Global.nearbyService!.startBrowsingForPeers();
-  }
-
-  void startAdvertising() async {
-    await Global.nearbyService!.stopAdvertisingPeer();
-    await Global.nearbyService!.startAdvertisingPeer();
-  }
-
-  // this function is supposed to broadcast all messages in the cache which is set to broadcast=true
-  void broadcast() async {
-    while (true) {
-      Global.cache.forEach((key, value) {
-        // if a message is supposed to be broadcasted to all devices in proximity then
-        if (value.runtimeType == Payload && value.broadcast) {
-          Payload payload = value;
-          var data = {
-            "sender": value.sender,
-            "receiver": payload.receiver,
-            "message": value.message,
-            "id": key,
-            "Timestamp": value.timestamp,
-            "type": value.type
-          };
-          var toSend = jsonEncode(data);
-          Global.devices.forEach((element) {
-            print("270" + toSend);
-            Global.nearbyService!
-                .sendMessage(element.deviceId,toSend);
-          });
-        } else if (value.runtimeType == Ack) {
-          Global.devices.forEach((element) {
-            var data = {"id": "$key", "type": "$value.type"};
-            Global.nearbyService!
-                .sendMessage(element.deviceId, jsonEncode(data));
-          });
-        }
-      });
-      await Future.delayed(Duration(seconds: 10));
-    }
-  }
 
   void init() async {
-    Global.nearbyService = NearbyService();
-    String devInfo = '';
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      devInfo = androidInfo.model;
-    }
-    if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      devInfo = iosInfo.localizedModel;
-    }
-    await Global.nearbyService!.init(
-        serviceType: 'mpconn',
-        deviceName: Global.myName,
-        strategy: Strategy.P2P_CLUSTER,
-        callback: (isRunning) async {
-          if (isRunning) {
-            startAdvertising();
-            startBrowsing();
-          }
-        });
+    initiateNearbyService();
     Global.subscription =
         Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
       devicesList.forEach((element) {
-        if (element.state != SessionState.connected) _connectToDevice(element);
+        if (element.state != SessionState.connected) connectToDevice(element);
         print(
             "deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
 
@@ -335,7 +216,6 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     broadcast();
     Global.receivedDataSubscription =
         Global.nearbyService!.dataReceivedSubscription(callback: (data) {
-      // print("dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       print("dataReceivedSubscription: ${jsonEncode(data)}");
 
       showToast(jsonEncode(data),
@@ -348,20 +228,20 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
       //       .sendMessage(element.deviceId, data["message"].toString());});
 
       setState(() {
-        // var msg = jsonEncode(data['message']);
         String temp = data['message'];
         var temp2 = jsonDecode(temp);
-        print("357: "+ temp2['receiver']);
-        // print(temp+"dataaaaaaaaaaaaaaaaaaaaaaaa");
-
+        print("331: " + temp2['receiver'].toString());
+        print("332:" + temp2['type'].toString());
+        print("333|" + Global.myName.toString());
         print(data['message'] + "can u hear meeeeeeeeeeeeeeeeeeeeeeeeeeeeee?");
-        if (Global.cache[temp2["id"]] == null) {
-          if (temp2["type"] == 'Payload') {
-            Global.cache[temp2["id"]] = Payload(
-                temp2['sender'],
-                temp2['receiver'],
-                temp2['message'],
-                temp2['timestamp']);
+        if (Global.cache.containsKey(temp2["id"]) == false) {
+          print("line 338 test");
+          if (temp2["type"].toString() == 'Payload') {
+            print("line 341");
+
+            Global.cache[temp2["id"]] = Payload(temp2["id"],temp2['sender'],
+                temp2['receiver'], temp2['message'], temp2['Timestamp']);
+            print("current cache 344" + Global.cache.toString());
           } else {
             Global.cache[temp2["id"]] = Ack(temp2["id"]);
           }
@@ -372,19 +252,24 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           }
         } else {
           // cache has a ack form the same message id so i guess can keep track of the number of times we get acks?. currently ignore
+          Global.cache.remove(temp2["id"]);
           ;
         }
-
-        if (temp2['type'] == "Payload" &&
-            temp2['receiver'] == Global.myName) {
+        print("350|" +
+            temp2['type'].toString() +
+            ":Payload |" +
+            temp2['receiver'].toString() +
+            ":" +
+            Global.myName.toString());
+        if (temp2['type'] == "Payload" && temp2['receiver'] == Global.myName) {
           Global.cache[temp2["id"]]!.broadcast = false;
           //send ack TODO
           Global.cache[temp2["id"]] = Ack(temp2["id"]);
-
+          print("355: ack added");
           Global.messages
               .add(new Msg(data["deviceId"], data["message"], "received"));
           Global.conversations[data["deviceId"]]!.ListOfMsgs
-              .add(new Msg(data["deviceId"], data["message"], "received"));
+              .add(new Msg(data["sender"], data["message"], "received"));
         } else {
           // Global.devices.forEach((element) {
           //   Global.nearbyService!

@@ -6,7 +6,7 @@
 6
 7    <uses-sdk
 8        android:minSdkVersion="16"
-9        android:targetSdkVersion="28" />
+9        android:targetSdkVersion="30" />
 10    <!--
 11         Flutter needs it to communicate with the running application
 12         to allow setting breakpoints, to provide hot reload, etc.
@@ -61,7 +61,7 @@
 36        android:name="io.flutter.app.FlutterApplication"
 36-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:9:9-57
 37        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-37-->[androidx.core:core:1.6.0-rc01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/228086b884fc49651a3302e755de318d/core-1.6.0-rc01/AndroidManifest.xml:24:18-86
+37-->[androidx.core:core:1.7.0-alpha01] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/4a49687e7070d5192c8f4d922e714ae7/core-1.7.0-alpha01/AndroidManifest.xml:24:18-86
 38        android:debuggable="true"
 39        android:icon="@mipmap/ic_launcher"
 39-->/media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:11:9-43
@@ -140,20 +140,20 @@
 86-->[:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:26:13-36
 87
 88        <activity
-88-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:23:9-26:75
+88-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:23:9-26:75
 89            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-89-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:24:13-79
+89-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:24:13-79
 90            android:exported="false"
-90-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:25:13-37
+90-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:25:13-37
 91            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-91-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/04037e151fdab6d3625a62e2850a25bd/jetified-play-services-base-17.3.0/AndroidManifest.xml:26:13-72
+91-->[com.google.android.gms:play-services-base:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/397dfa0d3dcec4d874190663cae1620b/jetified-play-services-base-17.3.0/AndroidManifest.xml:26:13-72
 92
 93        <meta-data
-93-->[com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:23:9-25:69
+93-->[com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:23:9-25:69
 94            android:name="com.google.android.gms.version"
-94-->[com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:24:13-58
+94-->[com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:24:13-58
 95            android:value="@integer/google_play_services_version" />
-95-->[com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/007ea585e43f3750b4ea22ee46ad54a3/jetified-play-services-basement-17.3.0/AndroidManifest.xml:25:13-66
+95-->[com.google.android.gms:play-services-basement:17.3.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/1561581ad0dc3c51c9529b3488b9d7d4/jetified-play-services-basement-17.3.0/AndroidManifest.xml:25:13-66
 96    </application>
 97
 98</manifest>
