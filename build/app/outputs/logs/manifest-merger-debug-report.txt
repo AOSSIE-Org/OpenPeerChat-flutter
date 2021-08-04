@@ -6,6 +6,7 @@ INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/s
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:1:1-47:12
 MERGED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml:1:1-47:12
 MERGED from [:flutter_udid] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_udid/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
+MERGED from [:sqflite] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/sqflite/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:2:1-29:12
 MERGED from [androidx.multidex:multidex:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/49aada15a0281e208dd96bc549862073/multidex-2.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [com.google.android.gms:play-services-nearby:17.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/6bdceebf16407183e113cf05393acd46/jetified-play-services-nearby-17.0.0/AndroidManifest.xml:2:1-11:12
@@ -122,6 +123,8 @@ INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/s
 INJECTED from /media/tokoyama/Data/Documents/p2p-messaging-flutter/android/app/src/main/AndroidManifest.xml
 MERGED from [:flutter_udid] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_udid/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:flutter_udid] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_udid/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:sqflite] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/sqflite/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:sqflite] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/sqflite/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:flutter_nearby_connections] /media/tokoyama/Data/Documents/p2p-messaging-flutter/build/flutter_nearby_connections/intermediates/library_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [androidx.multidex:multidex:2.0.0] /home/tokoyama/.gradle/caches/transforms-2/files-2.1/49aada15a0281e208dd96bc549862073/multidex-2.0.0/AndroidManifest.xml:20:5-43

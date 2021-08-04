@@ -1,9 +1,10 @@
 
 
 class Msg {
-  String deviceId;
   String message;
-  String msgtype;
-
-  Msg(this.deviceId, this.message, this.msgtype);
+  String msgtype; //sent or received
+  String timestamp;
+  String ack='false';
+  String id;
+  Msg(this.message, this.msgtype,this.timestamp,this.id);
 }

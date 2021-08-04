@@ -1,8 +1,8 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 // import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter_nearby_connections_example/DatabaseHelper.dart';
 import 'package:flutter_nearby_connections_example/Payload.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +27,21 @@ class DevicesListScreen extends StatefulWidget {
 class _DevicesListScreenState extends State<DevicesListScreen> {
   bool isInit = false;
 
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
     init();
+    refreshMessages();
+    print(" 37 reloaded:"+ Global.cache.toString());
+  }
+  Future refreshMessages() async {
+    setState(() => isLoading = true);
+
+    readAllUpdateCache();
+    readAllUpdateConversation();
+    setState(() => isLoading = false);
   }
 
   @override
@@ -41,7 +52,24 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     Global.nearbyService!.stopAdvertisingPeer();
     super.dispose();
   }
-
+  var _selectedIndex = 0;
+  Widget getBody(BuildContext context) {
+    switch (_selectedIndex) {
+      case 0:
+        // return showTrips(context);
+      case 1:
+        // return search(widget.account);
+      case 2:
+        return Text('Not yet implemented!');
+      default:
+        throw UnimplementedError();
+    }
+  }
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,12 +91,16 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.group_work),
             title: Text("Available"),
+
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_box),
             title: Text("Profile"),
           ),
         ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
       ),
       body: Container(
           child: Column(
@@ -110,7 +142,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return ChatPage(device);
+                                    return ChatPage(device.deviceName);
                                   },
                                 ),
                               );
@@ -168,7 +200,6 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                               child: Center(
                                   child: Text(Global.messages[index].msgtype +
                                       ":" +
-                                      Global.messages[index].deviceId +
                                       " " +
                                       Global.messages[index].message)),
                             );
@@ -181,10 +212,6 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
       )),
     );
   }
-
-
-
-
 
   void init() async {
     initiateNearbyService();
@@ -239,20 +266,25 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           if (temp2["type"].toString() == 'Payload') {
             print("line 341");
 
-            Global.cache[temp2["id"]] = Payload(temp2["id"],temp2['sender'],
+            Global.cache[temp2["id"]] = Payload(temp2["id"], temp2['sender'],
                 temp2['receiver'], temp2['message'], temp2['Timestamp']);
+            insertIntoMessageTable(Payload(temp2["id"], temp2['sender'],
+                temp2['receiver'], temp2['message'], temp2['Timestamp']));
             print("current cache 344" + Global.cache.toString());
           } else {
             Global.cache[temp2["id"]] = Ack(temp2["id"]);
+            insertIntoMessageTable(Ack(temp2["id"]));
           }
         } else if (Global.cache[temp2["id"]].runtimeType == Payload) {
           if (temp2["type"] == 'Ack') {
             //broadcast Ack last time to neighbours
             Global.cache.remove(temp2["id"]);
+            deleteFromMessageTable(temp2["id"]);
           }
         } else {
           // cache has a ack form the same message id so i guess can keep track of the number of times we get acks?. currently ignore
           Global.cache.remove(temp2["id"]);
+          deleteFromMessageTable(temp2["id"]);
           ;
         }
         print("350|" +
@@ -262,14 +294,26 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
             ":" +
             Global.myName.toString());
         if (temp2['type'] == "Payload" && temp2['receiver'] == Global.myName) {
-          Global.cache[temp2["id"]]!.broadcast = false;
-          //send ack TODO
-          Global.cache[temp2["id"]] = Ack(temp2["id"]);
+          // Global.cache[temp2["id"]]!.broadcast = false;
+         if  (Global.conversations[ temp2['sender']]== null) {
+           Global.conversations[ temp2['sender']]= [];
+         }
+          Global.conversations[ temp2['sender']]!.add({temp2["id"]:Msg(temp2['message'],"received",temp2['Timestamp'],temp2["id"])});
+          insertIntoConversationsTable(Msg(temp2['message'],"received",temp2['Timestamp'],temp2["id"]), temp2['sender']);
+          if (Global.cache[temp2["id"]] == null) {
+            Global.cache[temp2["id"]] = Ack(temp2["id"]);
+            print("280 test");
+            insertIntoMessageTable(Ack(temp2['id']));
+          } else {
+            Global.cache[temp2["id"]] = Ack(temp2["id"]);
+            updateMessageTable(temp2["id"], Ack(temp2['id']));
+          }
+
           print("355: ack added");
-          Global.messages
-              .add(new Msg(data["deviceId"], data["message"], "received"));
-          Global.conversations[data["deviceId"]]!.ListOfMsgs
-              .add(new Msg(data["sender"], data["message"], "received"));
+          // Global.messages
+          //     .add(new Msg(data["deviceId"], data["message"], "received"));
+          // Global.conversations[data["deviceId"]]!.ListOfMsgs
+          //     .add(new Msg(data["sender"], data["message"], "received"));
         } else {
           // Global.devices.forEach((element) {
           //   Global.nearbyService!
