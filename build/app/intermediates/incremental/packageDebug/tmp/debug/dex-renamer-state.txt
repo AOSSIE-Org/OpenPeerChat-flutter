@@ -1,4 +1,4 @@
-#Wed Aug 04 11:23:05 IST 2021
+#Wed Aug 04 11:58:36 IST 2021
 base.1=/media/tokoyama/Data/Documents/p2p-messaging-flutter/build/app/intermediates/dex/debug/mergeDexDebug/classes2.dex
 path.1=classes2.dex
 base.0=/media/tokoyama/Data/Documents/p2p-messaging-flutter/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
