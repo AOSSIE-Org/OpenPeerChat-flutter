@@ -1,4 +1,4 @@
-package com.nankai.flutter_nearby_connections_example
+package com.aossie.p2p
 
 import io.flutter.embedding.android.FlutterActivity
 
