@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="out4">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/build/device_info/intermediates/merged_java_res/debug/out.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
