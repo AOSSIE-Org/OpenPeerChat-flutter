@@ -1,2 +1,0 @@
-com/nankai/flutter_nearby_connections/BuildConfig.java
- com.nankai.flutter_nearby_connections.BuildConfig

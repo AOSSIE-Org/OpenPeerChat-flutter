@@ -2,6 +2,7 @@
 
 # Peer-to-Peer Messaging Application
 
+
 GSoC pitch 2021.
 # Chosen Idea:
  A message sending/relaying messages to nearby devices until the destination is reached, instead of relying on a central server. GPS positioning could be used to route messages along the shortest path. Right now, despite the use of end-to-end encryption, our best and most popular messaging apps still rely on central servers to intermediate the communication. This has disadvantages such as:
@@ -102,20 +103,19 @@ There are 6 main parts the above idea can be broken into,
 - Send messages to multiple devices
 - Receive messages form mutliple devices
 - Normal chat interface built
- 
- 
- 
+ - Design the hop architecture
+ - each message needs a unique  ID
+ - Each message should be transmitted to other nodes using the above described gossip protocol
+     - For this Each device on the network must be able to “gossip”  and transmit the message to the destination
+ - Offline storage of undelivered messages: 
+ - If a ‘delivered’ callback is not received from the recipient the, the message is marked as undelivered, and its put in a local SQLite database(because SQLite has native support for android)
+ the sender device will ping for the recipient in small regular intervals thereafter and if it finds the device ‘online’ on the network then it'll retry to send the message.
+ Once the message has been delivered, it'll be marked as delivered.
+  
 ### To-Do
 - Each message should be broken into pieces and be able to assemble at destination
-- Design the hop architecture
-- each message needs a unique destination ID
-- Each message should be transmitted to other nodes using the above described gossip protocol
-    - For this Each device on the network must be able to “gossip”  and transmit the message to the destination
-when the message reaches its intended destination, it should be reassembled and displayed, and a response must be sent to the sender telling it that the message has been delivered
-- Offline storage of undelivered messages: 
-- If a ‘delivered’ callback is not received from the recipient the, the message is marked as undelivered, and its put in a local SQLite database(because SQLite has native support for android)
-the sender device will ping for the recipient in small regular intervals thereafter and if it finds the device ‘online’ on the network then it'll retry to send the message.
-Once the message has been delivered, it'll be marked as delivered.
- 
+
+
+- when the message reaches its intended destination, it should be reassembled and displayed, and a response must be sent to the sender telling it that the message has been delivered
+
 - Refining User interface .
- 
