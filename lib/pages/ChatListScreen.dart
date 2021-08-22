@@ -1,6 +1,8 @@
 import 'package:flutter_nearby_connections_example/database/DatabaseHelper.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_nearby_connections_example/p2p/MatrixServerModel.dart';
+import 'package:provider/provider.dart';
 
 import '../classes/Global.dart';
 
@@ -13,15 +15,15 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   bool isLoading = false;
-  List<String> conversers = [];
+  List<Contact> conversers = [];
 
   @override
   void initState() {
     super.initState();
     refreshMessages();
-    Global.conversations.forEach((key, value) {
-      conversers.add(key);
-    });
+    // Global.conversations.forEach((key, value) {
+    //   conversers.add(key);
+    // });
     print(" 37 reloaded:" + Global.cache.toString());
   }
 
@@ -36,6 +38,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var server = context.watch<MatrixServer>();
+    Future<void> getContacts() async {
+      var contacts = await server.getContactsList();
+      setState(() {
+        conversers = contacts;
+      });
+    }
+
+    getContacts();
     return Scaffold(
       appBar: AppBar(
         title: Text("Chats"),
@@ -108,7 +119,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             },
                             child: Column(
                               children: [
-                                Text(conversers[index]),
+                                Text(conversers[index].displayName),
                               ],
                               crossAxisAlignment: CrossAxisAlignment.start,
                             ),
