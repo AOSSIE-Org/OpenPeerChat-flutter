@@ -3,10 +3,10 @@ description: Demonstrates how to use the flutter_nearby_connections plugin.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -19,9 +19,7 @@ dependencies:
   nanoid: ^1.0.0
   sqflite: ^2.0.0+3
   intl: ^0.17.0
-  p2p_client_dart:
-    path: ../p2p-client/p2p-client-dart
-  provider: ^5.0.0
+
 
 dev_dependencies:
   flutter_test:

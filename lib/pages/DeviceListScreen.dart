@@ -7,7 +7,6 @@ import 'package:flutter_nearby_connections_example/classes/Payload.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
-import 'package:flutter_nearby_connections_example/p2p/MatrixServerModel.dart';
 import '../classes/Global.dart';
 
 import '../classes/Msg.dart';
@@ -35,9 +34,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     super.initState();
     init();
     refreshMessages();
-    print(" 37 reloaded:" + Global.cache.toString());
+    print(" 37 reloaded:"+ Global.cache.toString());
   }
-
   Future refreshMessages() async {
     setState(() => isLoading = true);
 
@@ -54,27 +52,24 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     Global.nearbyService!.stopAdvertisingPeer();
     super.dispose();
   }
-
   var _selectedIndex = 0;
   Widget getBody(BuildContext context) {
     switch (_selectedIndex) {
       case 0:
-      // return showTrips(context);
+        // return showTrips(context);
       case 1:
-      // return search(widget.account);
+        // return search(widget.account);
       case 2:
         return Text('Not yet implemented!');
       default:
         throw UnimplementedError();
     }
   }
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,6 +91,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.group_work),
             title: Text("Available"),
+
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_box),
@@ -145,7 +141,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return ChatPage(Contact(device.deviceName));
+                                    return ChatPage(device.deviceName);
                                   },
                                 ),
                               );
@@ -298,17 +294,11 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
             Global.myName.toString());
         if (temp2['type'] == "Payload" && temp2['receiver'] == Global.myName) {
           // Global.cache[temp2["id"]]!.broadcast = false;
-          if (Global.conversations[temp2['sender']] == null) {
-            Global.conversations[temp2['sender']] = [];
-          }
-          Global.conversations[temp2['sender']]!.add({
-            temp2["id"]: Msg(
-                temp2['message'], "received", temp2['Timestamp'], temp2["id"])
-          });
-          insertIntoConversationsTable(
-              Msg(temp2['message'], "received", temp2['Timestamp'],
-                  temp2["id"]),
-              temp2['sender']);
+         if  (Global.conversations[ temp2['sender']]== null) {
+           Global.conversations[ temp2['sender']]= [];
+         }
+          Global.conversations[ temp2['sender']]!.add({temp2["id"]:Msg(temp2['message'],"received",temp2['Timestamp'],temp2["id"])});
+          insertIntoConversationsTable(Msg(temp2['message'],"received",temp2['Timestamp'],temp2["id"]), temp2['sender']);
           if (Global.cache[temp2["id"]] == null) {
             Global.cache[temp2["id"]] = Ack(temp2["id"]);
             print("280 test");
