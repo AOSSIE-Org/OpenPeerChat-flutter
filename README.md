@@ -1,8 +1,5 @@
-# P2P Messaging Flutter
-
 # Peer-to-Peer Messaging Application
-
-
+ 
 GSoC pitch 2021.
 # Chosen Idea:
  A message sending/relaying messages to nearby devices until the destination is reached, instead of relying on a central server. GPS positioning could be used to route messages along the shortest path. Right now, despite the use of end-to-end encryption, our best and most popular messaging apps still rely on central servers to intermediate the communication. This has disadvantages such as:
@@ -23,6 +20,25 @@ Mentors: Bruno, Thuvarakan
 - The messages will be transferred using an optimal path using underlying network protocols.
 - Protocol to be used:  for hops, I will be using the gossip protocol, as it works even when devices are removed and added frequently.
 	the way the protocol works is:
+### The following have been implemented
+ 
+- Discover nearby devices
+- Connect to nearby devices
+- Send messages to multiple devices
+- Receive messages form mutliple devices
+- Normal chat interface built
+ - Designed the hop architecture (Push gossip protocol)
+ - each message has a unique  ID
+ - Each message should be transmitted to other nodes using the above described gossip protocol
+     - For this Each device on the network must be able to “gossip”  and transmit the message to the destination
+ - Offline storage of undelivered messages: 
+ - If a ‘delivered’ callback is not received from the recipient the, the message is marked as undelivered, and its put in a local SQLite database(because SQLite has native support for android)
+ the sender device will ping for the recipient in small regular intervals thereafter and if it finds the device ‘online’ on the network then it'll retry to send the message.
+ Once the message has been delivered, it'll be marked as delivered.
+ - RSA encryption has been implemented. The user can upload public keys of their friends and the message will be encypted using that. Thus messages are end to end encypted
+ 
+ 
+ 
 # Gossip Protocol
  
 - Multicast sender
@@ -74,7 +90,7 @@ That explains why COVID spread so quickly!
  - This is because it’s the fastest way to send a message. Construct a spanning tree with a constant degree of every node is O(log n).
  - Once this point is achieved, we find that the pull protocol is faster than the push protocol.
 - Let p(i) be the fraction of non-infected processes, after ith round, then
-
+ 
     p(i+1)=(p(i))^(k+1)
 - This is super-exponential.
  - Thus the second half of the gossip protocol finishes in O(log(log n))
@@ -97,25 +113,4 @@ There are 6 main parts the above idea can be broken into,
 - Have a Normal chat interface
 - use the 'hopping message' architecture to relay messages
 - offline storage of undelivered messages
-### In my demo app I have already completed implementing the following
-- Discover nearby devices
-- Connect to nearby devices
-- Send messages to multiple devices
-- Receive messages form mutliple devices
-- Normal chat interface built
- - Design the hop architecture
- - each message needs a unique  ID
- - Each message should be transmitted to other nodes using the above described gossip protocol
-     - For this Each device on the network must be able to “gossip”  and transmit the message to the destination
- - Offline storage of undelivered messages: 
- - If a ‘delivered’ callback is not received from the recipient the, the message is marked as undelivered, and its put in a local SQLite database(because SQLite has native support for android)
- the sender device will ping for the recipient in small regular intervals thereafter and if it finds the device ‘online’ on the network then it'll retry to send the message.
- Once the message has been delivered, it'll be marked as delivered.
-  
-### To-Do
-- Each message should be broken into pieces and be able to assemble at destination
-
-
-- when the message reaches its intended destination, it should be reassembled and displayed, and a response must be sent to the sender telling it that the message has been delivered
-
-- Refining User interface .
+ 

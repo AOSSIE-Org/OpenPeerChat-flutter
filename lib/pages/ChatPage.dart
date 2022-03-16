@@ -16,17 +16,19 @@ class ChatPage extends StatefulWidget {
   final String converser;
 
   @override
-  _ChatPageState createState() => _ChatPageState();
+  ChatPageState createState() => ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class ChatPageState extends State<ChatPage> {
   List<Msg> messageList = [];
-
+void refresh(){
+  setState(() {
+    ;
+  });
+}
   void initState() {
-    Global.conversations[widget.converser]!.forEach((element) {
-      element.forEach((key, value) {
-        messageList.add(value);
-      });
+    Global.conversations[widget.converser]!.forEach((key, value) {
+      messageList.add(value);
     });
   }
 
@@ -48,7 +50,7 @@ class _ChatPageState extends State<ChatPage> {
                 children: [
                   Container(
                     height: MediaQuery.of(context).size.height * .8,
-                    child:Global.conversations[widget.converser]==null? Text("no messages"): ListView.builder(
+                    child: messageList == null? Text("no messages"): ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
                       // reverse: true,
@@ -125,10 +127,10 @@ class _ChatPageState extends State<ChatPage> {
                           // Global
                           //     .conversations[widget.device.deviceName][msgId](new Msg(widget.device.deviceId,
                           //         myController.text, "sent"));
-                          Global.conversations[widget.converser]!.add({
-                            msgId: Msg(myController.text, "sent",
+                          Global.conversations[widget.converser]![msgId]=
+                            Msg(myController.text, "sent",
                                 data["Timestamp"]!, msgId)
-                          });
+                          ;
                           insertIntoConversationsTable(
                               Msg(myController.text, "sent", data["Timestamp"]!,
                                   msgId),
