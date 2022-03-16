@@ -19,6 +19,8 @@ dependencies:
   nanoid: ^1.0.0
   sqflite: ^2.0.0+3
   intl: ^0.17.0
+  rsa_encrypt: ^2.0.0
+  pointycastle: ^3.0.1
 
 
 dev_dependencies:

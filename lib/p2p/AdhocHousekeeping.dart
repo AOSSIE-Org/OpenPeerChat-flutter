@@ -56,6 +56,18 @@ int getItemCount() {
   return Global.devices.length;
 }
 
+bool search(String sender, String id) {
+  if(Global.conversations[sender]==null)
+    return false;
+
+    if (Global.conversations[sender]!.containsKey(id)) {
+      return true;
+
+  }
+
+  return false;
+}
+
 void connectToDevice(Device device) {
   switch (device.state) {
     case SessionState.notConnected:

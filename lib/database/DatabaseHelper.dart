@@ -2,25 +2,50 @@ import 'package:flutter_nearby_connections_example/classes/Global.dart';
 import 'package:flutter_nearby_connections_example/classes/Msg.dart';
 import 'dart:convert';
 import '../classes/Payload.dart';
-
+import 'package:pointycastle/api.dart' as crypto;
 import 'model.dart';
 import 'MessageDB.dart';
-void readAllUpdateConversation(){
-  List<ConversationFromDB> conversations = [ConversationFromDB("1", "2","3", "5", "6", "7")];
-  MessageDB.instance.readAllFromConversationsTable().then((value) {
-    conversations= value;
-    conversations.forEach((element) {
-      Global.conversations[element.converser]!.add({element.id:Msg(element.msg,element.type,element.timestamp,element.id)});
+
+Future <void> readAllUpdateConversation() async {
+  List<ConversationFromDB> conversations = [
+    ConversationFromDB("1", "2", "3", "5", "6", "7")
+  ];
+  var value = await MessageDB.instance.readAllFromConversationsTable();
+  conversations = value;
+  print("12:" + conversations.toString());
+  conversations.forEach((element) {
+    print(element.msg + ":14:" + element.type + element.timestamp);
+    if (Global.conversations[element.converser] == null) {
+      Global.conversations[element.converser] = Map();
+    }
+
+    Global.conversations[element.converser]![element.id] =
+        Msg(element.msg, element.type, element.timestamp, element.id);
+    // Global.conversations[element.converser]![element.id]=Msg(element.msg,element.type,element.timestamp,element.id);
+  });
+  print("19:" + Global.conversations.toString());
+}
+
+void readAllUpdatePublicKey() {
+  List<PublicKeyFromDB> publicKey = [PublicKeyFromDB("1", "2")];
+  MessageDB.instance.readAllFromPublicKeyTable().then((value) {
+    publicKey = value;
+
+    publicKey.forEach((element) {
+      Global.publicKeys[element.converser] = element.publicKey;
       // Global.conversations[element.converser]![element.id]=Msg(element.msg,element.type,element.timestamp,element.id);
     });
   });
 }
+
 void readAllUpdateCache() {
   List<MessageFromDB> messages = [MessageFromDB("1", "2", "3")];
   MessageDB.instance.readAllFromMessagesTable().then((value) {
     messages = value;
     print("10 tablevalues");
-    value.forEach((element) {print("_id ${element.id} type ${element.type} msg: ${element.msg}\n");});
+    value.forEach((element) {
+      print("_id ${element.id} type ${element.type} msg: ${element.msg}\n");
+    });
     print(value);
     messages.forEach((element) {
       print("line 16 dbhelper");
@@ -29,9 +54,8 @@ void readAllUpdateCache() {
       else
         Global.cache[element.id] = convertToPayload(element);
     });
-    print("reloaded cache #22 "+Global.cache.toString());
+    print("reloaded cache #22 " + Global.cache.toString());
   });
-
 }
 
 void insertIntoMessageTable(dynamic msg) {
@@ -40,8 +64,10 @@ void insertIntoMessageTable(dynamic msg) {
   else
     MessageDB.instance.insertIntoMessagesTable(convertFromAck(msg));
 }
-void insertIntoConversationsTable(Msg msg,String converser) {
-    MessageDB.instance.insertIntoConversationsTable(ConversationFromDB(msg.id,msg.msgtype,msg.message,msg.timestamp,msg.ack,converser));
+
+void insertIntoConversationsTable(Msg msg, String converser) {
+  MessageDB.instance.insertIntoConversationsTable(ConversationFromDB(
+      msg.id, msg.msgtype, msg.message, msg.timestamp, msg.ack, converser));
 }
 
 void deleteFromMessageTable(String id) {
@@ -65,7 +91,7 @@ Payload convertToPayload(MessageFromDB message) {
   String payload = message.msg;
   print("#61: ${payload}");
   var json = jsonDecode(payload);
-  print("#63"+json.toString());
+  print("#63" + json.toString());
   print("#62 ${json['id']}| ${json['sender']}");
   return Payload(
       id, json['sender'], json['receiver'], json['message'], json['timestamp']);
@@ -82,7 +108,7 @@ MessageFromDB convertFromPayload(Payload msg) {
     "sender": msg.sender,
     "receiver": msg.receiver
   };
-  print("#80"+jsonEncode(message));
+  print("#80" + jsonEncode(message));
   return MessageFromDB(id, type, jsonEncode(message));
 }
 
@@ -93,5 +119,5 @@ MessageFromDB convertFromAck(Ack msg) {
     "id": msg.id,
     "type": msg.type,
   };
-  return MessageFromDB(id, type,jsonEncode(message));
+  return MessageFromDB(id, type, jsonEncode(message));
 }

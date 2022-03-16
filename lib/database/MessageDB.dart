@@ -12,7 +12,7 @@ class MessageDB {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('P2P.db');
+    _database = await _initDB('p2p.db');
     return _database!;
   }
 
@@ -27,6 +27,8 @@ class MessageDB {
         'CREATE TABLE $messagesTableName(_id PRIMARY KEY, type TEXT NOT NULL,msg TEXT NOT NULL);');
     await db.execute(
         'CREATE TABLE $conversationsTableName(_id PRIMARY KEY, converser TEXT NOT NULL,type TEXT NOT NULL,msg TEXT NOT NULL,timestamp TEXT NOT NULL, ack TEXT NOT NULL);');
+    await db.execute(
+        'CREATE TABLE $publicKeyTableName( converser TEXT NOT NULL,publicKey TEXT NOT NULL);');
   }
 
   void insertIntoMessagesTable(MessageFromDB message) async {
@@ -65,7 +67,13 @@ class MessageDB {
     else
       return null;
   }
-
+  Future<List<PublicKeyFromDB>> readAllFromPublicKeyTable() async {
+    final db = await instance.database;
+    final result = await db.query(
+      publicKeyTableName,
+    );
+    return result.map((json) => PublicKeyFromDB.fromJson(json)).toList();
+  }
   Future<List<MessageFromDB>> readAllFromMessagesTable() async {
     final db = await instance.database;
     final result = await db.query(
