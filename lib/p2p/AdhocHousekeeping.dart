@@ -1,31 +1,30 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:developer';
 
 // import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_nearby_connections_example/classes/Payload.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import '../classes/Global.dart';
-import '../classes/Msg.dart';
 
 String getStateName(SessionState state) {
   switch (state) {
     case SessionState.notConnected:
-      return "disconnected";
+      return "Disconnected";
     case SessionState.connecting:
-      return "waiting";
+      return "Waiting";
     default:
-      return "connected";
+      return "Connected";
   }
 }
 
 String getButtonStateName(SessionState state) {
   switch (state) {
     case SessionState.notConnected:
-    case SessionState.connecting:
       return "Connect";
+    case SessionState.connecting:
+      return "Connecting";
     default:
       return "Disconnect";
   }
@@ -45,8 +44,9 @@ Color getStateColor(SessionState state) {
 Color getButtonColor(SessionState state) {
   switch (state) {
     case SessionState.notConnected:
-    case SessionState.connecting:
       return Colors.green;
+    case SessionState.connecting:
+      return Colors.yellow;
     default:
       return Colors.red;
   }
@@ -57,12 +57,10 @@ int getItemCount() {
 }
 
 bool search(String sender, String id) {
-  if(Global.conversations[sender]==null)
-    return false;
+  if (Global.conversations[sender] == null) return false;
 
-    if (Global.conversations[sender]!.containsKey(id)) {
-      return true;
-
+  if (Global.conversations[sender]!.containsKey(id)) {
+    return true;
   }
 
   return false;
@@ -75,6 +73,7 @@ void connectToDevice(Device device) {
         deviceID: device.deviceId,
         deviceName: device.deviceName,
       );
+      log("Want to connect");
       break;
     case SessionState.connected:
       Global.nearbyService!.disconnectPeer(deviceID: device.deviceId);

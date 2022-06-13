@@ -91,15 +91,15 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
-            title: Text("Chats"),
+            label: "Chats",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.group_work),
-            title: Text("Available"),
+            label: "Available",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_box),
-            title: Text("Profile"),
+            label: "Profile",
           ),
         ],
         currentIndex: _selectedIndex,
@@ -190,7 +190,6 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                         height: 1,
                         color: Colors.grey,
                       ),
-                      Text("hello"),
                       ListView.builder(
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
@@ -288,7 +287,6 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           // cache has a ack form the same message id so i guess can keep track of the number of times we get acks?. currently ignore
           Global.cache.remove(temp2["id"]);
           deleteFromMessageTable(temp2["id"]);
-          ;
         }
         print("350|" +
             temp2['type'].toString() +
