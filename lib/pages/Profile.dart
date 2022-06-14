@@ -3,6 +3,7 @@ import 'package:flutter_nearby_connections_example/pages/DeviceListScreen.dart';
 import 'package:nanoid/nanoid.dart';
 import '../classes/Global.dart';
 import 'DeviceListScreen.dart';
+
 class Profile extends StatelessWidget {
   TextEditingController myName = TextEditingController();
   var custom_length_id = nanoid(6);
@@ -36,14 +37,16 @@ class Profile extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            ElevatedButton(onPressed: () {
-              // Global.myName = myName.text+custom_length_id;
-              Global.myName = myName.text;
-              Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (_) => DevicesListScreen(deviceType: DeviceType.browser)));
-
-            }, child: Text("Save"))
+            ElevatedButton(
+              onPressed: () {
+                // Global.myName = myName.text+custom_length_id;
+                Global.myName = myName.text;
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) =>
+                        DevicesListScreen(deviceType: DeviceType.browser)));
+              },
+              child: Text("Save"),
+            )
           ],
         ),
       ),
