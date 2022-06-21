@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:flutter_nearby_connections_example/classes/Payload.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
+import 'package:flutter_nearby_connections_example/database/MessageDB.dart';
 import '../classes/Global.dart';
 
 String getStateName(SessionState state) {
@@ -126,6 +127,30 @@ void broadcast() async {
   }
 }
 
+// Sending request message to the connected devices to recieve fresh messages that are yet to be recieved
+void broadcastLastMessageID() async {
+  // From Database get the last message.
+  String id = await MessageDB.instance.getLastMessageId(type: "received");
+  log("Last message id: " + id);
+
+  Global.devices.forEach((element) async {
+    var data = {
+      "sender": Global.myName,
+      "receiver": element.deviceName,
+      "message": "__update__",
+      "id": id,
+      "Timestamp": DateTime.now().toString(),
+      "type": "Update"
+    };
+    var toSend = jsonEncode(data);
+
+    log("270" + toSend);
+    await Global.nearbyService!
+        .sendMessage(element.deviceId, toSend); //make this async
+  });
+}
+
+// Initiating NearbyService to start the connection
 void initiateNearbyService() async {
   Global.nearbyService = NearbyService();
   await Global.nearbyService!.init(
