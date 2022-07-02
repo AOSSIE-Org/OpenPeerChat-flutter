@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'pages/Profile.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MyApp(),
+  );
 }
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -10,7 +12,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 }
 
 class MyApp extends StatelessWidget {
-  void initState() {}
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

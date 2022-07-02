@@ -1,6 +1,7 @@
 final String messagesTableName = 'messages';
 final String conversationsTableName = 'conversations';
-final String publicKeyTableName='publicKey';
+final String publicKeyTableName = 'publicKey';
+
 class MessageTableFields {
   static final List<String> values = [id, type, msg];
   static final String type = 'type';

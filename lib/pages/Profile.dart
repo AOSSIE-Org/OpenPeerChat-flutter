@@ -10,8 +10,10 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  // TextEditingController for the name of the user
   TextEditingController myName = TextEditingController();
 
+  // Custom generated id for the user
   var customLengthId = nanoid(6);
 
   @override
@@ -48,6 +50,8 @@ class _ProfileState extends State<Profile> {
               onPressed: () {
                 // Global.myName = myName.text+custom_length_id;
                 Global.myName = myName.text;
+
+                // On pressing, move to the device list screen
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) =>
