@@ -20,11 +20,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
     super.initState();
     readAllUpdateCache();
     readAllUpdateConversation().then((value) {
-      print("34" + Global.conversations.toString());
+      // print("34" + Global.conversations.toString());
 
       Global.conversations.forEach((key, value) {
         conversers.add(key);
       });
+
       print(" 37 reloaded:" + Global.cache.toString());
     });
     // print("34" + Global.conversations.toString());
@@ -109,7 +110,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return ChatPage(conversers[index]);
+                                    return ChatPage(
+                                      converser: conversers[index],
+                                    );
                                   },
                                 ),
                               );
