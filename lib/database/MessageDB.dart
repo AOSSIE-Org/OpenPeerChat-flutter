@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'model.dart';
@@ -33,14 +35,34 @@ class MessageDB {
 
   void insertIntoMessagesTable(MessageFromDB message) async {
     final db = await instance.database;
-    final id = await db.insert(messagesTableName, message.toJson());
+    await db.insert(messagesTableName, message.toJson());
     return;
   }
+
   void insertIntoConversationsTable(ConversationFromDB message) async {
     final db = await instance.database;
-    final id = await db.insert(conversationsTableName, message.toJson());
+    await db.insert(conversationsTableName, message.toJson());
     return;
   }
+
+  // Function to get last message id from the database
+  // in the conversation table
+  // The type can be modified based on the type of message
+  // that is being sent or received
+  Future<String> getLastMessageId({required String type}) async {
+    final db = await instance.database;
+    final message = await db.query(
+      conversationsTableName,
+      where: '${ConversationTableFields.type}=?',
+      whereArgs: [type],
+      orderBy: '${ConversationTableFields.timestamp} DESC',
+      limit: 1,
+    );
+    log(message.toString());
+    if (message.isEmpty) return "-1"; // If error in database.
+    return MessageFromDB.fromJson(message[0]).id;
+  }
+
   Future<MessageFromDB?> readFromMessagesTable(int id) async {
     final db = await instance.database;
     final maps = await db.query(
@@ -54,6 +76,7 @@ class MessageDB {
     else
       return null;
   }
+
   Future<ConversationFromDB?> readFromConversationsTable(int id) async {
     final db = await instance.database;
     final maps = await db.query(
@@ -67,6 +90,7 @@ class MessageDB {
     else
       return null;
   }
+
   Future<List<PublicKeyFromDB>> readAllFromPublicKeyTable() async {
     final db = await instance.database;
     final result = await db.query(
@@ -74,6 +98,7 @@ class MessageDB {
     );
     return result.map((json) => PublicKeyFromDB.fromJson(json)).toList();
   }
+
   Future<List<MessageFromDB>> readAllFromMessagesTable() async {
     final db = await instance.database;
     final result = await db.query(
@@ -81,6 +106,7 @@ class MessageDB {
     );
     return result.map((json) => MessageFromDB.fromJson(json)).toList();
   }
+
   Future<List<ConversationFromDB>> readAllFromConversationsTable() async {
     final db = await instance.database;
     final result = await db.query(
@@ -88,11 +114,13 @@ class MessageDB {
     );
     return result.map((json) => ConversationFromDB.fromJson(json)).toList();
   }
+
   Future<int> updateMessageTable(MessageFromDB msg) async {
     final db = await instance.database;
     return db.update(messagesTableName, msg.toJson(),
         where: '${MessageTableFields.id}=?', whereArgs: [msg.id]);
   }
+
   Future<int> updateConversationTable(ConversationFromDB msg) async {
     final db = await instance.database;
     return db.update(conversationsTableName, msg.toJson(),
@@ -104,11 +132,13 @@ class MessageDB {
     return db.delete(messagesTableName,
         where: '${MessageTableFields.id}=?', whereArgs: [id]);
   }
+
   Future<int> deleteFromConversationsTable(String id) async {
     final db = await instance.database;
     return db.delete(conversationsTableName,
         where: '${ConversationTableFields.id}=?', whereArgs: [id]);
   }
+
   Future close() async {
     final db = await instance.database;
     db.close();
