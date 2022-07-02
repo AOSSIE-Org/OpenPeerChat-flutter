@@ -1,17 +1,14 @@
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_nearby_connections_example/classes/Payload.dart';
 import 'package:nanoid/nanoid.dart';
-import 'package:intl/intl.dart';
 
 import '../database/DatabaseHelper.dart';
 import '../classes/Msg.dart';
 import '../classes/Global.dart';
 
 class ChatPage extends StatefulWidget {
-  ChatPage(this.converser);
+  ChatPage({Key? key, required this.converser});
 
   final String converser;
 
@@ -21,11 +18,21 @@ class ChatPage extends StatefulWidget {
 
 class ChatPageState extends State<ChatPage> {
   List<Msg> messageList = [];
+  TextEditingController myController = TextEditingController();
+
+  // Function to fetch messages every time new message is sent
   void refreshMessages() {
     if (Global.conversations[widget.converser] != null) {
+      messageList = [];
       Global.conversations[widget.converser]!.forEach((key, value) {
         messageList.add(value);
       });
+      if (_scrollController.hasClients)
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent + 100,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
     }
   }
 
@@ -38,7 +45,6 @@ class ChatPageState extends State<ChatPage> {
   ScrollController _scrollController = new ScrollController();
 
   Widget build(BuildContext context) {
-    TextEditingController myController = TextEditingController();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -53,15 +59,16 @@ class ChatPageState extends State<ChatPage> {
             children: [
               Container(
                 height: MediaQuery.of(context).size.height * .8,
-                child: messageList == null
-                    ? Text("no messages")
+                child: messageList.isEmpty
+                    ? Center(
+                        child: Text('No messages yet'),
+                      )
                     : ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
-                        // reverse: true,
                         controller: _scrollController,
                         padding: const EdgeInsets.all(8),
-                        itemCount: messageList == null ? 0 : messageList.length,
+                        itemCount: messageList.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
                             height: 55,
@@ -71,10 +78,11 @@ class ChatPageState extends State<ChatPage> {
                                     nip: BubbleNip.rightTop,
                                     color: Color(0xffd1c4e9),
                                     child: Text(
-                                        messageList[index].msgtype +
-                                            ": " +
-                                            messageList[index].message,
-                                        textAlign: TextAlign.right),
+                                      messageList[index].msgtype +
+                                          ": " +
+                                          messageList[index].message,
+                                      textAlign: TextAlign.right,
+                                    ),
                                   )
                                 : Bubble(
                                     nip: BubbleNip.leftTop,
@@ -109,7 +117,6 @@ class ChatPageState extends State<ChatPage> {
                     "Timestamp": "${DateTime.now().toUtc().toString()}",
                     "type": "Payload"
                   };
-                  var Mesagedata = data.toString();
                   Global.cache[msgId] = Payload(
                       msgId,
                       Global.myName,
@@ -129,17 +136,22 @@ class ChatPageState extends State<ChatPage> {
                   // Global.nearbyService!
                   //     .sendMessage(widget.device.deviceId, myController.text);
                   setState(() {
-                    // Global
-                    //     .conversations[widget.device.deviceName][msgId](new Msg(widget.device.deviceId,
-                    //         myController.text, "sent"));
+                    // Global.conversations[widget.device.deviceName]![msgId](
+                    //     new Msg(
+                    //         widget.device.deviceId, myController.text, "sent"));
+                    if (Global.conversations[widget.converser] == null) {
+                      Global.conversations[widget.converser] = {};
+                    }
                     Global.conversations[widget.converser]![msgId] = Msg(
                         myController.text, "sent", data["Timestamp"]!, msgId);
+
                     insertIntoConversationsTable(
                         Msg(myController.text, "sent", data["Timestamp"]!,
                             msgId),
                         widget.converser);
                   });
                   refreshMessages();
+                  myController.clear();
                 },
                 child: Text("send"),
               ),
