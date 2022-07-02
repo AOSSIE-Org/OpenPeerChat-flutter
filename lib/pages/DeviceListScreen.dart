@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 // import 'package:device_info_plus/device_info_plus.dart';
@@ -34,7 +36,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     super.initState();
     init();
     refreshMessages();
-    print(" 37 reloaded:" + Global.cache.toString());
+    // print(" 37 reloaded:" + Global.cache.toString());
+    // checkForMessageUpdates();
   }
 
   Future refreshMessages() async {
@@ -47,7 +50,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
 
   @override
   void dispose() {
-    Global.subscription!.cancel();
+    Global.deviceSubscription!.cancel();
     Global.receivedDataSubscription!.cancel();
     Global.nearbyService!.stopBrowsingForPeers();
     Global.nearbyService!.stopAdvertisingPeer();
@@ -56,18 +59,18 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
 
   var _selectedIndex = 0;
 
-  Widget getBody(BuildContext context) {
-    switch (_selectedIndex) {
-      case 0:
-      // return showTrips(context);
-      case 1:
-      // return search(widget.account);
-      case 2:
-        return Text('Not yet implemented!');
-      default:
-        throw UnimplementedError();
-    }
-  }
+  // Widget getBody(BuildContext context) {
+  //   switch (_selectedIndex) {
+  //     case 0:
+  //     // return showTrips(context);
+  //     case 1:
+  //     // return search(widget.account);
+  //     case 2:
+  //       return Text('Not yet implemented!');
+  //     default:
+  //       throw UnimplementedError();
+  //   }
+  // }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -106,64 +109,46 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
         onTap: _onItemTapped,
       ),
       body: Container(
+        child: SingleChildScrollView(
           child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Search...",
-                hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade600,
-                  size: 20,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Search...",
+                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.grey.shade600,
+                      size: 20,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                    contentPadding: EdgeInsets.all(8),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: Colors.grey.shade100)),
+                  ),
                 ),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                contentPadding: EdgeInsets.all(8),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade100)),
               ),
-            ),
-          ),
-          ListView.builder(
-              itemCount: getItemCount(),
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                final device = Global.devices[index];
-                return Container(
-                  margin: EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                              child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return ChatPage(device.deviceName);
-                                  },
-                                ),
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Text(device.deviceName),
-                                Text(
-                                  getStateName(device.state),
-                                  style: TextStyle(
-                                      color: getStateColor(device.state)),
-                                ),
-                              ],
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                            ),
-                          )),
-                          // Request connect
-                          GestureDetector(
+              ListView.builder(
+                itemCount: getItemCount(),
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final device = Global.devices[index];
+                  return Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(device.deviceName),
+                          subtitle: Text(
+                            getStateName(device.state),
+                            style:
+                                TextStyle(color: getStateColor(device.state)),
+                          ),
+                          trailing: GestureDetector(
                             onTap: () => connectToDevice(device),
                             child: Container(
                               margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -180,47 +165,41 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                                 ),
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8.0,
-                      ),
-                      Divider(
-                        height: 1,
-                        color: Colors.grey,
-                      ),
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.all(8),
-                          itemCount: Global.messages.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              height: 15,
-                              // color: Colors.amber[colorCodes[index]],
-                              child: Center(
-                                  child: Text(Global.messages[index].msgtype +
-                                      ":" +
-                                      " " +
-                                      Global.messages[index].message)),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return ChatPage(
+                                    converser: device.deviceName,
+                                  );
+                                },
+                              ),
                             );
-                          }),
-                    ],
-                  ),
-                );
-              })
-        ],
-      )),
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  void init() async {
-    initiateNearbyService();
-    Global.subscription =
+  // Check for devices in proximity
+  void checkDevices() {
+    Global.deviceSubscription =
         Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
       devicesList.forEach((element) {
-        if (element.state != SessionState.connected) connectToDevice(element);
+        // if (element.state != SessionState.connected) connectToDevice(element);
         print(
             "deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
 
@@ -242,85 +221,109 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
             .toList());
       });
     });
-    broadcast();
+  }
+
+  // The function responsible for receiving the messages
+  void init() async {
+    initiateNearbyService();
+    checkDevices();
+    broadcastLastMessageID();
     Global.receivedDataSubscription =
         Global.nearbyService!.dataReceivedSubscription(callback: (data) {
-      print("dataReceivedSubscription: ${jsonEncode(data)}");
-
-      showToast(jsonEncode(data),
-          context: context,
-          axis: Axis.horizontal,
-          alignment: Alignment.center,
-          position: StyledToastPosition.bottom);
-      // Global.devices.forEach((element) {
-      //   Global.nearbyService!
-      //       .sendMessage(element.deviceId, data["message"].toString());});
-
+      var decodedMessage = jsonDecode(data['message']);
+      showToast(
+        jsonEncode(data),
+        context: context,
+        axis: Axis.horizontal,
+        alignment: Alignment.center,
+        position: StyledToastPosition.bottom,
+      );
+      if (decodedMessage["type"] == "Update") {
+        log("Update Message ${decodedMessage["id"]}");
+        String sentDeviceName = decodedMessage["sender"];
+        compareMessageId(
+          receivedId: decodedMessage["id"],
+          sentDeviceName: sentDeviceName,
+        );
+      }
       setState(() {
-        String temp = data['message'];
-        var temp2 = jsonDecode(temp);
-        print("331: " + temp2['receiver'].toString());
-        print("332:" + temp2['type'].toString());
-        print("333|" + Global.myName.toString());
-        print(data['message'] + "can u hear meeeeeeeeeeeeeeeeeeeeeeeeeeeeee?");
-        if (Global.cache.containsKey(temp2["id"]) == false) {
-          print("line 338 test");
-          if (temp2["type"].toString() == 'Payload') {
-            print("line 341");
+        // print("331: " + temp2['receiver'].toString());
+        // print("332:" + temp2['type'].toString());
+        // print("333|" + Global.myName.toString());
+        // print(data['message'] + "can u hear meeeeeeeeeeeeeeeeeeeeeeeeeeeeee?");
+        if (Global.cache.containsKey(decodedMessage["id"]) == false) {
+          // print("line 338 test");
 
-            Global.cache[temp2["id"]] = Payload(temp2["id"], temp2['sender'],
-                temp2['receiver'], temp2['message'], temp2['Timestamp']);
-            insertIntoMessageTable(Payload(temp2["id"], temp2['sender'],
-                temp2['receiver'], temp2['message'], temp2['Timestamp']));
-            print("current cache 344" + Global.cache.toString());
+          if (decodedMessage["type"].toString() == 'Payload') {
+            // print("line 341");
+
+            Global.cache[decodedMessage["id"]] = Payload(
+                decodedMessage["id"],
+                decodedMessage['sender'],
+                decodedMessage['receiver'],
+                decodedMessage['message'],
+                decodedMessage['Timestamp']);
+            insertIntoMessageTable(Payload(
+                decodedMessage["id"],
+                decodedMessage['sender'],
+                decodedMessage['receiver'],
+                decodedMessage['message'],
+                decodedMessage['Timestamp']));
+            // print("current cache 344" + Global.cache.toString());
           } else {
-            Global.cache[temp2["id"]] = Ack(temp2["id"]);
-            insertIntoMessageTable(Ack(temp2["id"]));
+            Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
+            insertIntoMessageTable(Ack(decodedMessage["id"]));
           }
-        } else if (Global.cache[temp2["id"]].runtimeType == Payload) {
-          if (temp2["type"] == 'Ack') {
+        } else if (Global.cache[decodedMessage["id"]].runtimeType == Payload) {
+          if (decodedMessage["type"] == 'Ack') {
             //broadcast Ack last time to neighbours
-            Global.cache.remove(temp2["id"]);
-            deleteFromMessageTable(temp2["id"]);
+            Global.cache.remove(decodedMessage["id"]);
+            deleteFromMessageTable(decodedMessage["id"]);
           }
         } else {
           // cache has a ack form the same message id so i guess can keep track of the number of times we get acks?. currently ignore
-          Global.cache.remove(temp2["id"]);
-          deleteFromMessageTable(temp2["id"]);
+          Global.cache.remove(decodedMessage["id"]);
+          deleteFromMessageTable(decodedMessage["id"]);
         }
         print("350|" +
-            temp2['type'].toString() +
+            decodedMessage['type'].toString() +
             ":Payload |" +
-            temp2['receiver'].toString() +
+            decodedMessage['receiver'].toString() +
             ":" +
             Global.myName.toString());
-        if (temp2['type'] == "Payload" && temp2['receiver'] == Global.myName) {
+        if (decodedMessage['type'] == "Payload" &&
+            decodedMessage['receiver'] == Global.myName) {
           // Global.cache[temp2["id"]]!.broadcast = false;
-          if (Global.conversations[temp2['sender']] == null) {
-            Global.conversations[temp2['sender']] = Map();
+          if (Global.conversations[decodedMessage['sender']] == null) {
+            Global.conversations[decodedMessage['sender']] = Map();
           }
-          if (!search(temp2['sender'], temp2["id"])) {
-            Global.conversations[temp2['sender']]![temp2["id"]] = Msg(
-                temp2['message'], "received", temp2['Timestamp'], temp2["id"]);
+          // If message type Payload, then add to cache and to conversations table
+          // if not already present
+          if (!search(
+              decodedMessage['sender'], decodedMessage["id"], context)) {
+            Global.conversations[decodedMessage['sender']]![
+                decodedMessage["id"]] = Msg(
+              decodedMessage['message'],
+              "received",
+              decodedMessage['Timestamp'],
+              decodedMessage["id"],
+            );
+
             insertIntoConversationsTable(
-                Msg(temp2['message'], "received", temp2['Timestamp'],
-                    temp2["id"]),
-                temp2['sender']);
+                Msg(decodedMessage['message'], "received",
+                    decodedMessage['Timestamp'], decodedMessage["id"]),
+                decodedMessage['sender']);
           }
-          if (Global.cache[temp2["id"]] == null) {
-            Global.cache[temp2["id"]] = Ack(temp2["id"]);
-            print("280 test");
-            insertIntoMessageTable(Ack(temp2['id']));
+          if (Global.cache[decodedMessage["id"]] == null) {
+            Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
+            // print("280 test");
+            insertIntoMessageTable(Ack(decodedMessage['id']));
           } else {
-            Global.cache[temp2["id"]] = Ack(temp2["id"]);
-            updateMessageTable(temp2["id"], Ack(temp2['id']));
+            Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
+            updateMessageTable(decodedMessage["id"], Ack(decodedMessage['id']));
           }
 
-          print("355: ack added");
-          // Global.messages
-          //     .add(new Msg(data["deviceId"], data["message"], "received"));
-          // Global.conversations[data["deviceId"]]!.ListOfMsgs
-          //     .add(new Msg(data["sender"], data["message"], "received"));
+          // print("355: ack added");
         } else {
           // Global.devices.forEach((element) {
           //   Global.nearbyService!
