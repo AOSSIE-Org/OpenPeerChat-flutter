@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections_example/components/message_panel.dart';
+import 'package:intl/intl.dart';
+import '../components/message_panel.dart';
 import 'package:provider/provider.dart';
 import '../classes/Msg.dart';
 import '../classes/Global.dart';
@@ -66,30 +65,33 @@ class ChatPageState extends State<ChatPage> {
                     padding: const EdgeInsets.all(8),
                     itemCount: messageList.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        height: 55,
-                        child: messageList[index].msgtype == 'sent'
-                            ? Bubble(
-                                margin: BubbleEdges.only(top: 10),
-                                nip: BubbleNip.rightTop,
-                                color: Color(0xffd1c4e9),
-                                child: Text(
-                                  messageList[index].msgtype +
-                                      ": " +
-                                      messageList[index].message,
-                                  textAlign: TextAlign.right,
-                                ),
-                              )
-                            : Bubble(
-                                nip: BubbleNip.leftTop,
-                                color: Color(0xff80DEEA),
-                                margin: BubbleEdges.only(top: 10),
-                                child: Text(
-                                  messageList[index].msgtype +
-                                      ": " +
-                                      messageList[index].message,
-                                ),
-                              ),
+                      return Bubble(
+                        margin: BubbleEdges.only(top: 10),
+                        nip: messageList[index].msgtype == 'sent'
+                            ? BubbleNip.rightTop
+                            : BubbleNip.leftTop,
+                        color: messageList[index].msgtype == 'sent'
+                            ? Color(0xffd1c4e9)
+                            : Color(0xff80DEEA),
+                        child: ListTile(
+                          dense: true,
+                          title: Text(
+                            messageList[index].msgtype +
+                                ": " +
+                                messageList[index].message,
+                            textAlign: messageList[index].msgtype == 'sent'
+                                ? TextAlign.right
+                                : TextAlign.left,
+                          ),
+                          subtitle: Text(
+                            dateFormatter(
+                              timeStamp: messageList[index].timestamp,
+                            ),
+                            textAlign: messageList[index].msgtype == 'sent'
+                                ? TextAlign.right
+                                : TextAlign.left,
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -99,4 +101,12 @@ class ChatPageState extends State<ChatPage> {
       ),
     );
   }
+}
+
+String dateFormatter({required String timeStamp}) {
+  // From timestamp to readable date and hour minutes
+  DateTime dateTime = DateTime.parse(timeStamp);
+  String formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
+  String formattedTime = DateFormat('HH:mm').format(dateTime);
+  return formattedDate + " " + formattedTime;
 }
