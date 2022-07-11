@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections_example/pages/DeviceListScreen.dart';
+import 'DeviceListScreen.dart';
+import 'HomeScreen.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../classes/Global.dart';
@@ -32,7 +33,7 @@ class _ProfileState extends State<Profile> {
       myName.text = name;
     });
     if (name.isNotEmpty && id.isNotEmpty) {
-      navigateToDeviceListScreen();
+      navigateToHomeScreen();
     } else {
       setState(() {
         loading = false;
@@ -40,14 +41,12 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  void navigateToDeviceListScreen() {
+  void navigateToHomeScreen() {
     Global.myName = myName.text;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => DevicesListScreen(
-          deviceType: DeviceType.browser,
-        ),
+        builder: (context) => HomeScreen(),
       ),
     );
   }
@@ -101,7 +100,7 @@ class _ProfileState extends State<Profile> {
                 prefs.setString('p_name', myName.text);
                 prefs.setString('p_id', customLengthId);
                 // On pressing, move to the device list screen
-                navigateToDeviceListScreen();
+                navigateToHomeScreen();
               },
               child: Text("Save"),
             )
