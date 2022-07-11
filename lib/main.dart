@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections_example/classes/Global.dart';
+import 'classes/Global.dart';
 import 'package:provider/provider.dart';
 import 'pages/Profile.dart';
 

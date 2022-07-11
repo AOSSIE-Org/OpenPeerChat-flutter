@@ -1,18 +1,7 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-
-// import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter_nearby_connections_example/database/DatabaseHelper.dart';
-import 'package:flutter_nearby_connections_example/classes/Payload.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:provider/provider.dart';
 import '../classes/Global.dart';
 
-import '../classes/Msg.dart';
 import 'ChatPage.dart';
 import '../p2p/AdhocHousekeeping.dart';
 
@@ -54,7 +43,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
   //   setState(() => isLoading = false);
   // }
 
-  var _selectedIndex = 0;
+  // var _selectedIndex = 0;
 
   // Widget getBody(BuildContext context) {
   //   switch (_selectedIndex) {
@@ -69,11 +58,11 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
   //   }
   // }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  // void _onItemTapped(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
