@@ -1,4 +1,6 @@
-import 'package:flutter_nearby_connections_example/database/DatabaseHelper.dart';
+import 'package:provider/provider.dart';
+
+import '../database/DatabaseHelper.dart';
 
 import 'package:flutter/material.dart';
 
@@ -19,15 +21,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   void initState() {
     super.initState();
     readAllUpdateCache();
-    readAllUpdateConversation().then((value) {
-      // print("34" + Global.conversations.toString());
 
-      Global.conversations.forEach((key, value) {
-        conversers.add(key);
-      });
-
-      print(" 37 reloaded:" + Global.cache.toString());
-    });
     // print("34" + Global.conversations.toString());
     //
     // Global.conversations.forEach((key, value) {
@@ -45,125 +39,53 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Chats"),
-      ),
-      backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.red,
-        unselectedItemColor: Colors.grey.shade600,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: "Chats",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group_work),
-            label: "Available",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_box),
-            label: "Profile",
-          ),
-        ],
-      ),
-      body: Container(
-          child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Search...",
-                hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade600,
-                  size: 20,
-                ),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                contentPadding: EdgeInsets.all(8),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade100)),
+    conversers = [];
+    Provider.of<Global>(context).conversations.forEach((key, value) {
+      conversers.add(key);
+    });
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: "Search...",
+              hintStyle: TextStyle(color: Colors.grey.shade600),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.grey.shade600,
+                size: 20,
               ),
+              filled: true,
+              fillColor: Colors.grey.shade100,
+              contentPadding: EdgeInsets.all(8),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Colors.grey.shade100)),
             ),
           ),
-          ListView.builder(
+        ),
+        Expanded(
+          child: ListView.builder(
               itemCount: conversers.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                return Container(
-                  margin: EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                              child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return ChatPage(
-                                      converser: conversers[index],
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Text(conversers[index]),
-                              ],
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                            ),
-                          )),
-                          // Request connect
-                        ],
+                return ListTile(
+                  title: Text(conversers[index]),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatPage(
+                          converser: conversers[index],
+                        ),
                       ),
-                      SizedBox(
-                        height: 8.0,
-                      ),
-                      Divider(
-                        height: 1,
-                        color: Colors.grey,
-                      ),
-                      Text("hello"),
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.all(8),
-                          itemCount: Global.messages.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              height: 15,
-                              // color: Colors.amber[colorCodes[index]],
-                              child: Center(
-                                  child: Text(Global.messages[index].msgtype +
-                                      ":" +
-                                      " " +
-                                      Global.messages[index].message)),
-                            );
-                          }),
-                    ],
-                  ),
+                    );
+                  },
                 );
-              })
-        ],
-      )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add your onPressed code here!
-        },
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.green,
-      ),
+              }),
+        )
+      ],
     );
   }
 }

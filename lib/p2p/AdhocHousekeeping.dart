@@ -7,6 +7,7 @@ import 'package:flutter_nearby_connections_example/classes/Payload.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:flutter_nearby_connections_example/database/MessageDB.dart';
+import 'package:provider/provider.dart';
 import '../classes/Global.dart';
 
 // Get the state name of the connection
@@ -58,17 +59,27 @@ Color getButtonColor(SessionState state) {
 }
 
 // Get the number of devices
-int getItemCount() {
-  return Global.devices.length;
+int getItemCount(BuildContext context) {
+  return Provider.of<Global>(context, listen: false).devices.length;
 }
 
 // Check if the id exists in the conversation list
 bool search(String sender, String id, BuildContext context) {
-  if (Global.conversations[sender] == null) return false;
+  // if (Global.conversations[sender] == null) return false;
 
-  if (Global.conversations[sender]!.containsKey(id)) {
-    return true;
+  // if (Global.conversations[sender]!.containsKey(id)) {
+  //   return true;
+  // }
+  // Get from Provider
+  if (Provider.of<Global>(context, listen: false).conversations[sender] !=
+      null) {
+    if (Provider.of<Global>(context, listen: false)
+        .conversations[sender]!
+        .containsKey(id)) {
+      return true;
+    }
   }
+
   return false;
 }
 
@@ -101,7 +112,7 @@ void startAdvertising() async {
 }
 
 // this function is supposed to broadcast all messages in the cache when the message ids don't match
-void broadcast() async {
+void broadcast(BuildContext context) async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
@@ -115,13 +126,13 @@ void broadcast() async {
         "type": "Payload"
       };
       var toSend = jsonEncode(data);
-      Global.devices.forEach((element) {
+      Provider.of<Global>(context, listen: false).devices.forEach((element) {
         print("270" + toSend);
         Global.nearbyService!
             .sendMessage(element.deviceId, toSend); //make this async
       });
     } else if (value.runtimeType == Ack) {
-      Global.devices.forEach((element) {
+      Provider.of<Global>(context, listen: false).devices.forEach((element) {
         var data = {"id": "$key", "type": "Ack"};
         Global.nearbyService!.sendMessage(element.deviceId, jsonEncode(data));
       });
@@ -131,13 +142,15 @@ void broadcast() async {
 }
 
 // Broadcasting update request message to the connected devices to recieve fresh messages that are yet to be recieved
-void broadcastLastMessageID() async {
+void broadcastLastMessageID(BuildContext context) async {
   // Fetch from Database the last message.
   Timer.periodic(Duration(seconds: 3), (timer) async {
     String id = await MessageDB.instance.getLastMessageId(type: "received");
     log("Last message id: " + id);
 
-    Global.devices.forEach((element) async {
+    Provider.of<Global>(context, listen: false)
+        .devices
+        .forEach((element) async {
       var data = {
         "sender": Global.myName,
         "receiver": element.deviceName,
@@ -180,10 +193,11 @@ void broadcastLastMessageID() async {
 void compareMessageId({
   required String receivedId,
   required String sentDeviceName,
+  required BuildContext context,
 }) async {
   String sentId = await MessageDB.instance.getLastMessageId(type: "sent");
   if (sentId != receivedId) {
-    broadcast();
+    broadcast(context);
   }
 }
 
