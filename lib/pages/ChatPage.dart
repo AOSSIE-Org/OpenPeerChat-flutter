@@ -107,6 +107,6 @@ String dateFormatter({required String timeStamp}) {
   // From timestamp to readable date and hour minutes
   DateTime dateTime = DateTime.parse(timeStamp);
   String formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
-  String formattedTime = DateFormat('HH:mm').format(dateTime);
+  String formattedTime = DateFormat('hh:mm aa').format(dateTime);
   return formattedDate + " " + formattedTime;
 }
