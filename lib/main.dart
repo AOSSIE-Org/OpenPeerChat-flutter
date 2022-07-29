@@ -17,13 +17,18 @@ void main() {
 }
 
 Route<dynamic> generateRoute(RouteSettings settings) {
-  return MaterialPageRoute(builder: (_) => Profile());
+  return MaterialPageRoute(
+    builder: (_) => Profile(
+      onLogin: true,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       onGenerateRoute: generateRoute,
       initialRoute: '/',
     );

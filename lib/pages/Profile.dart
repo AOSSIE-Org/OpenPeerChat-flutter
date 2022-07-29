@@ -1,15 +1,14 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'DeviceListScreen.dart';
 import 'HomeScreen.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../classes/Global.dart';
-import 'DeviceListScreen.dart';
 
 class Profile extends StatefulWidget {
+  final bool onLogin;
+
+  const Profile({Key? key, required this.onLogin}) : super(key: key);
   @override
   State<Profile> createState() => _ProfileState();
 }
@@ -31,8 +30,9 @@ class _ProfileState extends State<Profile> {
     final id = prefs.getString('p_id') ?? '';
     setState(() {
       myName.text = name;
+      customLengthId = id.isNotEmpty ? id : customLengthId;
     });
-    if (name.isNotEmpty && id.isNotEmpty) {
+    if (name.isNotEmpty && id.isNotEmpty && widget.onLogin) {
       navigateToHomeScreen();
     } else {
       setState(() {
@@ -43,12 +43,17 @@ class _ProfileState extends State<Profile> {
 
   void navigateToHomeScreen() {
     Global.myName = myName.text;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(),
-      ),
-    );
+    if (!widget.onLogin) {
+      Global.myName = myName.text;
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    }
   }
 
   @override
@@ -100,6 +105,7 @@ class _ProfileState extends State<Profile> {
                 prefs.setString('p_name', myName.text);
                 prefs.setString('p_id', customLengthId);
                 // On pressing, move to the device list screen
+
                 navigateToHomeScreen();
               },
               child: Text("Save"),
