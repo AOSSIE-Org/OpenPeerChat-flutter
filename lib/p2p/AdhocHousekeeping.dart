@@ -108,7 +108,7 @@ void startAdvertising() async {
 }
 
 // this function is supposed to broadcast all messages in the cache when the message ids don't match
-void broadcast(BuildContext context) async {
+void broadcast() async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
@@ -122,13 +122,19 @@ void broadcast(BuildContext context) async {
         "type": "Payload"
       };
       var toSend = jsonEncode(data);
-      Provider.of<Global>(context, listen: false).devices.forEach((element) {
+      Provider.of<Global>(
+        Global.scaffoldKey.currentState!.context,
+        listen: false,
+      ).devices.forEach((element) {
         print("270" + toSend);
         Global.nearbyService!
             .sendMessage(element.deviceId, toSend); //make this async
       });
     } else if (value.runtimeType == Ack) {
-      Provider.of<Global>(context, listen: false).devices.forEach((element) {
+      Provider.of<Global>(Global.scaffoldKey.currentState!.context,
+              listen: false)
+          .devices
+          .forEach((element) {
         var data = {"id": "$key", "type": "Ack"};
         Global.nearbyService!.sendMessage(element.deviceId, jsonEncode(data));
       });
@@ -175,7 +181,7 @@ void compareMessageId({
 }) async {
   String sentId = await MessageDB.instance.getLastMessageId(type: "sent");
   if (sentId != receivedId) {
-    broadcast(context);
+    broadcast();
   }
 }
 

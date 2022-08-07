@@ -37,40 +37,27 @@ class _MessagePanelState extends State<MessagePanel> {
               "type": "Payload"
             };
             Global.cache[msgId] = Payload(
+              msgId,
+              Global.myName,
+              widget.converser,
+              myController.text,
+              DateTime.now().toUtc().toString(),
+            );
+            insertIntoMessageTable(
+              Payload(
                 msgId,
                 Global.myName,
                 widget.converser,
                 myController.text,
-                DateTime.now().toUtc().toString());
-            insertIntoMessageTable(Payload(
-                msgId,
-                Global.myName,
-                widget.converser,
-                myController.text,
-                DateTime.now().toUtc().toString()));
-            // Global.devices.forEach((element) {
-            //   Global.nearbyService!
-            //       .sendMessage(element.deviceId, Mesagedata);
-            // });
-            // Global.nearbyService!
-            //     .sendMessage(widget.device.deviceId, myController.text);
-            setState(() {
-              // Global.conversations[widget.device.deviceName]![msgId](
-              //     new Msg(
-              //         widget.device.deviceId, myController.text, "sent"));
-              Provider.of<Global>(context, listen: false).sentToConversations(
-                  Msg(myController.text, "sent", data["Timestamp"]!, msgId),
-                  widget.converser);
-              // if (Global.conversations[widget.converser] == null) {
-              //   Global.conversations[widget.converser] = {};
-              // }
-              // Global.conversations[widget.converser]![msgId] =
-              //     Msg(myController.text, "sent", data["Timestamp"]!, msgId);
+                DateTime.now().toUtc().toString(),
+              ),
+            );
 
-              // insertIntoConversationsTable(
-              //     Msg(myController.text, "sent", data["Timestamp"]!, msgId),
-              //     widget.converser);
-            });
+            Provider.of<Global>(context, listen: false).sentToConversations(
+              Msg(myController.text, "sent", data["Timestamp"]!, msgId),
+              widget.converser,
+            );
+
             // refreshMessages();
             myController.clear();
           },

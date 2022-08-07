@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
+import 'package:flutter_nearby_connections_example/p2p/AdhocHousekeeping.dart';
 import '../database/DatabaseHelper.dart';
 import 'Msg.dart';
 
@@ -37,6 +38,8 @@ class Global extends ChangeNotifier {
       insertIntoConversationsTable(msg, converser);
     }
     notifyListeners();
+    // First push the new message for one time when new message is sent
+    broadcast();
   }
 
   void receivedToConversations(dynamic decodedMessage, BuildContext context) {
