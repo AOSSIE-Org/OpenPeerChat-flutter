@@ -21,21 +21,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   void initState() {
     super.initState();
     readAllUpdateCache();
-
-    // print("34" + Global.conversations.toString());
-    //
-    // Global.conversations.forEach((key, value) {
-    //   conversers.add(key);
-    // });
-    // print(" 37 reloaded:" + Global.cache.toString());
   }
-
-  // void refreshMessages()  {
-  //   setState(() => isLoading = true);
-  //
-  //
-  //   setState(() => isLoading = false);
-  // }
 
   @override
   Widget build(BuildContext context) {
