@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import '../database/DatabaseHelper.dart';
 import 'Msg.dart';
@@ -21,7 +22,8 @@ class Global extends ChangeNotifier {
   Map<String, Map<String, Msg>> conversations = Map();
   static String myName = '';
   static Map<String, dynamic> cache = Map();
-
+  static final GlobalKey<ScaffoldState> scaffoldKey =
+      GlobalKey<ScaffoldState>();
   // Global({
   //   this.conversations = Map,
   // });
