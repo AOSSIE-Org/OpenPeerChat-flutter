@@ -108,7 +108,7 @@ void startAdvertising() async {
 }
 
 // this function is supposed to broadcast all messages in the cache when the message ids don't match
-void broadcast() async {
+void broadcast(BuildContext context) async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
@@ -123,7 +123,7 @@ void broadcast() async {
       };
       var toSend = jsonEncode(data);
       Provider.of<Global>(
-        Global.scaffoldKey.currentState!.context,
+        context,
         listen: false,
       ).devices.forEach((element) {
         print("270" + toSend);
@@ -131,10 +131,7 @@ void broadcast() async {
             .sendMessage(element.deviceId, toSend); //make this async
       });
     } else if (value.runtimeType == Ack) {
-      Provider.of<Global>(Global.scaffoldKey.currentState!.context,
-              listen: false)
-          .devices
-          .forEach((element) {
+      Provider.of<Global>(context, listen: false).devices.forEach((element) {
         var data = {"id": "$key", "type": "Ack"};
         Global.nearbyService!.sendMessage(element.deviceId, jsonEncode(data));
       });
@@ -181,11 +178,11 @@ void compareMessageId({
 }) async {
   String sentId = await MessageDB.instance.getLastMessageId(type: "sent");
   if (sentId != receivedId) {
-    broadcast();
+    broadcast(context);
   }
 }
 
-void checkDevices() {
+void checkDevices(BuildContext context) {
   Global.deviceSubscription =
       Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
     devicesList.forEach((element) {
@@ -201,26 +198,23 @@ void checkDevices() {
         }
       }
     });
-    Provider.of<Global>(Global.scaffoldKey.currentState!.context, listen: false)
-        .updateDevices(devicesList);
-    Provider.of<Global>(Global.scaffoldKey.currentState!.context, listen: false)
-        .updateConnectedDevices(devicesList
-            .where((d) => d.state == SessionState.connected)
-            .toList());
+    Provider.of<Global>(context, listen: false).updateDevices(devicesList);
+    Provider.of<Global>(context, listen: false).updateConnectedDevices(
+        devicesList.where((d) => d.state == SessionState.connected).toList());
     log('Devices length: ${devicesList.length}');
   });
 }
 
-void init() async {
+void init(BuildContext context) async {
   initiateNearbyService();
-  checkDevices();
-  broadcastLastMessageID(Global.scaffoldKey.currentState!.context);
+  checkDevices(context);
+  broadcastLastMessageID(context);
   Global.receivedDataSubscription =
       Global.nearbyService!.dataReceivedSubscription(callback: (data) {
     var decodedMessage = jsonDecode(data['message']);
     showToast(
       jsonEncode(data),
-      context: Global.scaffoldKey.currentState!.context,
+      context: context,
       axis: Axis.horizontal,
       alignment: Alignment.center,
       position: StyledToastPosition.bottom,
@@ -231,7 +225,7 @@ void init() async {
       compareMessageId(
         receivedId: decodedMessage["id"],
         sentDeviceName: sentDeviceName,
-        context: Global.scaffoldKey.currentState!.context,
+        context: context,
       );
     }
 
@@ -270,10 +264,8 @@ void init() async {
         Global.myName.toString());
     if (decodedMessage['type'] == "Payload" &&
         decodedMessage['receiver'] == Global.myName) {
-      Provider.of<Global>(Global.scaffoldKey.currentState!.context,
-              listen: false)
-          .receivedToConversations(
-              decodedMessage, Global.scaffoldKey.currentState!.context);
+      Provider.of<Global>(context, listen: false)
+          .receivedToConversations(decodedMessage, context);
       if (Global.cache[decodedMessage["id"]] == null) {
         Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
         insertIntoMessageTable(Ack(decodedMessage['id']));

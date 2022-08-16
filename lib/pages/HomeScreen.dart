@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    init();
+    // init(context);
     refreshMessages();
   }
 
@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     readAllUpdateConversation(context);
-    init();
+    init(context);
   }
 
   @override

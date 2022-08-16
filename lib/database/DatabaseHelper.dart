@@ -15,18 +15,13 @@ Future<void> readAllUpdateConversation(BuildContext context) async {
   var value = await MessageDB.instance.readAllFromConversationsTable();
   conversations = value;
   conversations.forEach((element) {
-    // if (Global.conversations[element.converser] == null) {
-    //   Global.conversations[element.converser] = Map();
-    // }
     Provider.of<Global>(context, listen: false).sentToConversations(
       Msg(element.msg, element.type, element.timestamp, element.id),
       element.converser,
       addToTable: false,
     );
-    // Global.conversations[element.converser]![element.id] =
-    //     Msg(element.msg, element.type, element.timestamp, element.id);
+    Msg(element.msg, element.type, element.timestamp, element.id);
   });
-  // print("19:" + Global.conversations.toString());
 }
 
 void readAllUpdatePublicKey() {
@@ -36,7 +31,6 @@ void readAllUpdatePublicKey() {
 
     publicKey.forEach((element) {
       Global.publicKeys[element.converser] = element.publicKey;
-      // Global.conversations[element.converser]![element.id]=Msg(element.msg,element.type,element.timestamp,element.id);
     });
   });
 }

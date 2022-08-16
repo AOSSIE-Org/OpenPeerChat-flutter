@@ -39,7 +39,7 @@ class Global extends ChangeNotifier {
     }
     notifyListeners();
     // First push the new message for one time when new message is sent
-    broadcast();
+    broadcast(scaffoldKey.currentContext!);
   }
 
   void receivedToConversations(dynamic decodedMessage, BuildContext context) {
