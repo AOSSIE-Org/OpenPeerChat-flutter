@@ -6,8 +6,10 @@ import 'dart:developer';
 import 'package:flutter_nearby_connections_example/classes/Payload.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
+import 'package:flutter_nearby_connections_example/database/MessageDB.dart';
 import '../classes/Global.dart';
 
+// Get the state name of the connection
 String getStateName(SessionState state) {
   switch (state) {
     case SessionState.notConnected:
@@ -19,6 +21,7 @@ String getStateName(SessionState state) {
   }
 }
 
+// Get the button state name of the connection
 String getButtonStateName(SessionState state) {
   switch (state) {
     case SessionState.notConnected:
@@ -30,6 +33,7 @@ String getButtonStateName(SessionState state) {
   }
 }
 
+// Get the state colour of the connection
 Color getStateColor(SessionState state) {
   switch (state) {
     case SessionState.notConnected:
@@ -41,6 +45,7 @@ Color getStateColor(SessionState state) {
   }
 }
 
+// Get the button state colour of the connection
 Color getButtonColor(SessionState state) {
   switch (state) {
     case SessionState.notConnected:
@@ -52,20 +57,22 @@ Color getButtonColor(SessionState state) {
   }
 }
 
+// Get the number of devices
 int getItemCount() {
   return Global.devices.length;
 }
 
-bool search(String sender, String id) {
+// Check if the id exists in the conversation list
+bool search(String sender, String id, BuildContext context) {
   if (Global.conversations[sender] == null) return false;
 
   if (Global.conversations[sender]!.containsKey(id)) {
     return true;
   }
-
   return false;
 }
 
+// Function to connect to a device
 void connectToDevice(Device device) {
   switch (device.state) {
     case SessionState.notConnected:
@@ -93,49 +100,105 @@ void startAdvertising() async {
   await Global.nearbyService!.startAdvertisingPeer();
 }
 
-// this function is supposed to broadcast all messages in the cache which is set to broadcast=true
+// this function is supposed to broadcast all messages in the cache when the message ids don't match
 void broadcast() async {
-  while (true) {
-    Global.cache.forEach((key, value) {
-      // if a message is supposed to be broadcasted to all devices in proximity then
-      if (value.runtimeType == Payload && value.broadcast) {
-        Payload payload = value;
-        var data = {
-          "sender": value.sender,
-          "receiver": payload.receiver,
-          "message": value.message,
-          "id": key,
-          "Timestamp": value.timestamp,
-          "type": "Payload"
-        };
-        var toSend = jsonEncode(data);
-        Global.devices.forEach((element) {
-          print("270" + toSend);
-          Global.nearbyService!
-              .sendMessage(element.deviceId, toSend); //make this async
-        });
-      } else if (value.runtimeType == Ack) {
-        Global.devices.forEach((element) {
-          var data = {"id": "$key", "type": "Ack"};
-          Global.nearbyService!.sendMessage(element.deviceId, jsonEncode(data));
-        });
-      }
+  Global.cache.forEach((key, value) {
+    // if a message is supposed to be broadcasted to all devices in proximity then
+    if (value.runtimeType == Payload && value.broadcast) {
+      Payload payload = value;
+      var data = {
+        "sender": value.sender,
+        "receiver": payload.receiver,
+        "message": value.message,
+        "id": key,
+        "Timestamp": value.timestamp,
+        "type": "Payload"
+      };
+      var toSend = jsonEncode(data);
+      Global.devices.forEach((element) {
+        print("270" + toSend);
+        Global.nearbyService!
+            .sendMessage(element.deviceId, toSend); //make this async
+      });
+    } else if (value.runtimeType == Ack) {
+      Global.devices.forEach((element) {
+        var data = {"id": "$key", "type": "Ack"};
+        Global.nearbyService!.sendMessage(element.deviceId, jsonEncode(data));
+      });
+    }
+  });
+  print("current cache:" + Global.cache.toString());
+}
+
+// Broadcasting update request message to the connected devices to recieve fresh messages that are yet to be recieved
+void broadcastLastMessageID() async {
+  // Fetch from Database the last message.
+  Timer.periodic(Duration(seconds: 3), (timer) async {
+    String id = await MessageDB.instance.getLastMessageId(type: "received");
+    log("Last message id: " + id);
+
+    Global.devices.forEach((element) async {
+      var data = {
+        "sender": Global.myName,
+        "receiver": element.deviceName,
+        "message": "__update__",
+        "id": id,
+        "Timestamp": DateTime.now().toString(),
+        "type": "Update"
+      };
+      var toSend = jsonEncode(data);
+
+      log("270" + toSend);
+      await Global.nearbyService!.sendMessage(
+        element.deviceId,
+        toSend,
+      );
     });
-    print("current cache:" + Global.cache.toString());
-    await Future.delayed(Duration(seconds: 10));
+  });
+}
+
+// void checkForMessageUpdates() async {
+//   broadcastLastMessageID();
+//   Global.receivedDataSubscription!.onData((data) {
+//     // print("dataReceivedSubscription: ${jsonEncode(data)}");
+//     var decodedMessage = jsonDecode(data["message"]);
+
+//     // checking if successfully recieving the update or not
+//     if (decodedMessage["type"] == "Update") {
+//       log("Update Message ${decodedMessage["id"]}");
+//       String sentDeviceName = decodedMessage["sender"];
+//       compareMessageId(
+//         receivedId: decodedMessage["id"],
+//         sentDeviceName: sentDeviceName,
+//       );
+//     }
+//   });
+// }
+
+// Compare message Ids
+// If they are not same, the message needs to be broadcasted.
+void compareMessageId({
+  required String receivedId,
+  required String sentDeviceName,
+}) async {
+  String sentId = await MessageDB.instance.getLastMessageId(type: "sent");
+  if (sentId != receivedId) {
+    broadcast();
   }
 }
 
+// Initiating NearbyService to start the connection
 void initiateNearbyService() async {
   Global.nearbyService = NearbyService();
   await Global.nearbyService!.init(
-      serviceType: 'mpconn',
-      deviceName: Global.myName,
-      strategy: Strategy.P2P_CLUSTER,
-      callback: (isRunning) async {
-        if (isRunning) {
-          startAdvertising();
-          startBrowsing();
-        }
-      });
+    serviceType: 'mpconn',
+    deviceName: Global.myName,
+    strategy: Strategy.P2P_CLUSTER,
+    callback: (isRunning) async {
+      if (isRunning) {
+        startAdvertising();
+        startBrowsing();
+      }
+    },
+  );
 }

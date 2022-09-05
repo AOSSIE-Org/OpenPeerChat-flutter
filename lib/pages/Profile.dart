@@ -4,9 +4,18 @@ import 'package:nanoid/nanoid.dart';
 import '../classes/Global.dart';
 import 'DeviceListScreen.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  // TextEditingController for the name of the user
   TextEditingController myName = TextEditingController();
-  var custom_length_id = nanoid(6);
+
+  // Custom generated id for the user
+  var customLengthId = nanoid(6);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +25,7 @@ class Profile extends StatelessWidget {
             SizedBox(
               height: 100,
             ),
-            Text("Your Username will be your name+$custom_length_id"),
+            Text("Your Username will be your name+$customLengthId"),
             TextFormField(
               controller: myName,
               decoration: const InputDecoration(
@@ -41,9 +50,14 @@ class Profile extends StatelessWidget {
               onPressed: () {
                 // Global.myName = myName.text+custom_length_id;
                 Global.myName = myName.text;
-                Navigator.of(context).push(MaterialPageRoute(
+
+                // On pressing, move to the device list screen
+                Navigator.of(context).push(
+                  MaterialPageRoute(
                     builder: (_) =>
-                        DevicesListScreen(deviceType: DeviceType.browser)));
+                        DevicesListScreen(deviceType: DeviceType.browser),
+                  ),
+                );
               },
               child: Text("Save"),
             )

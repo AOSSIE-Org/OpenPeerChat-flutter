@@ -2,11 +2,10 @@ import 'package:flutter_nearby_connections_example/classes/Global.dart';
 import 'package:flutter_nearby_connections_example/classes/Msg.dart';
 import 'dart:convert';
 import '../classes/Payload.dart';
-import 'package:pointycastle/api.dart' as crypto;
 import 'model.dart';
 import 'MessageDB.dart';
 
-Future <void> readAllUpdateConversation() async {
+Future<void> readAllUpdateConversation() async {
   List<ConversationFromDB> conversations = [
     ConversationFromDB("1", "2", "3", "5", "6", "7")
   ];
@@ -21,9 +20,8 @@ Future <void> readAllUpdateConversation() async {
 
     Global.conversations[element.converser]![element.id] =
         Msg(element.msg, element.type, element.timestamp, element.id);
-    // Global.conversations[element.converser]![element.id]=Msg(element.msg,element.type,element.timestamp,element.id);
   });
-  print("19:" + Global.conversations.toString());
+  // print("19:" + Global.conversations.toString());
 }
 
 void readAllUpdatePublicKey() {
@@ -58,6 +56,7 @@ void readAllUpdateCache() {
   });
 }
 
+// Inserting message to the messages table in the database
 void insertIntoMessageTable(dynamic msg) {
   if (msg.runtimeType == Payload)
     MessageDB.instance.insertIntoMessagesTable(convertFromPayload(msg));
@@ -65,6 +64,7 @@ void insertIntoMessageTable(dynamic msg) {
     MessageDB.instance.insertIntoMessagesTable(convertFromAck(msg));
 }
 
+// Inserting message to the conversation table in the database
 void insertIntoConversationsTable(Msg msg, String converser) {
   MessageDB.instance.insertIntoConversationsTable(ConversationFromDB(
       msg.id, msg.msgtype, msg.message, msg.timestamp, msg.ack, converser));
@@ -89,7 +89,7 @@ Ack convertToAck(MessageFromDB msg) {
 Payload convertToPayload(MessageFromDB message) {
   String id = message.id;
   String payload = message.msg;
-  print("#61: ${payload}");
+  print("#61: $payload");
   var json = jsonDecode(payload);
   print("#63" + json.toString());
   print("#62 ${json['id']}| ${json['sender']}");
