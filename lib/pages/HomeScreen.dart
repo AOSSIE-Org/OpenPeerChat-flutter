@@ -1,3 +1,8 @@
+/// This the home screen. This can also be considered as the
+///  main screen of the application.
+/// As the app launches and navigates to the HomeScreen from the Profile screen,
+/// all the processes of message hopping are being initiated from this page.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections_example/pages/Profile.dart';
 import 'ChatListScreen.dart';
@@ -15,8 +20,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isInit = false;
-
   bool isLoading = false;
 
   @override
@@ -26,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     refreshMessages();
   }
 
+  /// After reading all the cache, the home screen becomes visible.
   Future refreshMessages() async {
     setState(() => isLoading = true);
 
@@ -40,6 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
     init(context);
   }
 
+  /// When the messaging is done, the services
+  /// or the subscrption needs to be closed
+  /// Hence the deviceSubscription stream is cancelled.
+  /// Also the nearby services are stopped.
   @override
   void dispose() {
     Global.deviceSubscription!.cancel();
@@ -56,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         key: Global.scaffoldKey,
         appBar: AppBar(
-          title: Text("P2P Messaging"),
+          title: Text("P2P Messaging - AOSSIE"),
           actions: [
             IconButton(
               icon: Icon(Icons.settings),

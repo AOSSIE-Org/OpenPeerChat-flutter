@@ -1,3 +1,5 @@
+/// This file has some utility functions for the
+/// retrieval and saving of messages in the database.
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 

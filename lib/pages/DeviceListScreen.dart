@@ -1,3 +1,9 @@
+/// This is the DeviceListScreen page. This page task is to display the
+/// devices in the range that are active now. It is used to manage the
+/// connection between devices. We can either connect or disconnect
+/// with any device in the range.
+/// This is the Frontend of the Devices management, the backend is managed
+/// with the help of Provider and AdhocHouseKeeping.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../classes/Global.dart';
@@ -53,9 +59,11 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
               ),
             ),
             ListView.builder(
+              // Builds a screen with list of devices in the proximity
               itemCount: Provider.of<Global>(context).devices.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
+                // Getting a device from the provider
                 final device = Provider.of<Global>(context).devices[index];
                 return Container(
                   margin: EdgeInsets.all(8.0),
@@ -68,6 +76,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                           style: TextStyle(color: getStateColor(device.state)),
                         ),
                         trailing: GestureDetector(
+                          // GestureDetector act as onPressed() and enables
+                          // to connect/disconnect with any device
                           onTap: () => connectToDevice(device),
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -86,6 +96,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                           ),
                         ),
                         onTap: () {
+                          // On clicking any device tile, we navigate to the
+                          // ChatPage.
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) {

@@ -1,3 +1,6 @@
+/// This component is used in the ChatPage.
+/// It is the message bar where the message is typed on and sent to
+/// connected devices.
 import 'package:flutter/material.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:provider/provider.dart';

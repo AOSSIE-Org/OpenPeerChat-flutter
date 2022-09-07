@@ -1,3 +1,5 @@
+/// This is the Adhoc part where the messages are received and sent.
+/// Each and every function have there purpose mentioned above them.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -97,6 +99,7 @@ void connectToDevice(Device device) {
   }
 }
 
+// Start discovering devices
 void startBrowsing() async {
   await Global.nearbyService!.stopBrowsingForPeers();
   await Global.nearbyService!.startBrowsingForPeers();
@@ -107,7 +110,8 @@ void startAdvertising() async {
   await Global.nearbyService!.startAdvertisingPeer();
 }
 
-// this function is supposed to broadcast all messages in the cache when the message ids don't match
+// This function is supposed to broadcast all messages in the cache
+// when the message ids don't match
 void broadcast(BuildContext context) async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
@@ -140,7 +144,8 @@ void broadcast(BuildContext context) async {
   print("current cache:" + Global.cache.toString());
 }
 
-// Broadcasting update request message to the connected devices to recieve fresh messages that are yet to be recieved
+// Broadcasting update request message to the connected devices to receive
+// fresh messages that are yet to be recieved
 void broadcastLastMessageID(BuildContext context) async {
   // Fetch from Database the last message.
   Timer.periodic(Duration(seconds: 3), (timer) async {
@@ -182,6 +187,7 @@ void compareMessageId({
   }
 }
 
+//
 void checkDevices(BuildContext context) {
   Global.deviceSubscription =
       Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
@@ -205,6 +211,8 @@ void checkDevices(BuildContext context) {
   });
 }
 
+// The the protocol service. It receives the messages from the
+// dataReceivedSubscription service and decode it.
 void init(BuildContext context) async {
   initiateNearbyService();
   checkDevices(context);

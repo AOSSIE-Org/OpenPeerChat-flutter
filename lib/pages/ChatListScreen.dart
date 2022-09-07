@@ -1,3 +1,5 @@
+/// This is ChatListScreen. This screen lists all the Devices with which the
+/// device has chat with and keeps all the previous messages records.
 import 'package:provider/provider.dart';
 
 import '../database/DatabaseHelper.dart';
@@ -16,7 +18,7 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   bool isLoading = false;
   List<String> conversers = [];
-
+  // In the init state, we need to update the cache everytime.
   @override
   void initState() {
     super.initState();
@@ -25,6 +27,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Whenever the the UI is built, each converser is added to the list
+    // from the conversations map that stores the key as name of the device.
+    // The names are inserted into the list conversers here and then displayed
+    // with the help of ListView.builder.
     conversers = [];
     Provider.of<Global>(context).conversations.forEach((key, value) {
       conversers.add(key);
@@ -59,6 +65,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 return ListTile(
                   title: Text(conversers[index]),
                   onTap: () {
+                    // Whenever tapped on the Device tile, it navigates to the
+                    // chatpage
                     Navigator.push(
                       context,
                       MaterialPageRoute(

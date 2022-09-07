@@ -16,7 +16,11 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   // TextEditingController for the name of the user
   TextEditingController myName = TextEditingController();
+
+  // loading variable is used for UI purpose when the app is fetching
+  // user details
   bool loading = true;
+
   // Custom generated id for the user
   var customLengthId = nanoid(6);
 
@@ -41,6 +45,12 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+  // It is a general function to navigate to home screen.
+  // If we are first launching the app, we need to replace the profile page
+  // from the context and then open the home screen
+  // Otherwise we need to pop out the profile screen context
+  // from memory of the application. This is a flutter way
+  // to manage different contexts and screens.
   void navigateToHomeScreen() {
     Global.myName = myName.text;
     if (!widget.onLogin) {
@@ -59,6 +69,7 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
+    // At the launch we are fetching details using the getDetails function
     getDetails();
   }
 
@@ -104,8 +115,8 @@ class _ProfileState extends State<Profile> {
                 // saving the name and id to shared preferences
                 prefs.setString('p_name', myName.text);
                 prefs.setString('p_id', customLengthId);
-                // On pressing, move to the device list screen
 
+                // On pressing, move to the home screen
                 navigateToHomeScreen();
               },
               child: Text("Save"),

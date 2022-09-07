@@ -1,3 +1,7 @@
+/// This is the ChatPage. This screen consists of the chat with a single device
+/// with whom we had chat. The messages are saved in the database and
+/// retrieved from the same using the Provider state management as it allows
+/// real time messaging.
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -32,6 +36,8 @@ class ChatPageState extends State<ChatPage> {
   ScrollController _scrollController = new ScrollController();
 
   Widget build(BuildContext context) {
+    /// If we have previously conversed with the device, it is going to store
+    /// the conversations in the messageList
     if (Provider.of<Global>(context).conversations[widget.converser] != null) {
       messageList = [];
       Provider.of<Global>(context)
@@ -39,6 +45,8 @@ class ChatPageState extends State<ChatPage> {
           .forEach((key, value) {
         messageList.add(value);
       });
+      // Since there can be long list of message, the scroll controller
+      // auto scrolls to bottom of the list.
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent + 50,
@@ -60,6 +68,7 @@ class ChatPageState extends State<ChatPage> {
                     child: Text('No messages yet'),
                   )
                 : ListView.builder(
+                    // Builder to view messages chronologically
                     shrinkWrap: true,
                     controller: _scrollController,
                     padding: const EdgeInsets.all(8),
@@ -103,6 +112,7 @@ class ChatPageState extends State<ChatPage> {
   }
 }
 
+// Function to format the date in viewable form
 String dateFormatter({required String timeStamp}) {
   // From timestamp to readable date and hour minutes
   DateTime dateTime = DateTime.parse(timeStamp);

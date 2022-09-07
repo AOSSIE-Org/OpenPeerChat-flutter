@@ -1,7 +1,7 @@
-import 'dart:async';
-import 'dart:developer';
+/// It the Global state management class.
+/// This is used over all the application.
 
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:flutter_nearby_connections_example/p2p/AdhocHousekeeping.dart';
