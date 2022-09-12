@@ -49,3 +49,12 @@ Now the application saves the user name and unique id(automatically generated) i
 Here is the video for the working application.
 
 https://drive.google.com/file/d/1Egv-RhbZmwLcs0yskrFm4Ym8IX44D1qg/view?usp=sharing
+
+## APK Link
+https://drive.google.com/file/d/1fBfJO6akTe_-GXhvtEcr_qd59W7Ah5YG/view?usp=sharing
+
+## Project Link
+https://gitlab.com/aossie/p2p-messaging-flutter
+
+## GSOC 2022 Branch Link
+https://gitlab.com/aossie/p2p-messaging-flutter/-/tree/gsoc-2022
