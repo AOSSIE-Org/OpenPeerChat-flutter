@@ -58,15 +58,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
-            title: Text("Chats"),
+            label: "Chats"
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.group_work),
-            title: Text("Available"),
+            label: "Available"
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_box),
-            title: Text("Profile"),
+            label: "Profile"
           ),
         ],
       ),
