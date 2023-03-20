@@ -21,7 +21,7 @@ dependencies:
   intl: ^0.17.0
   rsa_encrypt: ^2.0.0
   pointycastle: ^3.0.1
-
+  p2p_client_dart: ^1.0.4
 
 dev_dependencies:
   flutter_test:
