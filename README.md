@@ -1,6 +1,6 @@
 # Peer-to-Peer Messaging Application
  
-GSoC pitch 2021.
+GSoC pitch 2023.
 # Chosen Idea:
  A message sending/relaying messages to nearby devices until the destination is reached, instead of relying on a central server. GPS positioning could be used to route messages along the shortest path. Right now, despite the use of end-to-end encryption, our best and most popular messaging apps still rely on central servers to intermediate the communication. This has disadvantages such as:
 * Authorities can censor the use of the messaging application by targeting the operator of the servers.
