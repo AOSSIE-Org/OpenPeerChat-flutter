@@ -1,13 +1,17 @@
+/// This is the Adhoc part where the messages are received and sent.
+/// Each and every function have there purpose mentioned above them.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-
-// import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter_nearby_connections_example/classes/Payload.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
+import 'package:flutter_nearby_connections_example/classes/Payload.dart';
 import 'package:flutter_nearby_connections_example/database/MessageDB.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:provider/provider.dart';
 import '../classes/Global.dart';
+import '../database/DatabaseHelper.dart';
 
 // Get the state name of the connection
 String getStateName(SessionState state) {
@@ -58,17 +62,22 @@ Color getButtonColor(SessionState state) {
 }
 
 // Get the number of devices
-int getItemCount() {
-  return Global.devices.length;
+int getItemCount(BuildContext context) {
+  return Provider.of<Global>(context, listen: false).devices.length;
 }
 
 // Check if the id exists in the conversation list
 bool search(String sender, String id, BuildContext context) {
-  if (Global.conversations[sender] == null) return false;
-
-  if (Global.conversations[sender]!.containsKey(id)) {
-    return true;
+  // Get from Provider
+  if (Provider.of<Global>(context, listen: false).conversations[sender] !=
+      null) {
+    if (Provider.of<Global>(context, listen: false)
+        .conversations[sender]!
+        .containsKey(id)) {
+      return true;
+    }
   }
+
   return false;
 }
 
@@ -90,6 +99,7 @@ void connectToDevice(Device device) {
   }
 }
 
+// Start discovering devices
 void startBrowsing() async {
   await Global.nearbyService!.stopBrowsingForPeers();
   await Global.nearbyService!.startBrowsingForPeers();
@@ -100,8 +110,9 @@ void startAdvertising() async {
   await Global.nearbyService!.startAdvertisingPeer();
 }
 
-// this function is supposed to broadcast all messages in the cache when the message ids don't match
-void broadcast() async {
+// This function is supposed to broadcast all messages in the cache
+// when the message ids don't match
+void broadcast(BuildContext context) async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
@@ -115,13 +126,16 @@ void broadcast() async {
         "type": "Payload"
       };
       var toSend = jsonEncode(data);
-      Global.devices.forEach((element) {
+      Provider.of<Global>(
+        context,
+        listen: false,
+      ).devices.forEach((element) {
         print("270" + toSend);
         Global.nearbyService!
             .sendMessage(element.deviceId, toSend); //make this async
       });
     } else if (value.runtimeType == Ack) {
-      Global.devices.forEach((element) {
+      Provider.of<Global>(context, listen: false).devices.forEach((element) {
         var data = {"id": "$key", "type": "Ack"};
         Global.nearbyService!.sendMessage(element.deviceId, jsonEncode(data));
       });
@@ -130,14 +144,17 @@ void broadcast() async {
   print("current cache:" + Global.cache.toString());
 }
 
-// Broadcasting update request message to the connected devices to recieve fresh messages that are yet to be recieved
-void broadcastLastMessageID() async {
+// Broadcasting update request message to the connected devices to receive
+// fresh messages that are yet to be recieved
+void broadcastLastMessageID(BuildContext context) async {
   // Fetch from Database the last message.
   Timer.periodic(Duration(seconds: 3), (timer) async {
     String id = await MessageDB.instance.getLastMessageId(type: "received");
     log("Last message id: " + id);
 
-    Global.devices.forEach((element) async {
+    Provider.of<Global>(context, listen: false)
+        .devices
+        .forEach((element) async {
       var data = {
         "sender": Global.myName,
         "receiver": element.deviceName,
@@ -157,34 +174,115 @@ void broadcastLastMessageID() async {
   });
 }
 
-// void checkForMessageUpdates() async {
-//   broadcastLastMessageID();
-//   Global.receivedDataSubscription!.onData((data) {
-//     // print("dataReceivedSubscription: ${jsonEncode(data)}");
-//     var decodedMessage = jsonDecode(data["message"]);
-
-//     // checking if successfully recieving the update or not
-//     if (decodedMessage["type"] == "Update") {
-//       log("Update Message ${decodedMessage["id"]}");
-//       String sentDeviceName = decodedMessage["sender"];
-//       compareMessageId(
-//         receivedId: decodedMessage["id"],
-//         sentDeviceName: sentDeviceName,
-//       );
-//     }
-//   });
-// }
-
 // Compare message Ids
 // If they are not same, the message needs to be broadcasted.
 void compareMessageId({
   required String receivedId,
   required String sentDeviceName,
+  required BuildContext context,
 }) async {
   String sentId = await MessageDB.instance.getLastMessageId(type: "sent");
   if (sentId != receivedId) {
-    broadcast();
+    broadcast(context);
   }
+}
+
+//
+void checkDevices(BuildContext context) {
+  Global.deviceSubscription =
+      Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
+    devicesList.forEach((element) {
+      // if (element.state != SessionState.connected) connectToDevice(element);
+      print(
+          "deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
+
+      if (Platform.isAndroid) {
+        if (element.state == SessionState.connected) {
+          Global.nearbyService!.stopBrowsingForPeers();
+        } else {
+          Global.nearbyService!.startBrowsingForPeers();
+        }
+      }
+    });
+    Provider.of<Global>(context, listen: false).updateDevices(devicesList);
+    Provider.of<Global>(context, listen: false).updateConnectedDevices(
+        devicesList.where((d) => d.state == SessionState.connected).toList());
+    log('Devices length: ${devicesList.length}');
+  });
+}
+
+// The the protocol service. It receives the messages from the
+// dataReceivedSubscription service and decode it.
+void init(BuildContext context) async {
+  initiateNearbyService();
+  checkDevices(context);
+  broadcastLastMessageID(context);
+  Global.receivedDataSubscription =
+      Global.nearbyService!.dataReceivedSubscription(callback: (data) {
+    var decodedMessage = jsonDecode(data['message']);
+    showToast(
+      jsonEncode(data),
+      context: context,
+      axis: Axis.horizontal,
+      alignment: Alignment.center,
+      position: StyledToastPosition.bottom,
+    );
+    if (decodedMessage["type"] == "Update") {
+      log("Update Message ${decodedMessage["id"]}");
+      String sentDeviceName = decodedMessage["sender"];
+      compareMessageId(
+        receivedId: decodedMessage["id"],
+        sentDeviceName: sentDeviceName,
+        context: context,
+      );
+    }
+
+    if (Global.cache.containsKey(decodedMessage["id"]) == false) {
+      if (decodedMessage["type"].toString() == 'Payload') {
+        Global.cache[decodedMessage["id"]] = Payload(
+            decodedMessage["id"],
+            decodedMessage['sender'],
+            decodedMessage['receiver'],
+            decodedMessage['message'],
+            decodedMessage['Timestamp']);
+        insertIntoMessageTable(Payload(
+            decodedMessage["id"],
+            decodedMessage['sender'],
+            decodedMessage['receiver'],
+            decodedMessage['message'],
+            decodedMessage['Timestamp']));
+      } else {
+        Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
+        insertIntoMessageTable(Ack(decodedMessage["id"]));
+      }
+    } else if (Global.cache[decodedMessage["id"]].runtimeType == Payload) {
+      if (decodedMessage["type"] == 'Ack') {
+        Global.cache.remove(decodedMessage["id"]);
+        deleteFromMessageTable(decodedMessage["id"]);
+      }
+    } else {
+      Global.cache.remove(decodedMessage["id"]);
+      deleteFromMessageTable(decodedMessage["id"]);
+    }
+    print("350|" +
+        decodedMessage['type'].toString() +
+        ":Payload |" +
+        decodedMessage['receiver'].toString() +
+        ":" +
+        Global.myName.toString());
+    if (decodedMessage['type'] == "Payload" &&
+        decodedMessage['receiver'] == Global.myName) {
+      Provider.of<Global>(context, listen: false)
+          .receivedToConversations(decodedMessage, context);
+      if (Global.cache[decodedMessage["id"]] == null) {
+        Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
+        insertIntoMessageTable(Ack(decodedMessage['id']));
+      } else {
+        Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
+        updateMessageTable(decodedMessage["id"], Ack(decodedMessage['id']));
+      }
+    } else {}
+  });
 }
 
 // Initiating NearbyService to start the connection

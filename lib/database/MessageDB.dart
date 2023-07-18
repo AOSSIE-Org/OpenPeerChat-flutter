@@ -1,5 +1,5 @@
+/// It is the database for the messages.
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';

@@ -1,5 +1,6 @@
-import 'package:rsa_encrypt/rsa_encrypt.dart';
+// This file is used for encryption of messages.
 import 'package:pointycastle/api.dart' as crypto;
+import 'package:rsa_encrypt/rsa_encrypt.dart';
 
 //Future to hold our KeyPair
 Future<crypto.AsymmetricKeyPair>? futureKeyPair;
