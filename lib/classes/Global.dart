@@ -21,4 +21,20 @@ class Global {
       Map(); //converser  mapped to conversation
   static String myName = '';
   static Map<String, dynamic> cache = Map();
+
+  static void initialize() {
+    devices = [];
+    connectedDevices = [];
+    nearbyService = null;
+    subscription = null;
+    receivedDataSubscription = null;
+    messages = [
+      Msg("1", "test", "sent", '2'),
+      Msg("2", "test2", "sent", '4')
+    ];
+    publicKeys = Map();
+    conversations = Map();
+    myName = '';
+    cache = Map();
+  }
 }
