@@ -1,41 +1,41 @@
-/// The logic for the Adhoc and the UI are separated.
-/// The different section are listed as follows
-/// - p2p => Backend of application where message protocols, connections, state are managed
-/// - pages => This is the UI section of the application
-/// - encryption => The messages are encrypted here.
-/// - database => Storage for our messages and conversations
-/// - classes => Different model classes for databases
-/// - components => Common UI components
-
 import 'package:flutter/material.dart';
-import 'classes/Global.dart';
 import 'package:provider/provider.dart';
+import 'classes/Global.dart';
+import 'encyption/key_storage.dart';
+import 'encyption/rsa.dart';
 import 'pages/Profile.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final keyStorage = KeyStorage();
+
+  // Check if keys already exist
+  String? privateKeyPem = await keyStorage.getPrivateKey();
+  String? publicKeyPem = await keyStorage.getPublicKey();
+
+  if (privateKeyPem == null || publicKeyPem == null) {
+    // Generate RSA key pair
+    final pair = generateRSAkeyPair(exampleSecureRandom());
+    privateKeyPem = encodePrivateKeyToPem(pair.privateKey);
+    publicKeyPem = encodePublicKeyToPem(pair.publicKey);
+
+    // Store keys
+    await keyStorage.savePrivateKey(privateKeyPem);
+    await keyStorage.savePublicKey(publicKeyPem);
+  }
+
+  Global.myPrivateKey = parsePrivateKeyFromPem(privateKeyPem);
+  Global.myPublicKey = parsePublicKeyFromPem(publicKeyPem);
+
   runApp(
-    // Provider is used for state management. The state management will help us
-    // to know when a new message has arrived and to refresh the chat page.
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          // Currently we have single class for to manage which contains the
-          // required data and streams
           create: (_) => Global(),
         ),
       ],
       child: MyApp(),
-    ),
-  );
-}
-
-Route<dynamic> generateRoute(RouteSettings settings) {
-  // Initially app opens the profile page where we need to either create
-  // new profile or
-  // navigate to the home screen
-  return MaterialPageRoute(
-    builder: (_) => Profile(
-      onLogin: true,
     ),
   );
 }
@@ -49,4 +49,12 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
     );
   }
+}
+
+Route<dynamic> generateRoute(RouteSettings settings) {
+  return MaterialPageRoute(
+    builder: (_) => Profile(
+      onLogin: true,
+    ),
+  );
 }

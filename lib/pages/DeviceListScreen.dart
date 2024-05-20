@@ -71,10 +71,6 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                     children: [
                       ListTile(
                         title: Text(device.deviceName),
-                        subtitle: Text(
-                          getStateName(device.state),
-                          style: TextStyle(color: getStateColor(device.state)),
-                        ),
                         trailing: GestureDetector(
                           // GestureDetector act as onPressed() and enables
                           // to connect/disconnect with any device

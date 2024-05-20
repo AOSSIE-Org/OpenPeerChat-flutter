@@ -1,6 +1,5 @@
 /// It is the database for the messages.
 import 'dart:async';
-import 'dart:developer';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'model.dart';
@@ -30,8 +29,36 @@ class MessageDB {
     await db.execute(
         'CREATE TABLE $conversationsTableName(_id PRIMARY KEY, converser TEXT NOT NULL,type TEXT NOT NULL,msg TEXT NOT NULL,timestamp TEXT NOT NULL, ack TEXT NOT NULL);');
     await db.execute(
-        'CREATE TABLE $publicKeyTableName( converser TEXT NOT NULL,publicKey TEXT NOT NULL);');
+        'CREATE TABLE $publicKeyTableName( ${PublicKeyFields.converser} TEXT NOT NULL,${PublicKeyFields.publicKey} TEXT NOT NULL);');
   }
+  Future<void> insertPublicKey(PublicKeyFromDB publicKey) async {
+    final db = await instance.database;
+
+    await db.insert(publicKeyTableName, publicKey.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<PublicKeyFromDB>> readAllFromPublicKeyTable() async {
+    final db = await instance.database;
+
+    final result = await db.query(publicKeyTableName);
+
+    return result.map((json) => PublicKeyFromDB.fromJson(json)).toList();
+  }
+
+  Future<PublicKeyFromDB?> getPublicKey(String converser) async {
+    final db = await instance.database;
+
+    final result = await db.query(publicKeyTableName,
+        where: '${PublicKeyFields.converser} = ?', whereArgs: [converser]);
+
+    if (result.isNotEmpty) {
+      return PublicKeyFromDB.fromJson(result.first);
+    } else {
+      return null;
+    }
+  }
+
 
   void insertIntoMessagesTable(MessageFromDB message) async {
     final db = await instance.database;
@@ -58,7 +85,6 @@ class MessageDB {
       orderBy: '${ConversationTableFields.timestamp} DESC',
       limit: 1,
     );
-    log(message.toString());
     if (message.isEmpty) return "-1"; // If error in database.
     return MessageFromDB.fromJson(message[0]).id;
   }
@@ -89,14 +115,6 @@ class MessageDB {
       return ConversationFromDB.fromJson(maps.first);
     else
       return null;
-  }
-
-  Future<List<PublicKeyFromDB>> readAllFromPublicKeyTable() async {
-    final db = await instance.database;
-    final result = await db.query(
-      publicKeyTableName,
-    );
-    return result.map((json) => PublicKeyFromDB.fromJson(json)).toList();
   }
 
   Future<List<MessageFromDB>> readAllFromMessagesTable() async {

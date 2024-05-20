@@ -11,9 +11,7 @@ import 'model.dart';
 import 'MessageDB.dart';
 
 Future<void> readAllUpdateConversation(BuildContext context) async {
-  List<ConversationFromDB> conversations = [
-    ConversationFromDB("1", "2", "3", "5", "6", "7")
-  ];
+  List<ConversationFromDB> conversations ;
   var value = await MessageDB.instance.readAllFromConversationsTable();
   conversations = value;
   conversations.forEach((element) {
@@ -27,7 +25,7 @@ Future<void> readAllUpdateConversation(BuildContext context) async {
 }
 
 void readAllUpdatePublicKey() {
-  List<PublicKeyFromDB> publicKey = [PublicKeyFromDB("1", "2")];
+  List<PublicKeyFromDB> publicKey;
   MessageDB.instance.readAllFromPublicKeyTable().then((value) {
     publicKey = value;
 
@@ -38,14 +36,10 @@ void readAllUpdatePublicKey() {
 }
 
 void readAllUpdateCache() {
-  List<MessageFromDB> messages = [MessageFromDB("1", "2", "3")];
+  List<MessageFromDB> messages ;
   MessageDB.instance.readAllFromMessagesTable().then((value) {
     messages = value;
-    value.forEach((element) {
-      print("_id ${element.id} type ${element.type} msg: ${element.msg}\n");
-    });
     messages.forEach((element) {
-      print("line 16 dbhelper");
       if (element.type == 'Ack')
         Global.cache[element.id] = convertToAck(element);
       else
@@ -87,10 +81,7 @@ Ack convertToAck(MessageFromDB msg) {
 Payload convertToPayload(MessageFromDB message) {
   String id = message.id;
   String payload = message.msg;
-  print("#61: $payload");
   var json = jsonDecode(payload);
-  print("#63" + json.toString());
-  print("#62 ${json['id']}| ${json['sender']}");
   return Payload(
       id, json['sender'], json['receiver'], json['message'], json['timestamp']);
 }
@@ -106,7 +97,6 @@ MessageFromDB convertFromPayload(Payload msg) {
     "sender": msg.sender,
     "receiver": msg.receiver
   };
-  print("#80" + jsonEncode(message));
   return MessageFromDB(id, type, jsonEncode(message));
 }
 

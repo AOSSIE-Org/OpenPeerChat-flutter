@@ -5,13 +5,19 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:flutter_nearby_connections_example/classes/Payload.dart';
 import 'package:flutter_nearby_connections_example/database/MessageDB.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:pointycastle/asymmetric/api.dart';
 import 'package:provider/provider.dart';
 import '../classes/Global.dart';
 import '../database/DatabaseHelper.dart';
+import "package:pointycastle/export.dart";
+import '../database/model.dart';
+import '../encyption/rsa.dart';
+
+
 
 // Get the state name of the connection
 String getStateName(SessionState state) {
@@ -89,12 +95,14 @@ void connectToDevice(Device device) {
         deviceID: device.deviceId,
         deviceName: device.deviceName,
       );
-      log("Want to connect");
+
       break;
     case SessionState.connected:
+
       Global.nearbyService!.disconnectPeer(deviceID: device.deviceId);
       break;
     case SessionState.connecting:
+
       break;
   }
 }
@@ -110,30 +118,48 @@ void startAdvertising() async {
   await Global.nearbyService!.startAdvertisingPeer();
 }
 
+
+  //
 // This function is supposed to broadcast all messages in the cache
 // when the message ids don't match
 void broadcast(BuildContext context) async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
-      Payload payload = value;
-      var data = {
-        "sender": value.sender,
-        "receiver": payload.receiver,
-        "message": value.message,
-        "id": key,
-        "Timestamp": value.timestamp,
-        "type": "Payload"
-      };
+      if (Global.publicKeys.isEmpty) {
+        sendPublicKey(context);
+        return;
+      }
+      else{
+        Payload payload = value;
+
+        // Get the public key of the receiver
+        RSAPublicKey publicKey = Global.publicKeys[value.receiver]!;
+        // Encrypt the message
+        Uint8List encryptedMessage = rsaEncrypt(publicKey, Uint8List.fromList(utf8.encode(payload.message)));
+        // Encode the message to base64
+        String encodedMessage = base64.encode(encryptedMessage);
+        // Create the data to be sent
+        var data = {
+          "sender": payload.sender,
+          "receiver": payload.receiver,
+          "message": encodedMessage,
+          "id": key,
+          "Timestamp": payload.timestamp,
+          "type": "Payload"
+        };
+        // Encode the data to json
+
       var toSend = jsonEncode(data);
       Provider.of<Global>(
         context,
         listen: false,
       ).devices.forEach((element) {
-        print("270" + toSend);
+
         Global.nearbyService!
-            .sendMessage(element.deviceId, toSend); //make this async
+            .sendMessage(element.deviceId, toSend);
       });
+    }
     } else if (value.runtimeType == Ack) {
       Provider.of<Global>(context, listen: false).devices.forEach((element) {
         var data = {"id": "$key", "type": "Ack"};
@@ -141,7 +167,6 @@ void broadcast(BuildContext context) async {
       });
     }
   });
-  print("current cache:" + Global.cache.toString());
 }
 
 // Broadcasting update request message to the connected devices to receive
@@ -150,7 +175,6 @@ void broadcastLastMessageID(BuildContext context) async {
   // Fetch from Database the last message.
   Timer.periodic(Duration(seconds: 3), (timer) async {
     String id = await MessageDB.instance.getLastMessageId(type: "received");
-    log("Last message id: " + id);
 
     Provider.of<Global>(context, listen: false)
         .devices
@@ -165,7 +189,7 @@ void broadcastLastMessageID(BuildContext context) async {
       };
       var toSend = jsonEncode(data);
 
-      log("270" + toSend);
+
       await Global.nearbyService!.sendMessage(
         element.deviceId,
         toSend,
@@ -174,6 +198,41 @@ void broadcastLastMessageID(BuildContext context) async {
   });
 }
 
+
+void sendPublicKey(BuildContext context) async {
+  // Fetch from Database the last message.
+  String id = await MessageDB.instance.getLastMessageId(type: "received");
+
+  if (Global.myPublicKey != null) {
+    String publicKeyPem = encodePublicKeyToPem(Global.myPublicKey!);
+
+
+    Provider.of<Global>(context, listen: false)
+        .devices
+        .forEach((element) async {
+      var data = {
+        "sender": Global.myName,
+        "receiver": element.deviceName,
+        "message":  publicKeyPem,
+        "id": id,
+        "Timestamp": DateTime.now().toString(),
+        "type": "PublicKey"
+      };
+      var toSend = jsonEncode(data);
+
+
+      await Global.nearbyService!.sendMessage(
+
+        element.deviceId,
+        toSend,
+      );
+    });
+  }
+  else {
+    // Handle the case where myPublicKey is null, if necessary
+    print("Public key is not initialized.");
+  }
+}
 // Compare message Ids
 // If they are not same, the message needs to be broadcasted.
 void compareMessageId({
@@ -193,9 +252,6 @@ void checkDevices(BuildContext context) {
       Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
     devicesList.forEach((element) {
       // if (element.state != SessionState.connected) connectToDevice(element);
-      print(
-          "deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
-
       if (Platform.isAndroid) {
         if (element.state == SessionState.connected) {
           Global.nearbyService!.stopBrowsingForPeers();
@@ -207,7 +263,6 @@ void checkDevices(BuildContext context) {
     Provider.of<Global>(context, listen: false).updateDevices(devicesList);
     Provider.of<Global>(context, listen: false).updateConnectedDevices(
         devicesList.where((d) => d.state == SessionState.connected).toList());
-    log('Devices length: ${devicesList.length}');
   });
 }
 
@@ -216,19 +271,32 @@ void checkDevices(BuildContext context) {
 void init(BuildContext context) async {
   initiateNearbyService();
   checkDevices(context);
+
   broadcastLastMessageID(context);
+
   Global.receivedDataSubscription =
       Global.nearbyService!.dataReceivedSubscription(callback: (data) {
-    var decodedMessage = jsonDecode(data['message']);
-    showToast(
-      jsonEncode(data),
-      context: context,
-      axis: Axis.horizontal,
-      alignment: Alignment.center,
-      position: StyledToastPosition.bottom,
-    );
-    if (decodedMessage["type"] == "Update") {
-      log("Update Message ${decodedMessage["id"]}");
+        print("Data Received: $data");
+
+        if (Global.myPublicKey != null && Global.publicKeys.isEmpty) {
+          sendPublicKey(context);
+        }
+
+        var decodedMessage = jsonDecode(data['message']);
+
+        if (decodedMessage['type'] == 'PublicKey') {
+
+          String sentDeviceName = decodedMessage["sender"];
+          String publicKeyPem = decodedMessage['message'];
+          print("Received public key: $publicKeyPem");
+          RSAPublicKey publicKey = parsePublicKeyFromPem(publicKeyPem);
+          Global.publicKeys[sentDeviceName] = publicKey;
+
+          // Store the public key in the database
+          MessageDB.instance.insertPublicKey(PublicKeyFromDB(sentDeviceName, publicKey));
+        }
+
+    else if (decodedMessage["type"] == "Update") {
       String sentDeviceName = decodedMessage["sender"];
       compareMessageId(
         receivedId: decodedMessage["id"],
@@ -237,8 +305,9 @@ void init(BuildContext context) async {
       );
     }
 
-    if (Global.cache.containsKey(decodedMessage["id"]) == false) {
+    else if (Global.cache.containsKey(decodedMessage["id"]) == false) {
       if (decodedMessage["type"].toString() == 'Payload') {
+
         Global.cache[decodedMessage["id"]] = Payload(
             decodedMessage["id"],
             decodedMessage['sender'],
@@ -264,12 +333,6 @@ void init(BuildContext context) async {
       Global.cache.remove(decodedMessage["id"]);
       deleteFromMessageTable(decodedMessage["id"]);
     }
-    print("350|" +
-        decodedMessage['type'].toString() +
-        ":Payload |" +
-        decodedMessage['receiver'].toString() +
-        ":" +
-        Global.myName.toString());
     if (decodedMessage['type'] == "Payload" &&
         decodedMessage['receiver'] == Global.myName) {
       Provider.of<Global>(context, listen: false)
@@ -281,8 +344,13 @@ void init(BuildContext context) async {
         Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
         updateMessageTable(decodedMessage["id"], Ack(decodedMessage['id']));
       }
-    } else {}
+    }
+
   });
+
+
+  // Now, call sendPublicKey
+  sendPublicKey(context);
 }
 
 // Initiating NearbyService to start the connection
@@ -296,7 +364,9 @@ void initiateNearbyService() async {
       if (isRunning) {
         startAdvertising();
         startBrowsing();
+
       }
     },
   );
 }
+

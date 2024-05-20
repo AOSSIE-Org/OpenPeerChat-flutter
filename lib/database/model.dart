@@ -1,3 +1,5 @@
+import 'package:pointycastle/export.dart';
+
 /// Models for different use cases and constants
 ///
 final String messagesTableName = 'messages';
@@ -29,7 +31,7 @@ class PublicKeyFields {
 
 class PublicKeyFromDB {
   final String converser;
-  final String publicKey;
+  final RSAPublicKey publicKey;
 
   PublicKeyFromDB(
     this.converser,
@@ -42,8 +44,8 @@ class PublicKeyFromDB {
       };
 
   static PublicKeyFromDB fromJson(Map<String, Object?> json) => PublicKeyFromDB(
-        json[PublicKeyFields.publicKey].toString(),
-        json[PublicKeyFields.converser].toString(),
+      json[PublicKeyFields.converser].toString(),
+      json[PublicKeyFields.publicKey] as RSAPublicKey
       );
 }
 

@@ -1,67 +1,48 @@
-/// It the Global state management class.
-/// This is used over all the application.
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
-import 'package:flutter_nearby_connections_example/p2p/AdhocHousekeeping.dart';
+import 'package:pointycastle/export.dart';
 import '../database/DatabaseHelper.dart';
+import '../p2p/AdhocHousekeeping.dart';
 import 'Msg.dart';
 
+
 class Global extends ChangeNotifier {
-  List<Device> devices = [];
-  List<Device> connectedDevices = [];
+  static RSAPrivateKey? myPrivateKey;
+  static RSAPublicKey? myPublicKey;
   static NearbyService? nearbyService;
   static StreamSubscription? deviceSubscription;
-
   static StreamSubscription? receivedDataSubscription;
-  static List<Msg> messages = [
-    Msg("1", "test", "sent", '2'),
-    Msg("2", "test2", "sent", '4')
-  ];
-  static Map<String, String> publicKeys = Map();
-  Map<String, Map<String, Msg>> conversations = Map();
+
+  List<Device> devices = [];
+  List<Device> connectedDevices = [];
+  static List<Msg> messages = [];
+  static Map<String, RSAPublicKey> publicKeys = {};
+  Map<String, Map<String, Msg>> conversations = {};
   static String myName = '';
-  static Map<String, dynamic> cache = Map();
-  static final GlobalKey<ScaffoldState> scaffoldKey =
-      GlobalKey<ScaffoldState>();
-  // Global({
-  //   this.conversations = Map,
-  // });
-  void sentToConversations(Msg msg, String converser,
-      {bool addToTable = true}) {
-    if (conversations[converser] == null) {
-      conversations[converser] = {};
-    }
+  static Map<String, dynamic> cache = {};
+  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+
+  void sentToConversations(Msg msg, String converser, {bool addToTable = true}) {
+    conversations.putIfAbsent(converser, () => {});
     conversations[converser]![msg.id] = msg;
     if (addToTable) {
       insertIntoConversationsTable(msg, converser);
     }
     notifyListeners();
-    // First push the new message for one time when new message is sent
     broadcast(scaffoldKey.currentContext!);
   }
 
   void receivedToConversations(dynamic decodedMessage, BuildContext context) {
-    if (conversations[decodedMessage['sender']] == null) {
-      conversations[decodedMessage['sender']] = Map();
+    var sender = decodedMessage['sender'];
+    conversations.putIfAbsent(sender, () => {});
+    if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
+      var msg = Msg(decodedMessage['message'], "received", decodedMessage['Timestamp'], decodedMessage['id']);
+      conversations[sender]![decodedMessage["id"]] = msg;
+      insertIntoConversationsTable(msg, sender);
+      notifyListeners();
     }
-    if (conversations[decodedMessage['sender']] != null &&
-        !(conversations[decodedMessage['sender']]!
-            .containsKey(decodedMessage['id']))) {
-      conversations[decodedMessage['sender']]![decodedMessage["id"]] = Msg(
-        decodedMessage['message'],
-        "received",
-        decodedMessage['Timestamp'],
-        decodedMessage["id"],
-      );
-      insertIntoConversationsTable(
-          Msg(decodedMessage['message'], "received",
-              decodedMessage['Timestamp'], decodedMessage["id"]),
-          decodedMessage['sender']);
-    }
-
-    notifyListeners();
   }
 
   void updateDevices(List<Device> devices) {
