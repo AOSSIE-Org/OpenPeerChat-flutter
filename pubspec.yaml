@@ -14,7 +14,6 @@ dependencies:
   flutter_styled_toast: ^2.0.0
   flutter_nearby_connections: ^1.0.11
   cupertino_icons: ^1.0.2
-  flutter_udid: ^2.0.0
   bubble: ^1.2.1
   nanoid: ^1.0.0
   sqflite: ^2.0.0+3
@@ -25,6 +24,7 @@ dependencies:
   flutter_secure_storage:
   encrypt: ^5.0.3
   asn1lib:
+  local_auth:
 
 dev_dependencies:
   flutter_test:

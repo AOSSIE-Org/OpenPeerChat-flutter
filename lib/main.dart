@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_nearby_connections_example/pages/HomePage.dart';
 import 'package:provider/provider.dart';
 import 'classes/Global.dart';
 import 'encyption/key_storage.dart';
 import 'encyption/rsa.dart';
-import 'pages/Profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,8 +53,6 @@ class MyApp extends StatelessWidget {
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   return MaterialPageRoute(
-    builder: (_) => Profile(
-      onLogin: true,
-    ),
+    builder: (_) => HomePage(),
   );
 }

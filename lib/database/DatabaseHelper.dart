@@ -7,6 +7,7 @@ import '../classes/Global.dart';
 import '../classes/Msg.dart';
 import 'dart:convert';
 import '../classes/Payload.dart';
+import '../encyption/rsa.dart';
 import 'model.dart';
 import 'MessageDB.dart';
 
@@ -30,7 +31,8 @@ void readAllUpdatePublicKey() {
     publicKey = value;
 
     publicKey.forEach((element) {
-      Global.publicKeys[element.converser] = element.publicKey;
+      String string = String.fromCharCodes(element.publicKey);
+      Global.publicKeys[element.converser] =  parsePublicKeyFromPem(string);
     });
   });
 }

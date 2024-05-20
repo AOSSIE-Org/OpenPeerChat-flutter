@@ -2,7 +2,6 @@
 /// Each and every function have there purpose mentioned above them.
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -126,7 +125,7 @@ void broadcast(BuildContext context) async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
-      if (Global.publicKeys.isEmpty) {
+      if(Global.publicKeys[value.receiver] == null) {
         sendPublicKey(context);
         return;
       }
@@ -292,8 +291,12 @@ void init(BuildContext context) async {
           RSAPublicKey publicKey = parsePublicKeyFromPem(publicKeyPem);
           Global.publicKeys[sentDeviceName] = publicKey;
 
+          //string to uint8list
+          List<int> list = publicKeyPem.codeUnits;
+          Uint8List bytes = Uint8List.fromList(list);
+
           // Store the public key in the database
-          MessageDB.instance.insertPublicKey(PublicKeyFromDB(sentDeviceName, publicKey));
+          MessageDB.instance.insertPublicKey(PublicKeyFromDB(sentDeviceName, bytes));
         }
 
     else if (decodedMessage["type"] == "Update") {

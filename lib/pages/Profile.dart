@@ -69,6 +69,7 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
+
     // At the launch we are fetching details using the getDetails function
     getDetails();
   }

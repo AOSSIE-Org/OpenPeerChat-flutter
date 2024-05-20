@@ -1,4 +1,4 @@
-import 'package:pointycastle/export.dart';
+import 'package:flutter/services.dart';
 
 /// Models for different use cases and constants
 ///
@@ -24,29 +24,25 @@ class ConversationTableFields {
 }
 
 class PublicKeyFields {
-  static final List<String> values = [converser, publicKey];
   static final String converser = 'converser';
   static final String publicKey = 'publicKey';
 }
 
 class PublicKeyFromDB {
   final String converser;
-  final RSAPublicKey publicKey;
+  final Uint8List publicKey;
 
-  PublicKeyFromDB(
-    this.converser,
-    this.publicKey,
-  );
+  PublicKeyFromDB(this.converser, this.publicKey);
 
-  Map<String, Object?> toJson() => {
-        PublicKeyFields.publicKey: publicKey,
-        PublicKeyFields.converser: converser
-      };
+  Map<String, Object> toJson() => {
+    PublicKeyFields.converser: converser,
+    PublicKeyFields.publicKey: publicKey,
+  };
 
   static PublicKeyFromDB fromJson(Map<String, Object?> json) => PublicKeyFromDB(
-      json[PublicKeyFields.converser].toString(),
-      json[PublicKeyFields.publicKey] as RSAPublicKey
-      );
+    json[PublicKeyFields.converser] as String,
+    json[PublicKeyFields.publicKey] as Uint8List,
+  );
 }
 
 class MessageFromDB {
