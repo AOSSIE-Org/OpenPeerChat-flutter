@@ -46,6 +46,7 @@ class Global extends ChangeNotifier {
   }
 
   void updateDevices(List<Device> devices) {
+
     this.devices = devices;
     notifyListeners();
   }

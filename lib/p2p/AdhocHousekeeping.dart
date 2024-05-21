@@ -125,11 +125,8 @@ void broadcast(BuildContext context) async {
   Global.cache.forEach((key, value) {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
-      if(Global.publicKeys[value.receiver] == null) {
-        sendPublicKey(context);
-        return;
-      }
-      else{
+      if(Global.publicKeys[value.receiver] != null ) {
+
         Payload payload = value;
 
         // Get the public key of the receiver
@@ -202,7 +199,6 @@ void sendPublicKey(BuildContext context) async {
   // Fetch from Database the last message.
   String id = await MessageDB.instance.getLastMessageId(type: "received");
 
-  if (Global.myPublicKey != null) {
     String publicKeyPem = encodePublicKeyToPem(Global.myPublicKey!);
 
 
@@ -226,11 +222,6 @@ void sendPublicKey(BuildContext context) async {
         toSend,
       );
     });
-  }
-  else {
-    // Handle the case where myPublicKey is null, if necessary
-    print("Public key is not initialized.");
-  }
 }
 // Compare message Ids
 // If they are not same, the message needs to be broadcasted.
@@ -245,41 +236,45 @@ void compareMessageId({
   }
 }
 
-//
 void checkDevices(BuildContext context) {
   Global.deviceSubscription =
       Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
-    devicesList.forEach((element) {
-      // if (element.state != SessionState.connected) connectToDevice(element);
-      if (Platform.isAndroid) {
-        if (element.state == SessionState.connected) {
-          Global.nearbyService!.stopBrowsingForPeers();
-        } else {
-          Global.nearbyService!.startBrowsingForPeers();
-        }
-      }
-    });
-    Provider.of<Global>(context, listen: false).updateDevices(devicesList);
-    Provider.of<Global>(context, listen: false).updateConnectedDevices(
-        devicesList.where((d) => d.state == SessionState.connected).toList());
-  });
+        devicesList.forEach((element) {
+
+          // If the device is connected, send the public key
+          if (element.state == SessionState.connected) {
+            sendPublicKey(context);
+          }
+
+          if (Platform.isAndroid) {
+            if (element.state == SessionState.connected) {
+              Global.nearbyService!.stopBrowsingForPeers();
+            } else {
+              Global.nearbyService!.startBrowsingForPeers();
+            }
+          }
+        });
+
+        Provider.of<Global>(context, listen: false).updateDevices(devicesList);
+        Provider.of<Global>(context, listen: false).updateConnectedDevices(
+            devicesList.where((d) => d.state == SessionState.connected).toList());
+      });
 }
+
 
 // The the protocol service. It receives the messages from the
 // dataReceivedSubscription service and decode it.
 void init(BuildContext context) async {
-  initiateNearbyService();
+   initiateNearbyService();
   checkDevices(context);
 
   broadcastLastMessageID(context);
+   sendPublicKey(context);
 
   Global.receivedDataSubscription =
       Global.nearbyService!.dataReceivedSubscription(callback: (data) {
         print("Data Received: $data");
 
-        if (Global.myPublicKey != null && Global.publicKeys.isEmpty) {
-          sendPublicKey(context);
-        }
 
         var decodedMessage = jsonDecode(data['message']);
 
@@ -350,10 +345,6 @@ void init(BuildContext context) async {
     }
 
   });
-
-
-  // Now, call sendPublicKey
-  sendPublicKey(context);
 }
 
 // Initiating NearbyService to start the connection
