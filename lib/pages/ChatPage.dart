@@ -8,6 +8,7 @@ import '../classes/Msg.dart';
 import '../classes/Global.dart';
 import 'dart:convert';
 import 'package:pointycastle/asymmetric/api.dart';
+import '../components/view_file.dart';
 import '../encyption/rsa.dart';  // Assuming this is the correct path for your RSA functions
 
 class ChatPage extends StatefulWidget {
@@ -80,38 +81,95 @@ class ChatPageState extends State<ChatPage> {
 
                 if(Global.myPrivateKey != null) {
                   RSAPrivateKey privateKey = Global.myPrivateKey!;
-                  Uint8List encryptedBytes = base64Decode(
-                      messageList[index].message);
-                  Uint8List decryptedBytes = rsaDecrypt(
-                      privateKey, encryptedBytes);
-                  displayMessage = utf8.decode(decryptedBytes);
-                }
-                return Bubble(
-                  margin: BubbleEdges.only(top: 10),
-                  nip: messageList[index].msgtype == 'sent'
-                      ? BubbleNip.rightTop
-                      : BubbleNip.leftTop,
-                  color: messageList[index].msgtype == 'sent'
-                      ? Color(0xffd1c4e9)
-                      : Color(0xff80DEEA),
-                  child: ListTile(
-                    dense: true,
-                    title: Text(
-                      messageList[index].msgtype + ": " + displayMessage,
-                      textAlign: messageList[index].msgtype == 'sent'
-                          ? TextAlign.right
-                          : TextAlign.left,
-                    ),
-                    subtitle: Text(
-                      dateFormatter(
-                        timeStamp: messageList[index].timestamp,
+                  dynamic data = jsonDecode(messageList[index].message);
+                  print(data);
+
+                  if (data['type'] == 'text') {
+                    Uint8List encryptedBytes = base64Decode(
+                        data['data']);
+                    Uint8List decryptedBytes = rsaDecrypt(
+                        privateKey, encryptedBytes);
+
+
+                    displayMessage = utf8.decode(decryptedBytes);
+                    print("decrypted message: $displayMessage");
+                    return Bubble(
+                      margin: BubbleEdges.only(top: 10),
+                      nip: messageList[index].msgtype == 'sent'
+                          ? BubbleNip.rightTop
+                          : BubbleNip.leftTop,
+                      color: messageList[index].msgtype == 'sent'
+                          ? Color(0xffd1c4e9)
+                          : Color(0xff80DEEA),
+                      child: ListTile(
+                        dense: true,
+                        title: Text(
+                          messageList[index].msgtype + ": " + displayMessage,
+                          textAlign: messageList[index].msgtype == 'sent'
+                              ? TextAlign.right
+                              : TextAlign.left,
+                        ),
+                        subtitle: Text(
+                          dateFormatter(
+                            timeStamp: messageList[index].timestamp,
+                          ),
+                          textAlign: messageList[index].msgtype == 'sent'
+                              ? TextAlign.right
+                              : TextAlign.left,
+                        ),
                       ),
-                      textAlign: messageList[index].msgtype == 'sent'
-                          ? TextAlign.right
-                          : TextAlign.left,
-                    ),
-                  ),
-                );
+                    );
+                  }
+                  else if (data['type'] == 'file') {
+
+                    String fileName =
+                        data['fileName'];
+                    print("file name: $fileName");
+                    String filePath =
+                    data['filePath'];
+
+                    return Bubble(
+                        margin: BubbleEdges.only(top: 10),
+                        nip: messageList[index].msgtype == 'sent'
+                            ? BubbleNip.rightTop
+                            : BubbleNip.leftTop,
+                        color: messageList[index].msgtype == 'sent'
+                            ? Color(0xffd1c4e9)
+                            : Color(0xff80DEEA),
+                        child: ListTile(
+                          dense: true,
+                          title: Text(
+                            messageList[index].msgtype + ": " + fileName,
+                            textAlign: messageList[index].msgtype == 'sent'
+                                ? TextAlign.right
+                                : TextAlign.left,
+                          ),
+                          subtitle: Text(
+                            dateFormatter(
+                              timeStamp: messageList[index].timestamp,
+                            ),
+                            textAlign: messageList[index].msgtype == 'sent'
+                                ? TextAlign.right
+                                : TextAlign.left,
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.file_open),
+                            onPressed: () {
+                              print("file path: $filePath");
+                              //save file to downloads
+                              FilePreview.openFile(filePath);
+
+                            },
+                          ),
+                        ),
+                      );
+
+                  }
+                  // else {
+                  //   displayMessage = messageList[index].message;
+                  // }
+                }
+
               },
             ),
           ),
@@ -120,6 +178,7 @@ class ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
 }
 
 // Function to format the date in viewable form

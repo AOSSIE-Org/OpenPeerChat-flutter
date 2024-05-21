@@ -122,7 +122,7 @@ void startAdvertising() async {
 // This function is supposed to broadcast all messages in the cache
 // when the message ids don't match
 void broadcast(BuildContext context) async {
-  Global.cache.forEach((key, value) {
+  Global.cache.forEach((key, value) async {
     // if a message is supposed to be broadcasted to all devices in proximity then
     if (value.runtimeType == Payload && value.broadcast) {
       if(Global.publicKeys[value.receiver] != null ) {
@@ -131,15 +131,46 @@ void broadcast(BuildContext context) async {
 
         // Get the public key of the receiver
         RSAPublicKey publicKey = Global.publicKeys[value.receiver]!;
-        // Encrypt the message
-        Uint8List encryptedMessage = rsaEncrypt(publicKey, Uint8List.fromList(utf8.encode(payload.message)));
-        // Encode the message to base64
-        String encodedMessage = base64.encode(encryptedMessage);
+        dynamic message = jsonDecode(payload.message);
+
+        var finalData;
+        if (message['type'] == 'text') {
+          Uint8List encryptedBytes = utf8.encode(message['data']);
+          // Encrypt the message
+          Uint8List encryptedMessage = rsaEncrypt(publicKey, encryptedBytes);
+          // Encode the message to base64
+           String encodedMessage = base64.encode(encryptedMessage);
+           finalData = {
+            "type": "text",
+            "data": encodedMessage,
+          };
+        }
+        else if (message['type'] == 'file') {
+          File file = File(message['filePath']);
+          Uint8List encryptedBytes = await file.readAsBytes();
+
+          // // Encrypt the message
+          // Uint8List encryptedMessage = rsaEncrypt(publicKey, encryptedBytes);
+          // // Encode the message to base64
+          // String encodedMessage = base64.encode(encryptedMessage);
+          //
+
+          String encodedMessage = base64.encode(encryptedBytes);
+
+
+
+           finalData = {
+            "type": "file",
+            "data": encodedMessage,
+            "fileName": message['fileName'],
+          };
+        }
+
         // Create the data to be sent
         var data = {
           "sender": payload.sender,
           "receiver": payload.receiver,
-          "message": encodedMessage,
+          "message": jsonEncode(finalData),
           "id": key,
           "Timestamp": payload.timestamp,
           "type": "Payload"
@@ -272,9 +303,7 @@ void init(BuildContext context) async {
    sendPublicKey(context);
 
   Global.receivedDataSubscription =
-      Global.nearbyService!.dataReceivedSubscription(callback: (data) {
-        print("Data Received: $data");
-
+      Global.nearbyService!.dataReceivedSubscription(callback: (data) async {
 
         var decodedMessage = jsonDecode(data['message']);
 
@@ -282,7 +311,6 @@ void init(BuildContext context) async {
 
           String sentDeviceName = decodedMessage["sender"];
           String publicKeyPem = decodedMessage['message'];
-          print("Received public key: $publicKeyPem");
           RSAPublicKey publicKey = parsePublicKeyFromPem(publicKeyPem);
           Global.publicKeys[sentDeviceName] = publicKey;
 
@@ -306,18 +334,19 @@ void init(BuildContext context) async {
     else if (Global.cache.containsKey(decodedMessage["id"]) == false) {
       if (decodedMessage["type"].toString() == 'Payload') {
 
-        Global.cache[decodedMessage["id"]] = Payload(
-            decodedMessage["id"],
-            decodedMessage['sender'],
-            decodedMessage['receiver'],
-            decodedMessage['message'],
-            decodedMessage['Timestamp']);
-        insertIntoMessageTable(Payload(
-            decodedMessage["id"],
-            decodedMessage['sender'],
-            decodedMessage['receiver'],
-            decodedMessage['message'],
-            decodedMessage['Timestamp']));
+          Global.cache[decodedMessage["id"]] = Payload(
+              decodedMessage["id"],
+              decodedMessage['sender'],
+              decodedMessage['receiver'],
+              decodedMessage['message'],
+              decodedMessage['Timestamp']
+          );
+          insertIntoMessageTable(Payload(
+              decodedMessage["id"],
+              decodedMessage['sender'],
+              decodedMessage['receiver'],
+              decodedMessage['message'],
+              decodedMessage['Timestamp']));
       } else {
         Global.cache[decodedMessage["id"]] = Ack(decodedMessage["id"]);
         insertIntoMessageTable(Ack(decodedMessage["id"]));

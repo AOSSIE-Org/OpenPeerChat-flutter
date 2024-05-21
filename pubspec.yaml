@@ -25,6 +25,10 @@ dependencies:
   encrypt: ^5.0.3
   asn1lib:
   local_auth:
+  file_picker:
+  open_filex: ^4.4.0
+  permission_handler: ^11.3.1
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

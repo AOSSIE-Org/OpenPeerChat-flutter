@@ -1,8 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pointycastle/export.dart';
 import '../database/DatabaseHelper.dart';
+import '../encyption/rsa.dart';
 import '../p2p/AdhocHousekeeping.dart';
 import 'Msg.dart';
 
@@ -25,25 +31,78 @@ class Global extends ChangeNotifier {
 
 
   void sentToConversations(Msg msg, String converser, {bool addToTable = true}) {
+
+
     conversations.putIfAbsent(converser, () => {});
     conversations[converser]![msg.id] = msg;
     if (addToTable) {
       insertIntoConversationsTable(msg, converser);
     }
+
     notifyListeners();
     broadcast(scaffoldKey.currentContext!);
   }
 
-  void receivedToConversations(dynamic decodedMessage, BuildContext context) {
+  Future<void> receivedToConversations(dynamic decodedMessage, BuildContext context) async {
     var sender = decodedMessage['sender'];
-    conversations.putIfAbsent(sender, () => {});
-    if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
-      var msg = Msg(decodedMessage['message'], "received", decodedMessage['Timestamp'], decodedMessage['id']);
-      conversations[sender]![decodedMessage["id"]] = msg;
-      insertIntoConversationsTable(msg, sender);
-      notifyListeners();
+    var message = json.decode(decodedMessage['message']);
+    print("Received Message: $message");
+
+    //file decoding and saving
+    if(message['type'] == 'file') {
+      String filePath = await decodeAndStoreFile(
+          message['data'], message['fileName']);
+      conversations.putIfAbsent(sender, () => {});
+      if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
+        decodedMessage['message'] = json.encode({
+          'type': 'file',
+          'filePath': filePath,
+          'fileName': message['fileName']
+        });
+        var msg = Msg(
+            decodedMessage['message'], "received", decodedMessage['Timestamp'],
+            decodedMessage['id']);
+        conversations[sender]![decodedMessage["id"]] = msg;
+        insertIntoConversationsTable(msg, sender);
+        notifyListeners();
+      }
+    }
+    else {
+      conversations.putIfAbsent(sender, () => {});
+      if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
+        var msg = Msg(
+            decodedMessage['message'], "received", decodedMessage['Timestamp'],
+            decodedMessage['id']);
+        conversations[sender]![decodedMessage["id"]] = msg;
+        insertIntoConversationsTable(msg, sender);
+        notifyListeners();
+      }
     }
   }
+
+  Future<String> decodeAndStoreFile(String encodedFile, String fileName) async {
+    Uint8List fileBytes = base64.decode(encodedFile);
+    // Uint8List fileData = rsaDecrypt(Global.myPrivateKey!, fileBytes);
+
+    Directory documents ;
+    if (Platform.isAndroid) {
+      documents = (await getExternalStorageDirectory())!;
+    }
+    else {
+      documents = await getApplicationDocumentsDirectory();
+    }
+    PermissionStatus status = await Permission.storage.request();
+    if (status.isGranted) {
+      final path = '${documents.path}/${fileName}';
+      File(path).writeAsBytes(fileBytes);
+      print("File saved at: $path");
+      return path;
+    }
+    else {
+      throw FileSystemException('Storage permission not granted');
+    }
+  }
+
 
   void updateDevices(List<Device> devices) {
 
