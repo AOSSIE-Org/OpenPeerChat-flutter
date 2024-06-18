@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ElevatedButton(
-                onPressed: _supportState ? _authenticate : null,
+                onPressed: _supportState ? _authenticate : _authenticate2,
                 child: Text('Authenticate'),
               ),
             ],
@@ -54,6 +54,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+  Future<void> _authenticate2() async {
+   print('Authentication is not supported');
+   Navigator.pushReplacement(
+     context,
+     MaterialPageRoute(
+       builder: (context) => Profile(onLogin: true),
+     ),
+   );
   }
 
   Future<void> _authenticate() async {

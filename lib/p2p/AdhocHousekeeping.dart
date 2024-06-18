@@ -300,7 +300,6 @@ void init(BuildContext context) async {
   checkDevices(context);
 
   broadcastLastMessageID(context);
-   sendPublicKey(context);
 
   Global.receivedDataSubscription =
       Global.nearbyService!.dataReceivedSubscription(callback: (data) async {

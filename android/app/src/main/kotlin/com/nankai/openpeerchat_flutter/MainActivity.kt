@@ -1,4 +1,4 @@
-package com.aossie.p2p
+package com.nankai.openpeerchat_flutter
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

@@ -8,7 +8,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pointycastle/export.dart';
 import '../database/DatabaseHelper.dart';
-import '../encyption/rsa.dart';
 import '../p2p/AdhocHousekeeping.dart';
 import 'Msg.dart';
 

@@ -1,6 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../components/message_panel.dart';
@@ -9,7 +10,7 @@ import '../classes/Global.dart';
 import 'dart:convert';
 import 'package:pointycastle/asymmetric/api.dart';
 import '../components/view_file.dart';
-import '../encyption/rsa.dart';  // Assuming this is the correct path for your RSA functions
+import '../encyption/rsa.dart';
 
 class ChatPage extends StatefulWidget {
   ChatPage({Key? key, required this.converser}) : super(key: key);
@@ -38,8 +39,6 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    /// If we have previously conversed with the device, it is going to store
-    /// the conversations in the messageList
     if (Provider.of<Global>(context).conversations[widget.converser] != null) {
       messageList = [];
       Provider.of<Global>(context)
@@ -47,8 +46,7 @@ class ChatPageState extends State<ChatPage> {
           .forEach((key, value) {
         messageList.add(value);
       });
-      // Since there can be a long list of messages, the scroll controller
-      // auto scrolls to the bottom of the list.
+
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent + 50,
@@ -57,8 +55,17 @@ class ChatPageState extends State<ChatPage> {
         );
       }
     }
+
+    Map<String, List<Msg>> groupedMessages = {};
+    for (var msg in messageList) {
+      String date = DateFormat('dd/MM/yyyy').format(DateTime.parse(msg.timestamp));
+      if (groupedMessages[date] == null) {
+        groupedMessages[date] = [];
+      }
+      groupedMessages[date]!.add(msg);
+    }
+
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Chat with ' + widget.converser),
       ),
@@ -70,106 +77,67 @@ class ChatPageState extends State<ChatPage> {
               child: Text('No messages yet'),
             )
                 : ListView.builder(
-              // Builder to view messages chronologically
-              shrinkWrap: true,
               controller: _scrollController,
               padding: const EdgeInsets.all(8),
-              itemCount: messageList.length,
+              itemCount: groupedMessages.keys.length,
               itemBuilder: (BuildContext context, int index) {
-                // Decrypt the message if it is
-                String displayMessage = messageList[index].message;
-
-                if(Global.myPrivateKey != null) {
-                  RSAPrivateKey privateKey = Global.myPrivateKey!;
-                  dynamic data = jsonDecode(messageList[index].message);
-                  print(data);
-
-                  if (data['type'] == 'text') {
-                    Uint8List encryptedBytes = base64Decode(
-                        data['data']);
-                    Uint8List decryptedBytes = rsaDecrypt(
-                        privateKey, encryptedBytes);
-
-
-                    displayMessage = utf8.decode(decryptedBytes);
-                    print("decrypted message: $displayMessage");
-                    return Bubble(
-                      margin: BubbleEdges.only(top: 10),
-                      nip: messageList[index].msgtype == 'sent'
-                          ? BubbleNip.rightTop
-                          : BubbleNip.leftTop,
-                      color: messageList[index].msgtype == 'sent'
-                          ? Color(0xffd1c4e9)
-                          : Color(0xff80DEEA),
-                      child: ListTile(
-                        dense: true,
-                        title: Text(
-                          messageList[index].msgtype + ": " + displayMessage,
-                          textAlign: messageList[index].msgtype == 'sent'
-                              ? TextAlign.right
-                              : TextAlign.left,
-                        ),
-                        subtitle: Text(
-                          dateFormatter(
-                            timeStamp: messageList[index].timestamp,
-                          ),
-                          textAlign: messageList[index].msgtype == 'sent'
-                              ? TextAlign.right
-                              : TextAlign.left,
+                String date = groupedMessages.keys.elementAt(index);
+                return Column(
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          date,
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                    );
-                  }
-                  else if (data['type'] == 'file') {
-
-                    String fileName =
-                        data['fileName'];
-                    print("file name: $fileName");
-                    String filePath =
-                    data['filePath'];
-
-                    return Bubble(
-                        margin: BubbleEdges.only(top: 10),
-                        nip: messageList[index].msgtype == 'sent'
-                            ? BubbleNip.rightTop
-                            : BubbleNip.leftTop,
-                        color: messageList[index].msgtype == 'sent'
-                            ? Color(0xffd1c4e9)
-                            : Color(0xff80DEEA),
-                        child: ListTile(
-                          dense: true,
-                          title: Text(
-                            messageList[index].msgtype + ": " + fileName,
-                            textAlign: messageList[index].msgtype == 'sent'
-                                ? TextAlign.right
-                                : TextAlign.left,
-                          ),
-                          subtitle: Text(
-                            dateFormatter(
-                              timeStamp: messageList[index].timestamp,
+                    ),
+                    ...groupedMessages[date]!.map((msg) {
+                      String displayMessage = msg.message;
+                      if (Global.myPrivateKey != null) {
+                        RSAPrivateKey privateKey = Global.myPrivateKey!;
+                        dynamic data = jsonDecode(msg.message);
+                        if (data['type'] == 'text') {
+                          Uint8List encryptedBytes = base64Decode(data['data']);
+                          Uint8List decryptedBytes = rsaDecrypt(privateKey, encryptedBytes);
+                          displayMessage = utf8.decode(decryptedBytes);
+                        }
+                      }
+                      return Column(
+                        crossAxisAlignment: msg.msgtype == 'sent' ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          Align(
+                            alignment: msg.msgtype == 'sent' ? Alignment.centerRight : Alignment.centerLeft,
+                            child: Bubble(
+                              padding: BubbleEdges.all(12),
+                              margin: BubbleEdges.only(top: 10),
+                              //add shadow
+                              style: BubbleStyle(
+                                elevation: 3,
+                                  shadowColor: Colors.black.withOpacity(0.5),
+                              ),
+                              // nip: msg.msgtype == 'sent' ? BubbleNip.rightTop : BubbleNip.leftTop,
+                              radius: Radius.circular(10),
+                              color: msg.msgtype == 'sent' ? Color(0xffd1c4e9) : Color(0xff80DEEA),
+                              child: msg.message.contains('file') ? _buildFileBubble(msg) : Text(
+                                displayMessage,
+                                style: TextStyle(color: Colors.black87),
+                              ),
                             ),
-                            textAlign: messageList[index].msgtype == 'sent'
-                                ? TextAlign.right
-                                : TextAlign.left,
                           ),
-                          trailing: IconButton(
-                            icon: Icon(Icons.file_open),
-                            onPressed: () {
-                              print("file path: $filePath");
-                              //save file to downloads
-                              FilePreview.openFile(filePath);
-
-                            },
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2, bottom: 10),
+                            child: Text(
+                              dateFormatter(timeStamp: msg.timestamp),
+                              style: TextStyle(color: Colors.black54, fontSize: 10),
+                            ),
                           ),
-                        ),
+                        ],
                       );
-
-                  }
-                  // else {
-                  //   displayMessage = messageList[index].message;
-                  // }
-                }
-
+                    }).toList(),
+                  ],
+                );
               },
             ),
           ),
@@ -179,13 +147,33 @@ class ChatPageState extends State<ChatPage> {
     );
   }
 
+  Widget _buildFileBubble(Msg msg) {
+    dynamic data = jsonDecode(msg.message);
+    String fileName = data['fileName'];
+    String filePath = data['filePath'];
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          fileName,
+          style: TextStyle(
+            // fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.file_open, color: Colors.black87),
+          onPressed: () {
+            FilePreview.openFile(filePath);
+          },
+        ),
+      ],
+    );
+  }
 }
 
-// Function to format the date in viewable form
 String dateFormatter({required String timeStamp}) {
-  // From timestamp to readable date and hour minutes
   DateTime dateTime = DateTime.parse(timeStamp);
-  String formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
   String formattedTime = DateFormat('hh:mm aa').format(dateTime);
-  return formattedDate + " " + formattedTime;
+  return formattedTime;
 }
