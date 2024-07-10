@@ -1,18 +1,17 @@
+import 'package:provider/provider.dart';
+import '../database/database_helper.dart';
+import 'package:flutter/material.dart';
+import '../classes/global.dart';
+import 'chat_page.dart';
+
 /// This is ChatListScreen. This screen lists all the Devices with which the
 /// device has chat with and keeps all the previous messages records.
-import 'package:provider/provider.dart';
-
-import '../database/DatabaseHelper.dart';
-
-import 'package:flutter/material.dart';
-
-import '../classes/Global.dart';
-
-import 'ChatPage.dart';
 
 class ChatListScreen extends StatefulWidget {
+  const ChatListScreen({Key? key}) : super(key: key);
+
   @override
-  _ChatListScreenState createState() => _ChatListScreenState();
+ State<ChatListScreen> createState() => _ChatListScreenState();
 }
 
 class _ChatListScreenState extends State<ChatListScreen> {
@@ -38,7 +37,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+          padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
           child: TextField(
             decoration: InputDecoration(
               hintText: "Search...",
@@ -50,7 +49,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
               filled: true,
               fillColor: Colors.grey.shade100,
-              contentPadding: EdgeInsets.all(8),
+              contentPadding: const EdgeInsets.all(8),
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide(color: Colors.grey.shade100)),

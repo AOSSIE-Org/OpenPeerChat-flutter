@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections_example/pages/HomePage.dart';
+import 'package:flutter_nearby_connections_example/pages/home_page.dart';
 import 'package:provider/provider.dart';
-import 'classes/Global.dart';
+import 'classes/global.dart';
 import 'encyption/key_storage.dart';
 import 'encyption/rsa.dart';
 
@@ -35,15 +35,17 @@ void main() async {
           create: (_) => Global(),
         ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       onGenerateRoute: generateRoute,
       initialRoute: '/',
@@ -53,6 +55,6 @@ class MyApp extends StatelessWidget {
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   return MaterialPageRoute(
-    builder: (_) => HomePage(),
+    builder: (_) => const HomePage(),
   );
 }

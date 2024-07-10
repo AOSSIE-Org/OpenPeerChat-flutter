@@ -2,30 +2,30 @@ import 'package:flutter/services.dart';
 
 /// Models for different use cases and constants
 ///
-final String messagesTableName = 'messages';
-final String conversationsTableName = 'conversations';
-final String publicKeyTableName = 'publicKey';
+const String messagesTableName = 'messages';
+const String conversationsTableName = 'conversations';
+const String publicKeyTableName = 'publicKey';
 
 class MessageTableFields {
   static final List<String> values = [id, type, msg];
-  static final String type = 'type';
-  static final String msg = 'msg';
-  static final String id = '_id';
+  static const String type = 'type';
+  static const String msg = 'msg';
+  static const String id = '_id';
 }
 
 class ConversationTableFields {
   static final List<String> values = [id, type, msg, converser, timestamp, ack];
-  static final String type = 'type';
-  static final String msg = 'msg';
-  static final String id = '_id';
-  static final String converser = 'converser';
-  static final String timestamp = 'timestamp';
-  static final String ack = 'ack';
+  static const String type = 'type';
+  static const String msg = 'msg';
+  static const String id = '_id';
+  static const String converser = 'converser';
+  static const String timestamp = 'timestamp';
+  static const String ack = 'ack';
 }
 
 class PublicKeyFields {
-  static final String converser = 'converser';
-  static final String publicKey = 'publicKey';
+  static const String converser = 'converser';
+  static const String publicKey = 'publicKey';
 }
 
 class PublicKeyFromDB {

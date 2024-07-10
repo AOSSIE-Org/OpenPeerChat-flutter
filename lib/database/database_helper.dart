@@ -1,28 +1,29 @@
-/// This file has some utility functions for the
-/// retrieval and saving of messages in the database.
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-
-import '../classes/Global.dart';
-import '../classes/Msg.dart';
+import '../classes/global.dart';
+import '../classes/msg.dart';
 import 'dart:convert';
-import '../classes/Payload.dart';
+import '../classes/payload.dart';
 import '../encyption/rsa.dart';
 import 'model.dart';
-import 'MessageDB.dart';
+import 'message_db.dart';
+
+/// This file has some utility functions for the
+/// retrieval and saving of messages in the database.
 
 Future<void> readAllUpdateConversation(BuildContext context) async {
   List<ConversationFromDB> conversations ;
   var value = await MessageDB.instance.readAllFromConversationsTable();
   conversations = value;
-  conversations.forEach((element) {
+  for (var element in conversations) {
+    if (!context.mounted) return;
     Provider.of<Global>(context, listen: false).sentToConversations(
       Msg(element.msg, element.type, element.timestamp, element.id),
       element.converser,
       addToTable: false,
     );
     Msg(element.msg, element.type, element.timestamp, element.id);
-  });
+  }
 }
 
 void readAllUpdatePublicKey() {
@@ -30,10 +31,10 @@ void readAllUpdatePublicKey() {
   MessageDB.instance.readAllFromPublicKeyTable().then((value) {
     publicKey = value;
 
-    publicKey.forEach((element) {
+    for (var element in publicKey) {
       String string = String.fromCharCodes(element.publicKey);
       Global.publicKeys[element.converser] =  parsePublicKeyFromPem(string);
-    });
+    }
   });
 }
 
@@ -41,21 +42,23 @@ void readAllUpdateCache() {
   List<MessageFromDB> messages ;
   MessageDB.instance.readAllFromMessagesTable().then((value) {
     messages = value;
-    messages.forEach((element) {
-      if (element.type == 'Ack')
+    for (var element in messages) {
+      if (element.type == 'Ack') {
         Global.cache[element.id] = convertToAck(element);
-      else
+      } else {
         Global.cache[element.id] = convertToPayload(element);
-    });
+      }
+    }
   });
 }
 
 // Inserting message to the messages table in the database
 void insertIntoMessageTable(dynamic msg) {
-  if (msg.runtimeType == Payload)
+  if (msg.runtimeType == Payload) {
     MessageDB.instance.insertIntoMessagesTable(convertFromPayload(msg));
-  else
+  } else {
     MessageDB.instance.insertIntoMessagesTable(convertFromAck(msg));
+  }
 }
 
 // Inserting message to the conversation table in the database
@@ -69,10 +72,11 @@ void deleteFromMessageTable(String id) {
 }
 
 void updateMessageTable(String id, dynamic msg) {
-  if (msg.runtimeType == Payload)
+  if (msg.runtimeType == Payload) {
     MessageDB.instance.updateMessageTable(convertFromPayload(msg));
-  else
+  } else {
     MessageDB.instance.updateMessageTable(convertFromAck(msg));
+  }
 }
 
 Ack convertToAck(MessageFromDB msg) {

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'HomeScreen.dart';
+import 'home_screen.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../classes/Global.dart';
+import '../classes/global.dart';
 
 class Profile extends StatefulWidget {
   final bool onLogin;
@@ -60,7 +60,7 @@ class _ProfileState extends State<Profile> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(),
+          builder: (context) => const HomeScreen(),
         ),
       );
     }
@@ -78,15 +78,12 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Profile',
         ),
       ),
       body: Visibility(
         visible: loading,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
         replacement: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -120,9 +117,12 @@ class _ProfileState extends State<Profile> {
                 // On pressing, move to the home screen
                 navigateToHomeScreen();
               },
-              child: Text("Save"),
+              child: const Text("Save"),
             )
           ],
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
         ),
       ),
     );

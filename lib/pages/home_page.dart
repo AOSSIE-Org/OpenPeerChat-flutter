@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
-import 'Profile.dart';
+import 'profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -27,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Authentication'),
+        title: const Text('Authentication'),
       ),
       body: Center(
         child: Padding(
@@ -37,8 +38,8 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_supportState)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
                     'Authentication is supported',
                     textAlign: TextAlign.center,
@@ -47,7 +48,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ElevatedButton(
                 onPressed: _supportState ? _authenticate : _authenticate2,
-                child: Text('Authenticate'),
+                child: const Text('Authenticate'),
               ),
             ],
           ),
@@ -56,11 +57,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
   Future<void> _authenticate2() async {
-   print('Authentication is not supported');
+   if (kDebugMode) {
+     print('Authentication is not supported');
+   }
    Navigator.pushReplacement(
      context,
      MaterialPageRoute(
-       builder: (context) => Profile(onLogin: true),
+       builder: (context) => const Profile(onLogin: true),
      ),
    );
   }
@@ -74,17 +77,23 @@ class _HomePageState extends State<HomePage> {
           sensitiveTransaction: true,
         ),
       );
-      print(authenticated);
+      if (kDebugMode) {
+        print(authenticated);
+      }
       if (authenticated) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Profile(onLogin: true),
-          ),
-        );
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Profile(onLogin: true),
+            ),
+          );
+        }
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 }

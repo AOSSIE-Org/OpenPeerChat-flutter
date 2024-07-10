@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pointycastle/export.dart';
-import '../database/DatabaseHelper.dart';
-import '../p2p/AdhocHousekeeping.dart';
-import 'Msg.dart';
+import '../database/database_helper.dart';
+import '../p2p/adhoc_housekeeping.dart';
+import 'msg.dart';
 
 
 class Global extends ChangeNotifier {
@@ -45,7 +45,9 @@ class Global extends ChangeNotifier {
   Future<void> receivedToConversations(dynamic decodedMessage, BuildContext context) async {
     var sender = decodedMessage['sender'];
     var message = json.decode(decodedMessage['message']);
-    print("Received Message: $message");
+    if (kDebugMode) {
+      print("Received Message: $message");
+    }
 
     //file decoding and saving
     if(message['type'] == 'file') {
@@ -92,13 +94,15 @@ class Global extends ChangeNotifier {
     }
     PermissionStatus status = await Permission.storage.request();
     if (status.isGranted) {
-      final path = '${documents.path}/${fileName}';
+      final path = '${documents.path}/$fileName';
       File(path).writeAsBytes(fileBytes);
-      print("File saved at: $path");
+      if (kDebugMode) {
+        print("File saved at: $path");
+      }
       return path;
     }
     else {
-      throw FileSystemException('Storage permission not granted');
+      throw const FileSystemException('Storage permission not granted');
     }
   }
 
@@ -110,7 +114,7 @@ class Global extends ChangeNotifier {
   }
 
   void updateConnectedDevices(List<Device> devices) {
-    this.connectedDevices = devices;
+    connectedDevices = devices;
     notifyListeners();
   }
 }

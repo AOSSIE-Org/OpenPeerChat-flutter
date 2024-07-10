@@ -1,16 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_nearby_connections_example/pages/profile.dart';
+import 'chat_list_screen.dart';
+import '../classes/global.dart';
+import '../p2p/adhoc_housekeeping.dart';
+import 'device_list_screen.dart';
+
+import '../database/database_helper.dart';
+
 /// This the home screen. This can also be considered as the
 ///  main screen of the application.
 /// As the app launches and navigates to the HomeScreen from the Profile screen,
 /// all the processes of message hopping are being initiated from this page.
-
-import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections_example/pages/Profile.dart';
-import 'ChatListScreen.dart';
-import '../classes/Global.dart';
-import '../p2p/AdhocHousekeeping.dart';
-import 'DeviceListScreen.dart';
-
-import '../database/DatabaseHelper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -44,10 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     init(context);
   }
 
-  /// When the messaging is done, the services
-  /// or the subscrption needs to be closed
-  /// Hence the deviceSubscription stream is cancelled.
-  /// Also the nearby services are stopped.
   @override
   void dispose() {
     Global.deviceSubscription!.cancel();
@@ -64,15 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         key: Global.scaffoldKey,
         appBar: AppBar(
-          title: Text("P2P Messaging - AOSSIE"),
+          title: const Text("P2P Messaging - AOSSIE"),
           actions: [
             IconButton(
-              icon: Icon(Icons.settings),
+              icon: const Icon(Icons.settings),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Profile(
+                    builder: (context) => const Profile(
                       onLogin: false,
                     ),
                   ),
@@ -80,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ],
-          bottom: TabBar(
+          bottom: const TabBar(
             tabs: [
               Tab(
                 text: "Devices",
@@ -91,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
             DevicesListScreen(
               deviceType: DeviceType.browser,

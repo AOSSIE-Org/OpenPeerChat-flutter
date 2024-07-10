@@ -1,4 +1,3 @@
-/// Message model
 
 class Msg {
   String message;

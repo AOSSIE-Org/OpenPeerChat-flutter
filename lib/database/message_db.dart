@@ -1,8 +1,9 @@
-/// It is the database for the messages.
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'model.dart';
+
+/// It is the database for the messages.
 
 class MessageDB {
   static final MessageDB instance = MessageDB._init();
@@ -97,10 +98,11 @@ class MessageDB {
       where: '${MessageTableFields.id}=?',
       whereArgs: [id],
     );
-    if (maps.isNotEmpty)
+    if (maps.isNotEmpty) {
       return MessageFromDB.fromJson(maps.first);
-    else
+    } else {
       return null;
+    }
   }
 
   Future<ConversationFromDB?> readFromConversationsTable(int id) async {
@@ -111,10 +113,11 @@ class MessageDB {
       where: '${ConversationTableFields.id}=?',
       whereArgs: [id],
     );
-    if (maps.isNotEmpty)
+    if (maps.isNotEmpty) {
       return ConversationFromDB.fromJson(maps.first);
-    else
+    } else {
       return null;
+    }
   }
 
   Future<List<MessageFromDB>> readAllFromMessagesTable() async {

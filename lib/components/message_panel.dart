@@ -1,22 +1,21 @@
-/// This component is used in the ChatPage.
-/// It is the message bar where the message is typed on and sent to
-/// connected devices.
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:provider/provider.dart';
-
-import '../classes/Global.dart';
-import '../classes/Msg.dart';
-import '../classes/Payload.dart';
-import '../database/DatabaseHelper.dart';
+import '../classes/global.dart';
+import '../classes/msg.dart';
+import '../classes/payload.dart';
+import '../database/database_helper.dart';
 import '../encyption/rsa.dart';
 import 'view_file.dart';
+
+/// This component is used in the ChatPage.
+/// It is the message bar where the message is typed on and sent to
+/// connected devices.
 
 class MessagePanel extends StatefulWidget {
   const MessagePanel({Key? key, required this.converser}) : super(key: key);
@@ -37,7 +36,7 @@ class _MessagePanelState extends State<MessagePanel> {
       child: TextFormField(
         controller: myController,
         decoration: InputDecoration(
-          icon: Icon(Icons.person),
+          icon: const Icon(Icons.person),
           hintText: 'Send Message?',
           labelText: 'Send Message ',
           suffixIcon: Row(
@@ -46,11 +45,11 @@ class _MessagePanelState extends State<MessagePanel> {
             children: [
               IconButton(
                 onPressed: () => _navigateToFilePreviewPage(context),
-                icon: Icon(Icons.attach_file),
+                icon: const Icon(Icons.attach_file),
               ),
               IconButton(
                 onPressed: () => _sendMessage(context),
-                icon: Icon(
+                icon: const Icon(
                   Icons.send,
                 ),
               ),
@@ -73,9 +72,6 @@ class _MessagePanelState extends State<MessagePanel> {
       "type": "text",
       "data": myController.text,
     });
-
-
-
 
     String date = DateTime.now().toUtc().toString();
 
@@ -123,12 +119,12 @@ class _MessagePanelState extends State<MessagePanel> {
       setState(() {
         _selectedFile = File(result.files.single.path!);
       });
-
+      if (!context.mounted) return;
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('File Preview'),
+            title: const Text('File Preview'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -141,7 +137,7 @@ class _MessagePanelState extends State<MessagePanel> {
                 ),
                 ElevatedButton(
                   onPressed: () => FilePreview.openFile(_selectedFile.path),
-                  child: Text('Open File'),
+                  child: const Text('Open File'),
                 ),
               ],
             ),
@@ -151,7 +147,7 @@ class _MessagePanelState extends State<MessagePanel> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('Close'),
+                child: const Text('Close'),
               ),
               IconButton(
                 onPressed: () {
@@ -159,7 +155,7 @@ class _MessagePanelState extends State<MessagePanel> {
           _sendFileMessage(context, _selectedFile);
 
           },
-                icon: Icon(
+                icon: const Icon(
                   Icons.send,
                 ),
               ),
@@ -169,7 +165,6 @@ class _MessagePanelState extends State<MessagePanel> {
       );
     }
   }
-
 
 
   void _sendFileMessage(BuildContext context, File file) async{
@@ -202,8 +197,6 @@ class _MessagePanelState extends State<MessagePanel> {
         date,
       ),
     );
-
-
 
     Provider.of<Global>(context, listen: false).sentToConversations(
       Msg(data, "sent", date, msgId),

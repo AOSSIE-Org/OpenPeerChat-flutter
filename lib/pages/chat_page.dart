@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../components/message_panel.dart';
-import '../classes/Msg.dart';
-import '../classes/Global.dart';
+import '../classes/msg.dart';
+import '../classes/global.dart';
 import 'dart:convert';
 import 'package:pointycastle/asymmetric/api.dart';
 import '../components/view_file.dart';
 import '../encyption/rsa.dart';
 
 class ChatPage extends StatefulWidget {
-  ChatPage({Key? key, required this.converser}) : super(key: key);
+  const ChatPage({Key? key, required this.converser}) : super(key: key);
 
   final String converser;
 
@@ -35,7 +35,7 @@ class ChatPageState extends State<ChatPage> {
     super.didChangeDependencies();
   }
 
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class ChatPageState extends State<ChatPage> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent + 50,
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
       }
@@ -67,13 +67,13 @@ class ChatPageState extends State<ChatPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ' + widget.converser),
+        title: Text('Chat with ${widget.converser}'),
       ),
       body: Column(
         children: [
           Expanded(
             child: messageList.isEmpty
-                ? Center(
+                ? const Center(
               child: Text('No messages yet'),
             )
                 : ListView.builder(
@@ -89,7 +89,7 @@ class ChatPageState extends State<ChatPage> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Text(
                           date,
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -110,19 +110,19 @@ class ChatPageState extends State<ChatPage> {
                           Align(
                             alignment: msg.msgtype == 'sent' ? Alignment.centerRight : Alignment.centerLeft,
                             child: Bubble(
-                              padding: BubbleEdges.all(12),
-                              margin: BubbleEdges.only(top: 10),
+                              padding: const BubbleEdges.all(12),
+                              margin: const BubbleEdges.only(top: 10),
                               //add shadow
                               style: BubbleStyle(
                                 elevation: 3,
                                   shadowColor: Colors.black.withOpacity(0.5),
                               ),
                               // nip: msg.msgtype == 'sent' ? BubbleNip.rightTop : BubbleNip.leftTop,
-                              radius: Radius.circular(10),
-                              color: msg.msgtype == 'sent' ? Color(0xffd1c4e9) : Color(0xff80DEEA),
+                              radius: const Radius.circular(10),
+                              color: msg.msgtype == 'sent' ? const Color(0xffd1c4e9) : const Color(0xff80DEEA),
                               child: msg.message.contains('file') ? _buildFileBubble(msg) : Text(
                                 displayMessage,
-                                style: TextStyle(color: Colors.black87),
+                                style: const TextStyle(color: Colors.black87),
                               ),
                             ),
                           ),
@@ -130,12 +130,12 @@ class ChatPageState extends State<ChatPage> {
                             padding: const EdgeInsets.only(top: 2, bottom: 10),
                             child: Text(
                               dateFormatter(timeStamp: msg.timestamp),
-                              style: TextStyle(color: Colors.black54, fontSize: 10),
+                              style: const TextStyle(color: Colors.black54, fontSize: 10),
                             ),
                           ),
                         ],
                       );
-                    }).toList(),
+                    }),
                   ],
                 );
               },
@@ -156,13 +156,13 @@ class ChatPageState extends State<ChatPage> {
       children: [
         Text(
           fileName,
-          style: TextStyle(
+          style: const TextStyle(
             // fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
         ),
         IconButton(
-          icon: Icon(Icons.file_open, color: Colors.black87),
+          icon: const Icon(Icons.file_open, color: Colors.black87),
           onPressed: () {
             FilePreview.openFile(filePath);
           },

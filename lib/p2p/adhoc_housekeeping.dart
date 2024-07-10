@@ -1,22 +1,21 @@
-/// This is the Adhoc part where the messages are received and sent.
-/// Each and every function have there purpose mentioned above them.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
-import 'package:flutter_nearby_connections_example/classes/Payload.dart';
-import 'package:flutter_nearby_connections_example/database/MessageDB.dart';
+import 'package:flutter_nearby_connections_example/classes/payload.dart';
+import 'package:flutter_nearby_connections_example/database/message_db.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:provider/provider.dart';
-import '../classes/Global.dart';
-import '../database/DatabaseHelper.dart';
+import '../classes/global.dart';
+import '../database/database_helper.dart';
 import "package:pointycastle/export.dart";
 import '../database/model.dart';
 import '../encyption/rsa.dart';
 
-
+/// This is the Adhoc part where the messages are received and sent.
+/// Each and every function have there purpose mentioned above them.
 
 // Get the state name of the connection
 String getStateName(SessionState state) {
@@ -133,7 +132,7 @@ void broadcast(BuildContext context) async {
         RSAPublicKey publicKey = Global.publicKeys[value.receiver]!;
         dynamic message = jsonDecode(payload.message);
 
-        var finalData;
+        var finalData = {};
         if (message['type'] == 'text') {
           Uint8List encryptedBytes = utf8.encode(message['data']);
           // Encrypt the message
@@ -178,7 +177,8 @@ void broadcast(BuildContext context) async {
         // Encode the data to json
 
       var toSend = jsonEncode(data);
-      Provider.of<Global>(
+        if (!context.mounted) return;
+        Provider.of<Global>(
         context,
         listen: false,
       ).devices.forEach((element) {
@@ -189,7 +189,7 @@ void broadcast(BuildContext context) async {
     }
     } else if (value.runtimeType == Ack) {
       Provider.of<Global>(context, listen: false).devices.forEach((element) {
-        var data = {"id": "$key", "type": "Ack"};
+        var data = {"id": key, "type": "Ack"};
         Global.nearbyService!.sendMessage(element.deviceId, jsonEncode(data));
       });
     }
@@ -200,9 +200,9 @@ void broadcast(BuildContext context) async {
 // fresh messages that are yet to be recieved
 void broadcastLastMessageID(BuildContext context) async {
   // Fetch from Database the last message.
-  Timer.periodic(Duration(seconds: 3), (timer) async {
+  Timer.periodic(const Duration(seconds: 3), (timer) async {
     String id = await MessageDB.instance.getLastMessageId(type: "received");
-
+    if (!context.mounted) return;
     Provider.of<Global>(context, listen: false)
         .devices
         .forEach((element) async {
@@ -232,7 +232,7 @@ void sendPublicKey(BuildContext context) async {
 
     String publicKeyPem = encodePublicKeyToPem(Global.myPublicKey!);
 
-
+  if (!context.mounted) return;
     Provider.of<Global>(context, listen: false)
         .devices
         .forEach((element) async {
@@ -263,6 +263,7 @@ void compareMessageId({
 }) async {
   String sentId = await MessageDB.instance.getLastMessageId(type: "sent");
   if (sentId != receivedId) {
+    if (!context.mounted) return;
     broadcast(context);
   }
 }
@@ -270,7 +271,7 @@ void compareMessageId({
 void checkDevices(BuildContext context) {
   Global.deviceSubscription =
       Global.nearbyService!.stateChangedSubscription(callback: (devicesList) {
-        devicesList.forEach((element) {
+        for (var element in devicesList) {
 
           // If the device is connected, send the public key
           if (element.state == SessionState.connected) {
@@ -284,7 +285,7 @@ void checkDevices(BuildContext context) {
               Global.nearbyService!.startBrowsingForPeers();
             }
           }
-        });
+        }
 
         Provider.of<Global>(context, listen: false).updateDevices(devicesList);
         Provider.of<Global>(context, listen: false).updateConnectedDevices(
