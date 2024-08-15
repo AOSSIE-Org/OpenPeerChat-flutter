@@ -148,11 +148,12 @@ void broadcast(BuildContext context) async {
           File file = File(message['filePath']);
           Uint8List encryptedBytes = await file.readAsBytes();
 
-          // // Encrypt the message
+          //to send the file encrypted with the RSA
+          // Encrypt the message
           // Uint8List encryptedMessage = rsaEncrypt(publicKey, encryptedBytes);
-          // // Encode the message to base64
+          // Encode the message to base64
           // String encodedMessage = base64.encode(encryptedMessage);
-          //
+
 
           String encodedMessage = base64.encode(encryptedBytes);
 
@@ -297,6 +298,7 @@ void checkDevices(BuildContext context) {
 // The the protocol service. It receives the messages from the
 // dataReceivedSubscription service and decode it.
 void init(BuildContext context) async {
+
    initiateNearbyService();
   checkDevices(context);
 
@@ -385,6 +387,7 @@ void initiateNearbyService() async {
     strategy: Strategy.P2P_CLUSTER,
     callback: (isRunning) async {
       if (isRunning) {
+
         startAdvertising();
         startBrowsing();
 

@@ -17,11 +17,38 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   bool isLoading = false;
   List<String> conversers = [];
+  List<String> filteredConversers = [];
+  TextEditingController searchController = TextEditingController();
+
+
   // In the init state, we need to update the cache everytime.
   @override
   void initState() {
     super.initState();
     readAllUpdateCache();
+    searchController.addListener(_filterConversers);
+  }
+
+
+  @override
+  void dispose() {
+    searchController.removeListener(_filterConversers);
+    searchController.dispose();
+    super.dispose();
+  }
+
+
+  void _filterConversers() {
+    setState(() {
+      if (searchController.text.isEmpty) {
+        filteredConversers = conversers;
+      } else {
+        filteredConversers = conversers
+            .where((converser) =>
+            converser.toLowerCase().contains(searchController.text.toLowerCase()))
+            .toList();
+      }
+    });
   }
 
   @override
@@ -34,11 +61,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
     Provider.of<Global>(context).conversations.forEach((key, value) {
       conversers.add(key);
     });
+    if (searchController.text.isEmpty) {
+      filteredConversers = conversers;
+    }
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
           child: TextField(
+            controller: searchController,
             decoration: InputDecoration(
               hintText: "Search...",
               hintStyle: TextStyle(color: Colors.grey.shade600),
@@ -51,32 +82,33 @@ class _ChatListScreenState extends State<ChatListScreen> {
               fillColor: Colors.grey.shade100,
               contentPadding: const EdgeInsets.all(8),
               enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.grey.shade100)),
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(color: Colors.grey.shade100),
+              ),
             ),
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-              itemCount: conversers.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(conversers[index]),
-                  onTap: () {
-                    // Whenever tapped on the Device tile, it navigates to the
-                    // chatpage
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatPage(
-                          converser: conversers[index],
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }),
+    Expanded(
+    child: ListView.builder(
+    itemCount: filteredConversers.length,
+    shrinkWrap: true,
+    itemBuilder: (context, index) {
+    return ListTile(
+    title: Text(filteredConversers[index]),
+    onTap: () {
+    // Navigate to the chat page
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) => ChatPage(
+    converser: filteredConversers[index],
+    ),
+    ),
+    );
+    },
+    );
+    },
+               ),
         )
       ],
     );

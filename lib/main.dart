@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections_example/pages/home_page.dart';
+import 'package:flutter_nearby_connections_example/pages/profile.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 import 'classes/global.dart';
 import 'encyption/key_storage.dart';
@@ -52,9 +54,46 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+late final LocalAuthentication auth;
 
 Route<dynamic> generateRoute(RouteSettings settings) {
+
+
+
+  auth = LocalAuthentication();
+
+  _authenticate().then((authenticated) {
+    while (!authenticated) {
+      _authenticate().then((authenticated) {
+      });
+    }
+  });
+
   return MaterialPageRoute(
-    builder: (_) => const HomePage(),
+    builder: (_) => const Profile(
+      onLogin: true,
+    ),
   );
+}
+
+
+Future<bool> _authenticate() async {
+  try {
+    bool authenticated = await auth.authenticate(
+      localizedReason: 'Authenticate for access',
+      options: const AuthenticationOptions(
+        stickyAuth: true,
+        sensitiveTransaction: true,
+      ),
+    );
+    if (kDebugMode) {
+      print(authenticated);
+    }
+    return authenticated;
+  } catch (e) {
+    if (kDebugMode) {
+      print(e);
+    }
+    return false;
+  }
 }

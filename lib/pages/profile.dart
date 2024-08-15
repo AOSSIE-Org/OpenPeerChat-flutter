@@ -100,8 +100,8 @@ class _ProfileState extends State<Profile> {
                 ),
                 validator: (String? value) {
                   return (value != null &&
-                          value.contains('@') &&
-                          value.length > 3)
+                      value.contains('@') &&
+                      value.length > 3)
                       ? 'Do not use the @ char and name length should be greater than 3'
                       : null;
                 },

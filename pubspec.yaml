@@ -8,31 +8,33 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
+version: 1.0.0+0
+
 dependencies:
   flutter:
     sdk: flutter
   path: any
-  flutter_styled_toast: ^2.0.0
-  flutter_nearby_connections: ^1.0.11
-  cupertino_icons: ^1.0.2
-  bubble: ^1.2.1
-  nanoid: ^1.0.0
-  sqflite: ^2.0.0+3
-  intl: ^0.19.0
-  pointycastle: ^3.0.1
-  shared_preferences: ^2.0.15
-  provider: ^6.0.3
+  flutter_styled_toast:
+  flutter_nearby_connections:
+  cupertino_icons:
+  bubble:
+  nanoid:
+  sqflite:
+  intl:
+  pointycastle:
+  shared_preferences:
+  provider:
   flutter_secure_storage:
-  encrypt: ^5.0.3
+  encrypt:
   asn1lib:
   local_auth:
   file_picker:
-  open_filex: ^4.4.0
-  permission_handler: ^11.3.1
-  path_provider: ^2.1.2
+  open_filex:
+  permission_handler:
+  path_provider:
 
 dev_dependencies:
-  flutter_lints: ^4.0.0
+  flutter_lints:
   flutter_test:
     sdk: flutter
 
