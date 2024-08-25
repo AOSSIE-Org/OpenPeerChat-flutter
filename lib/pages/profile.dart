@@ -87,9 +87,9 @@ class _ProfileState extends State<Profile> {
         replacement: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text("Your Username will be your name+$customLengthId"),
+
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10.0),
               child: TextFormField(
                 controller: myName,
                 decoration: const InputDecoration(

@@ -79,7 +79,7 @@ The OpenPeerChat app is a secure, peer-to-peer messaging platform designed to pr
 
 ## Merge Requests
 https://github.com/AOSSIE-Org/OpenPeerChat-flutter/pull/21
-https://github.com/AOSSIE-Org/OpenPeerChat-flutter/pull/22
+https://github.com/AOSSIE-Org/OpenPeerChat-flutter/pull/23
 
 ## Contributor Details
 - Name: Bhavik Mangla
