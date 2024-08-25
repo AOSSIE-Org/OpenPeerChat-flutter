@@ -14,24 +14,24 @@ dependencies:
   flutter:
     sdk: flutter
   path: any
-  flutter_styled_toast:
-  flutter_nearby_connections:
-  cupertino_icons:
-  bubble:
-  nanoid:
-  sqflite:
-  intl:
-  pointycastle:
-  shared_preferences:
-  provider:
-  flutter_secure_storage:
-  encrypt:
-  asn1lib:
-  local_auth:
-  file_picker:
-  open_filex:
-  permission_handler:
-  path_provider:
+  flutter_styled_toast: ^2.2.1
+  flutter_nearby_connections: ^1.1.2
+  cupertino_icons: ^1.0.8
+  bubble: ^1.2.1
+  nanoid: ^1.0.0
+  sqflite: ^2.3.3+1
+  intl: ^0.19.0
+  pointycastle: ^3.9.1
+  shared_preferences: ^2.3.2
+  provider: ^6.1.2
+  flutter_secure_storage: ^9.2.2
+  encrypt: ^5.0.3
+  asn1lib: ^1.5.3
+  local_auth: ^2.3.0
+  file_picker: ^8.1.2
+  open_filex: ^4.5.0
+  permission_handler: ^11.3.1
+  path_provider: ^2.1.4
 
 dev_dependencies:
   flutter_lints:

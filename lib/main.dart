@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_nearby_connections_example/pages/auth_fail.dart';
 import 'package:flutter_nearby_connections_example/pages/profile.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
@@ -54,46 +55,49 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-late final LocalAuthentication auth;
-
-Route<dynamic> generateRoute(RouteSettings settings) {
 
 
+Future<void> _authenticate(BuildContext context) async {
+  final LocalAuthentication auth = LocalAuthentication();
+  bool authenticated = false;
 
-  auth = LocalAuthentication();
-
-  _authenticate().then((authenticated) {
-    while (!authenticated) {
-      _authenticate().then((authenticated) {
-      });
-    }
-  });
-
-  return MaterialPageRoute(
-    builder: (_) => const Profile(
-      onLogin: true,
-    ),
-  );
-}
-
-
-Future<bool> _authenticate() async {
   try {
-    bool authenticated = await auth.authenticate(
-      localizedReason: 'Authenticate for access',
+    authenticated = await auth.authenticate(
+      localizedReason: 'Please authenticate to proceed',
       options: const AuthenticationOptions(
         stickyAuth: true,
         sensitiveTransaction: true,
       ),
     );
-    if (kDebugMode) {
-      print(authenticated);
-    }
-    return authenticated;
   } catch (e) {
     if (kDebugMode) {
       print(e);
     }
-    return false;
+  }
+  if (!context.mounted) return;
+  if (authenticated) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Profile(onLogin: true)),
+    );
+  } else {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => AuthFailedPage(onRetry: () => _authenticate(context))),
+    );
   }
 }
+
+Route<dynamic> generateRoute(RouteSettings settings) {
+  return MaterialPageRoute(
+    builder: (context) {
+      _authenticate(context);
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    },
+  );
+}
+
