@@ -34,6 +34,8 @@ class _MessagePanelState extends State<MessagePanel> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        //multiline text field
+        maxLines: null,
         controller: myController,
         decoration: InputDecoration(
           icon: const Icon(Icons.person),
@@ -112,9 +114,50 @@ class _MessagePanelState extends State<MessagePanel> {
     myController.clear();
   }
 
+  /// This function is used to navigate to the file preview page and check the file size.
   void _navigateToFilePreviewPage(BuildContext context) async {
+    //max size of file is 30 MB
+    double sizeKbs = 0;
+    const int maxSizeKbs = 30 * 1024;
     FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if(result != null) {
+      sizeKbs = result.files.single.size / 1024;
+    }
 
+
+    if (sizeKbs > maxSizeKbs) {
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('File Size Exceeded'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  //file size in MB
+                  title: Text('File Size: ${(sizeKbs / 1024).ceil()} MB'),
+                  subtitle: const Text(
+                      'File size should not exceed 30 MB'),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+//this function is used to open the file preview dialog
     if (result != null) {
       setState(() {
         _selectedFile = File(result.files.single.path!);
@@ -129,11 +172,12 @@ class _MessagePanelState extends State<MessagePanel> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
+
                   title: Text('File Name: ${_selectedFile.path
                       .split('/')
-                      .last}'),
+                      .last}', overflow: TextOverflow.ellipsis,),
                   subtitle: Text(
-                      'File Size: ${_selectedFile.lengthSync()} bytes'),
+                      'File Size: ${(sizeKbs / 1024).floor()} MB'),
                 ),
                 ElevatedButton(
                   onPressed: () => FilePreview.openFile(_selectedFile.path),
@@ -167,6 +211,7 @@ class _MessagePanelState extends State<MessagePanel> {
   }
 
 
+/// This function is used to send the file message.
   void _sendFileMessage(BuildContext context, File file) async{
     var msgId = nanoid(21);
 

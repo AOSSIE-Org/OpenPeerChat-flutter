@@ -67,7 +67,7 @@ class ChatPageState extends State<ChatPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${widget.converser}'),
+        title: Text(widget.converser),
       ),
       body: Column(
         children: [
@@ -154,11 +154,14 @@ class ChatPageState extends State<ChatPage> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          fileName,
-          style: const TextStyle(
-            // fontWeight: FontWeight.bold,
-            color: Colors.black87,
+        Flexible(
+          child: Text(
+            fileName,
+            style: const TextStyle(
+              color: Colors.black87,
+            ),
+            overflow: TextOverflow.visible,
+
           ),
         ),
         IconButton(

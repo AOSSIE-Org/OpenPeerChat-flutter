@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:provider/provider.dart';
 import '../classes/global.dart';
 
@@ -28,19 +29,49 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
 
   bool isLoading = false;
 
+  TextEditingController searchController = TextEditingController();
+  List<Device> filteredDevices = [];
+
+
   @override
   void initState() {
     super.initState();
+    searchController.addListener(_filterDevices);
   }
 
   @override
+  void dispose() {
+    searchController.removeListener(_filterDevices);
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterDevices() {
+    setState(() {
+      if (searchController.text.isEmpty) {
+        filteredDevices = Provider.of<Global>(context, listen: false).devices;
+      } else {
+        filteredDevices = Provider.of<Global>(context, listen: false)
+            .devices
+            .where((device) => device.deviceName.toLowerCase().contains(searchController.text.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+    if (filteredDevices.isEmpty && searchController.text.isEmpty) {
+      filteredDevices = Provider.of<Global>(context).devices;
+    }
     return SingleChildScrollView(
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: TextField(
+              controller: searchController,
               decoration: InputDecoration(
                 hintText: "Search...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
@@ -60,7 +91,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           ),
           ListView.builder(
             // Builds a screen with list of devices in the proximity
-            itemCount: Provider.of<Global>(context).devices.length,
+            itemCount:  filteredDevices.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
               // Getting a device from the provider
@@ -76,11 +107,14 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                         // to connect/disconnect with any device
                         onTap: () => connectToDevice(device),
                         child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: getButtonColor(device.state),
+                          ),
                           margin: const EdgeInsets.symmetric(horizontal: 8.0),
                           padding: const EdgeInsets.all(8.0),
                           height: 35,
                           width: 100,
-                          color: getButtonColor(device.state),
                           child: Center(
                             child: Text(
                               getButtonStateName(device.state),

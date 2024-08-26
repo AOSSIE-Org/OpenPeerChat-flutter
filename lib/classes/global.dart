@@ -83,6 +83,8 @@ class Global extends ChangeNotifier {
 
   Future<String> decodeAndStoreFile(String encodedFile, String fileName) async {
     Uint8List fileBytes = base64.decode(encodedFile);
+
+    //to send files encrypted using RSA
     // Uint8List fileData = rsaDecrypt(Global.myPrivateKey!, fileBytes);
 
     Directory documents ;

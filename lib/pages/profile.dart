@@ -87,9 +87,9 @@ class _ProfileState extends State<Profile> {
         replacement: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text("Your Username will be your name+$customLengthId"),
+
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10.0),
               child: TextFormField(
                 controller: myName,
                 decoration: const InputDecoration(
@@ -100,8 +100,8 @@ class _ProfileState extends State<Profile> {
                 ),
                 validator: (String? value) {
                   return (value != null &&
-                          value.contains('@') &&
-                          value.length > 3)
+                      value.contains('@') &&
+                      value.length > 3)
                       ? 'Do not use the @ char and name length should be greater than 3'
                       : null;
                 },

@@ -60,10 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         key: Global.scaffoldKey,
         appBar: AppBar(
-          title: const Text("P2P Messaging - AOSSIE"),
+          title: const Text("AOSSIE"),
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings),
+              icon: const Icon(Icons.person),
               onPressed: () {
                 Navigator.push(
                   context,
