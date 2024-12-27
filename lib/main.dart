@@ -8,6 +8,41 @@ import 'classes/global.dart';
 import 'encyption/key_storage.dart';
 import 'encyption/rsa.dart';
 
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: Colors.blue,
+  scaffoldBackgroundColor: Colors.white,
+  textTheme: TextTheme(
+    displayLarge: TextStyle(
+      fontSize: 24.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: 16.0,
+      color: Colors.black87,
+    ),
+  ),
+);
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primaryColor: Colors.grey[900],
+  hintColor: Colors.blueAccent,
+  scaffoldBackgroundColor: Colors.grey[850],
+  textTheme: TextTheme(
+    displayLarge: TextStyle(
+      fontSize: 24.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: 16.0,
+      color: Colors.white70,
+    ),
+  ),
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -48,10 +83,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       onGenerateRoute: generateRoute,
       initialRoute: '/',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
     );
   }
 }
