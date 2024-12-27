@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../database/database_helper.dart';
 
 /// This the home screen. This can also be considered as the
-///  main screen of the application.
+/// main screen of the application.
 /// As the app launches and navigates to the HomeScreen from the Profile screen,
 /// all the processes of message hopping are being initiated from this page.
 
@@ -66,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // init(context);
     refreshMessages();
     _loadTheme();
   }
@@ -110,11 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setInt(themePreferenceKey, mode.index);
   }
 
-  void _toggleTheme() {
+  void _toggleTheme(bool value) {
     setState(() {
-      _themeMode = _themeMode == ThemeMode.light
-          ? ThemeMode.dark
-          : ThemeMode.light;
+      _themeMode = value ? ThemeMode.dark : ThemeMode.light;
     });
     _saveTheme(_themeMode);
   }
@@ -127,18 +124,19 @@ class _HomeScreenState extends State<HomeScreen> {
         data: ThemeData(
           brightness: _themeMode == ThemeMode.dark
               ? Brightness.dark
-              : Brightness.light, 
-          // You can further customize the theme here if needed
+              : Brightness.light,
         ),
         child: Scaffold(
           key: Global.scaffoldKey,
           appBar: AppBar(
             title: const Text("AOSSIE"),
             actions: [
-              //toggle button fro light and dark themes
-              IconButton(
-                onPressed: _toggleTheme,
-                icon: Icon(Icons.toggle_off_outlined),
+              // Slider toggle button for light and dark themes
+              Switch(
+                value: _themeMode == ThemeMode.dark,
+                onChanged: _toggleTheme,
+                activeColor: Colors.blueAccent,
+                inactiveThumbColor: Colors.grey,
               ),
               IconButton(
                 icon: const Icon(Icons.person),
