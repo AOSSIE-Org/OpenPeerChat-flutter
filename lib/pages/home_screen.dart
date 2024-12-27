@@ -132,6 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: const Text("AOSSIE"),
             actions: [
               // Slider toggle button for light and dark themes
+              //added switch inplace of icon button
               Switch(
                 value: _themeMode == ThemeMode.dark,
                 onChanged: _toggleTheme,
