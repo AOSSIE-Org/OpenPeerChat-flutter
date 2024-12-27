@@ -16,7 +16,7 @@ import '../database/database_helper.dart';
 const String themePreferenceKey = 'themePreference';
 
 final ThemeData lightTheme = ThemeData(
-  brightness:Brightness.light,
+  brightness: Brightness.light,
   primaryColor: Colors.blue,
   scaffoldBackgroundColor: Colors.white,
   textTheme: TextTheme(
@@ -33,7 +33,7 @@ final ThemeData lightTheme = ThemeData(
 );
 
 final ThemeData darkTheme = ThemeData(
-  brightness:Brightness.dark,
+  brightness: Brightness.dark,
   primaryColor: Colors.grey[900],
   hintColor: Colors.blueAccent,
   scaffoldBackgroundColor: Colors.grey[850],
