@@ -11,6 +11,8 @@
     <uses-permission android:minSdkVersion="31" android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:minSdkVersion="31" android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:minSdkVersion="32" android:name="android.permission.NEARBY_WIFI_DEVICES" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- Optional: only required for FILE payloads -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <application

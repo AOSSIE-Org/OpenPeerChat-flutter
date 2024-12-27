@@ -12,10 +12,19 @@ import '../classes/payload.dart';
 import '../database/database_helper.dart';
 import '../encyption/rsa.dart';
 import 'view_file.dart';
+import '../classes/audio_playback.dart';
+import '../classes/audio_recording.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// This component is used in the ChatPage.
 /// It is the message bar where the message is typed on and sent to
 /// connected devices.
+
+Future<bool> requestPermissions() async {
+  var micStatus = await Permission.microphone.request();
+  var storageStatus = await Permission.storage.request();
+  return micStatus.isGranted && storageStatus.isGranted;
+}
 
 class MessagePanel extends StatefulWidget {
   const MessagePanel({Key? key, required this.converser}) : super(key: key);
@@ -27,7 +36,16 @@ class MessagePanel extends StatefulWidget {
 
 class _MessagePanelState extends State<MessagePanel> {
   TextEditingController myController = TextEditingController();
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _recordingFilePath;
+
   File _selectedFile = File('');
+
+  void initState() {
+    super.initState();
+    _audioRecorder.initRecorder();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +73,104 @@ class _MessagePanelState extends State<MessagePanel> {
                   Icons.send,
                 ),
               ),
+              IconButton(
+                icon: Icon(Icons.mic),
+                onPressed: _startRecording,
+              ),
+              IconButton(
+                icon: Icon(Icons.stop),
+                onPressed: _stopRecording,
+              ),
+              IconButton(
+                icon: Icon(Icons.send),
+                onPressed: () => _sendAudioMessage(context),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
+  void _startRecording() async {
+    if (await requestPermissions()) {
+      print("***********************************");
+      String? filePath = await _audioRecorder.startRecording();
+      setState(() {
+        _recordingFilePath = filePath;
+      });
+    }
+  }
+
+  void _stopRecording() async {
+    await _audioRecorder.stopRecording();
+  }
+
+  void _playAudio() {
+    if (_recordingFilePath != null) {
+      _audioPlayer.playAudio(_recordingFilePath!);
+    }
+  }
+
+  void _sendAudioMessage(BuildContext context) async {
+  // Ensure a recording exists
+  if (_recordingFilePath == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('No audio recorded to send.')),
+    );
+    return;
+  }
+
+  var msgId = nanoid(21);
+
+  String fileName = _recordingFilePath!.split('/').last;
+
+  // Encode audio metadata for the message
+  String data = jsonEncode({
+    "sender": Global.myName,
+    "type": "audio",
+    "fileName": fileName,
+    "filePath": _recordingFilePath,
+  });
+
+  String date = DateTime.now().toUtc().toString();
+
+  // Save the message in cache
+  Global.cache[msgId] = Payload(
+    msgId,
+    Global.myName,
+    widget.converser,
+    data,
+    date,
+  );
+
+  // Insert the message into the database
+  insertIntoMessageTable(
+    Payload(
+      msgId,
+      Global.myName,
+      widget.converser,
+      data,
+      date,
+    ),
+  );
+
+  // Send the message to the conversation
+  Provider.of<Global>(context, listen: false).sentToConversations(
+    Msg(data, "sent", date, msgId),
+    widget.converser,
+  );
+
+  // Notify user and reset the recording state
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Audio message sent!')),
+  );
+
+  setState(() {
+    _recordingFilePath = null; // Clear the recording path after sending
+  });
+}
+
 
   void _sendMessage(BuildContext context) {
     var msgId = nanoid(21);
