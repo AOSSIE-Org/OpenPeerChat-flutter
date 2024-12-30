@@ -13,26 +13,31 @@ import '../components/view_file.dart';
 import '../encyption/rsa.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key, required this.converser}) : super(key: key);
+  String converser;
+   ChatPage({Key? key, required this.converser}) : super(key: key);
 
-  final String converser;
+
 
   @override
-  ChatPageState createState() => ChatPageState();
+  _ChatPageState createState() => _ChatPageState();
 }
 
-class ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> {
   List<Msg> messageList = [];
   TextEditingController myController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+    // Adding listener to listen for profile name updates
+    Global.profileNameStream.listen((updatedName) {
+      setState(() {
+        if (widget.converser == Global.myName) {
+          // Update the converser name if it matches the updated profile name
+          widget.converser = updatedName;
+        }
+      });
+    });
   }
 
   final ScrollController _scrollController = ScrollController();
@@ -74,72 +79,78 @@ class ChatPageState extends State<ChatPage> {
           Expanded(
             child: messageList.isEmpty
                 ? const Center(
-              child: Text('No messages yet'),
-            )
+                    child: Text('No messages yet'),
+                  )
                 : ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(8),
-              itemCount: groupedMessages.keys.length,
-              itemBuilder: (BuildContext context, int index) {
-                String date = groupedMessages.keys.elementAt(index);
-                return Column(
-                  children: [
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          date,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    ...groupedMessages[date]!.map((msg) {
-                      String displayMessage = msg.message;
-                      if (Global.myPrivateKey != null) {
-                        RSAPrivateKey privateKey = Global.myPrivateKey!;
-                        dynamic data = jsonDecode(msg.message);
-                        if (data['type'] == 'text') {
-                          Uint8List encryptedBytes = base64Decode(data['data']);
-                          Uint8List decryptedBytes = rsaDecrypt(privateKey, encryptedBytes);
-                          displayMessage = utf8.decode(decryptedBytes);
-                        }
-                      }
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(8),
+                    itemCount: groupedMessages.keys.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      String date = groupedMessages.keys.elementAt(index);
                       return Column(
-                        crossAxisAlignment: msg.msgtype == 'sent' ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                         children: [
-                          Align(
-                            alignment: msg.msgtype == 'sent' ? Alignment.centerRight : Alignment.centerLeft,
-                            child: Bubble(
-                              padding: const BubbleEdges.all(12),
-                              margin: const BubbleEdges.only(top: 10),
-                              //add shadow
-                              style: BubbleStyle(
-                                elevation: 3,
-                                  shadowColor: Colors.black.withOpacity(0.5),
-                              ),
-                              // nip: msg.msgtype == 'sent' ? BubbleNip.rightTop : BubbleNip.leftTop,
-                              radius: const Radius.circular(10),
-                              color: msg.msgtype == 'sent' ? const Color(0xffd1c4e9) : const Color(0xff80DEEA),
-                              child: msg.message.contains('file') ? _buildFileBubble(msg) : Text(
-                                displayMessage,
-                                style: const TextStyle(color: Colors.black87),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                date,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2, bottom: 10),
-                            child: Text(
-                              dateFormatter(timeStamp: msg.timestamp),
-                              style: const TextStyle(color: Colors.black54, fontSize: 10),
-                            ),
-                          ),
+                          ...groupedMessages[date]!.map((msg) {
+                            String displayMessage = msg.message;
+                            if (Global.myPrivateKey != null) {
+                              RSAPrivateKey privateKey = Global.myPrivateKey!;
+                              dynamic data = jsonDecode(msg.message);
+                              if (data['type'] == 'text') {
+                                Uint8List encryptedBytes = base64Decode(data['data']);
+                                Uint8List decryptedBytes = rsaDecrypt(privateKey, encryptedBytes);
+                                displayMessage = utf8.decode(decryptedBytes);
+                              }
+                            }
+                            return Column(
+                              crossAxisAlignment: msg.msgtype == 'sent'
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Align(
+                                  alignment: msg.msgtype == 'sent'
+                                      ? Alignment.centerRight
+                                      : Alignment.centerLeft,
+                                  child: Bubble(
+                                    padding: const BubbleEdges.all(12),
+                                    margin: const BubbleEdges.only(top: 10),
+                                    style: BubbleStyle(
+                                      elevation: 3,
+                                      shadowColor: Colors.black.withOpacity(0.5),
+                                    ),
+                                    radius: const Radius.circular(10),
+                                    color: msg.msgtype == 'sent'
+                                        ? const Color(0xffd1c4e9)
+                                        : const Color(0xff80DEEA),
+                                    child: msg.message.contains('file')
+                                        ? _buildFileBubble(msg)
+                                        : Text(
+                                            displayMessage,
+                                            style: const TextStyle(color: Colors.black87),
+                                          ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2, bottom: 10),
+                                  child: Text(
+                                    dateFormatter(timeStamp: msg.timestamp),
+                                    style: const TextStyle(color: Colors.black54, fontSize: 10),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
                         ],
                       );
-                    }),
-                  ],
-                );
-              },
-            ),
+                    },
+                  ),
           ),
           MessagePanel(converser: widget.converser),
         ],
@@ -161,7 +172,6 @@ class ChatPageState extends State<ChatPage> {
               color: Colors.black87,
             ),
             overflow: TextOverflow.visible,
-
           ),
         ),
         IconButton(
@@ -180,3 +190,4 @@ String dateFormatter({required String timeStamp}) {
   String formattedTime = DateFormat('hh:mm aa').format(dateTime);
   return formattedTime;
 }
+

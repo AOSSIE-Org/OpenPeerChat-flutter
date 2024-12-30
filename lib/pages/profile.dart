@@ -4,7 +4,7 @@ import 'home_screen.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../classes/global.dart';
-
+import '../services/communication_service.dart';
 class Profile extends StatefulWidget {
   final bool onLogin;
 
@@ -113,7 +113,7 @@ class _ProfileState extends State<Profile> {
                 // saving the name and id to shared preferences
                 prefs.setString('p_name', myName.text);
                 prefs.setString('p_id', customLengthId);
-
+                CommunicationService.broadcastProfileUpdate(customLengthId, myName.text);
                 // On pressing, move to the home screen
                 navigateToHomeScreen();
               },
