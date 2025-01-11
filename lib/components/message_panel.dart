@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:provider/provider.dart';
@@ -12,10 +13,14 @@ import '../classes/payload.dart';
 import '../database/database_helper.dart';
 import '../encyption/rsa.dart';
 import 'view_file.dart';
+import '../classes/audio_playback.dart';
+import '../classes/audio_recording.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-/// This component is used in the ChatPage.
-/// It is the message bar where the message is typed on and sent to
-/// connected devices.
+Future<bool> requestPermissions() async {
+  var micStatus = await Permission.microphone.request();
+  return micStatus.isGranted;
+}
 
 class MessagePanel extends StatefulWidget {
   const MessagePanel({Key? key, required this.converser}) : super(key: key);
@@ -27,20 +32,192 @@ class MessagePanel extends StatefulWidget {
 
 class _MessagePanelState extends State<MessagePanel> {
   TextEditingController myController = TextEditingController();
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _recordingFilePath;
+  bool _isRecording = false;
+  Duration _recordingDuration = Duration.zero;
   File _selectedFile = File('');
+
+  void initState() {
+    super.initState();
+    _audioRecorder.initRecorder();
+    _audioPlayer.initPlayer();
+  }
+
+  void _startRecording() async {
+    if (await requestPermissions()) {
+      String? filePath = await _audioRecorder.startRecording();
+      setState(() {
+        _recordingFilePath = filePath;
+        _isRecording = true;
+        _recordingDuration = Duration.zero;
+      });
+      _startRecordingTimer();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Microphone permission denied.')),
+      );
+    }
+  }
+
+  void _stopRecording({bool cancel = false}) async {
+    await _audioRecorder.stopRecording();
+    setState(() {
+      _isRecording = false;
+      if (cancel) {
+        _recordingFilePath = null;
+      }
+    });
+
+    if (!cancel && _recordingFilePath != null) {
+      _confirmAudioMessage();
+    }
+  }
+
+  void _startRecordingTimer() {
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 1));
+      if (_isRecording) {
+        setState(() {
+          _recordingDuration += const Duration(seconds: 1);
+        });
+        return true;
+      }
+      return false;
+    });
+  }
+
+  void _confirmAudioMessage() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Send Audio Message'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Duration: ${_recordingDuration.inSeconds} seconds'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.play_arrow),
+                    onPressed: () => _playAudio(),
+                  ),
+                  Lottie.asset('assets/audioAnimation.json',
+                      height: 50, width: 50),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      setState(() {
+                        _recordingFilePath = null;
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _sendAudioMessage();
+              },
+              child: const Text('Send'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _playAudio() {
+    if (_recordingFilePath != null) {
+      _audioPlayer.playAudio(_recordingFilePath!);
+    }
+  }
+
+  void _sendAudioMessage() async {
+  if (_recordingFilePath == null) return;
+
+  // Read the audio file content
+  Uint8List audioBytes = await File(_recordingFilePath!).readAsBytes();
+
+  // Encrypt the audio file content
+  RSAPublicKey publicKey = Global.myPublicKey!;
+  Uint8List encryptedAudio = rsaEncrypt(publicKey, audioBytes);
+
+  // Generate a unique ID for the message
+  var msgId = nanoid(21);
+  String fileName = _recordingFilePath!.split('/').last;
+
+  // Create the encrypted message payload
+  String myData = jsonEncode({
+    "sender": Global.myName,
+    "type": "audio",
+    "fileName": fileName,
+    "data": base64Encode(encryptedAudio),
+  });
+
+  String date = DateTime.now().toUtc().toString();
+
+  // Add the message to the local cache
+  Global.cache[msgId] = Payload(
+    msgId,
+    Global.myName,
+    widget.converser,
+    myData,
+    date,
+  );
+
+  // Save the message to the database
+  insertIntoMessageTable(
+    Payload(
+      msgId,
+      Global.myName,
+      widget.converser,
+      myData,
+      date,
+    ),
+  );
+
+  // Update the conversations in the UI
+  Provider.of<Global>(context, listen: false).sentToConversations(
+    Msg(myData, "sent", date, msgId),
+    widget.converser,
+  );
+
+  // Provide feedback to the user
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Audio message sent!')),
+  );
+
+  // Reset the recording state
+  setState(() {
+    _recordingFilePath = null;
+    _recordingDuration = Duration.zero;
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
-        //multiline text field
         maxLines: null,
         controller: myController,
         decoration: InputDecoration(
           icon: const Icon(Icons.person),
           hintText: 'Send Message?',
-          labelText: 'Send Message ',
+          labelText: 'Send Message',
           suffixIcon: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.min,
@@ -49,11 +226,18 @@ class _MessagePanelState extends State<MessagePanel> {
                 onPressed: () => _navigateToFilePreviewPage(context),
                 icon: const Icon(Icons.attach_file),
               ),
+              GestureDetector(
+                onLongPress: _startRecording,
+                onLongPressUp: () => _stopRecording(cancel: false),
+                onTapCancel: () => _stopRecording(cancel: true),
+                child: Icon(
+                  _isRecording ? Icons.mic : Icons.mic_none,
+                  color: _isRecording ? Colors.red : Colors.black,
+                ),
+              ),
               IconButton(
                 onPressed: () => _sendMessage(context),
-                icon: const Icon(
-                  Icons.send,
-                ),
+                icon: const Icon(Icons.send),
               ),
             ],
           ),

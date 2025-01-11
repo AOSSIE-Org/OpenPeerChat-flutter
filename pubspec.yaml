@@ -32,6 +32,8 @@ dependencies:
   open_filex: ^4.5.0
   permission_handler: ^11.3.1
   path_provider: ^2.1.4
+  flutter_sound:
+  lottie:
 
 dev_dependencies:
   flutter_lints:
@@ -39,4 +41,6 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
+  assets:
+    - assets/audioAnimation.json
   uses-material-design: true
