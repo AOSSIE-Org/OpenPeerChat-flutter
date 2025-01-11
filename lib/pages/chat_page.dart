@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'package:pointycastle/asymmetric/api.dart';
 import '../components/view_file.dart';
 import '../encyption/rsa.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key, required this.converser}) : super(key: key);
@@ -24,11 +25,21 @@ class ChatPage extends StatefulWidget {
 class ChatPageState extends State<ChatPage> {
   List<Msg> messageList = [];
   TextEditingController myController = TextEditingController();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _currentlyPlayingId;
+  bool _isPlaying = false;
+
 
   @override
   void initState() {
     super.initState();
   }
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
 
   @override
   void didChangeDependencies() {
@@ -36,6 +47,7 @@ class ChatPageState extends State<ChatPage> {
   }
 
   final ScrollController _scrollController = ScrollController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -146,11 +158,84 @@ class ChatPageState extends State<ChatPage> {
       ),
     );
   }
+  Widget _buildVoiceMessageBubble(Msg msg) {
+    final data = jsonDecode(msg.message);
+    final bool isCurrentlyPlaying = _currentlyPlayingId == msg.id;
+
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 250),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              isCurrentlyPlaying && _isPlaying ? Icons.pause : Icons.play_arrow,
+              color: Colors.black87,
+            ),
+            onPressed: () => _handleVoicePlayback(msg),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Voice Message',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                if (isCurrentlyPlaying)
+                  const LinearProgressIndicator(
+                    backgroundColor: Colors.grey,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleVoicePlayback(Msg msg) async {
+    final data = jsonDecode(msg.message);
+    final String filePath = data['filePath'];
+
+    if (_currentlyPlayingId == msg.id && _isPlaying) {
+      await _audioPlayer.pause();
+      setState(() => _isPlaying = false);
+    } else {
+      if (_currentlyPlayingId != msg.id) {
+        await _audioPlayer.stop();
+        await _audioPlayer.play(DeviceFileSource(filePath));
+      } else {
+        await _audioPlayer.resume();
+      }
+      setState(() {
+        _currentlyPlayingId = msg.id;
+        _isPlaying = true;
+      });
+    }
+
+    _audioPlayer.onPlayerComplete.listen((_) {
+      if (mounted) {
+        setState(() {
+          _currentlyPlayingId = null;
+          _isPlaying = false;
+        });
+      }
+    });
+  }
 
   Widget _buildFileBubble(Msg msg) {
     dynamic data = jsonDecode(msg.message);
+    if (data['type'] == 'voice') {
+      return _buildVoiceMessageBubble(msg);
+    }
     String fileName = data['fileName'];
     String filePath = data['filePath'];
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
