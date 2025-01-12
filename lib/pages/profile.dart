@@ -1,9 +1,48 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_nearby_connections_example/classes/themeProvider.dart';
+import 'package:provider/provider.dart';
 import 'home_screen.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../classes/global.dart';
+
+const String themePreferenceKey = 'themePreference';
+
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: Colors.blue,
+  scaffoldBackgroundColor: Colors.white,
+  textTheme: TextTheme(
+    displayLarge: TextStyle(
+      fontSize: 24.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: 16.0,
+      color: Colors.black87,
+    ),
+  ),
+);
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primaryColor: Colors.grey[900],
+  hintColor: Colors.blueAccent,
+  scaffoldBackgroundColor: Colors.grey[850],
+  textTheme: TextTheme(
+    displayLarge: TextStyle(
+      fontSize: 24.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: 16.0,
+      color: Colors.white70,
+    ),
+  ),
+);
 
 class Profile extends StatefulWidget {
   final bool onLogin;
@@ -14,6 +53,10 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+
+  //initial theme of the system
+  ThemeMode _themeMode = ThemeMode.light;
+
   // TextEditingController for the name of the user
   TextEditingController myName = TextEditingController();
 
@@ -69,13 +112,36 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-
+    _loadTheme();
     // At the launch we are fetching details using the getDetails function
     getDetails();
   }
 
+  Future<void> _loadTheme() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? themeIndex = prefs.getInt(themePreferenceKey);
+    if (themeIndex != null) {
+      setState(() {
+        _themeMode = ThemeMode.values[themeIndex];
+      });
+    }
+  }
+
+  Future<void> _saveTheme(ThemeMode mode) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(themePreferenceKey, mode.index);
+  }
+
+  void _toggleTheme(bool value) {
+    setState(() {
+      _themeMode = value ? ThemeMode.dark : ThemeMode.light;
+    });
+    _saveTheme(_themeMode);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -106,6 +172,25 @@ class _ProfileState extends State<Profile> {
                       : null;
                 },
               ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  'Switch to dark theme',
+                  style: const TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                Switch(
+                  value: themeProvider.themeMode == ThemeMode.dark,
+                  onChanged: (value) {
+                    themeProvider.toggleTheme(value);
+                  },
+                  activeColor: Colors.blueAccent,
+                  inactiveThumbColor: Colors.grey,
+                ),
+              ],
             ),
             ElevatedButton(
               onPressed: () async {
