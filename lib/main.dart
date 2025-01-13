@@ -4,27 +4,56 @@ import 'package:flutter_nearby_connections_example/pages/auth_fail.dart';
 import 'package:flutter_nearby_connections_example/pages/profile.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'classes/global.dart';
 import 'encyption/key_storage.dart';
 import 'encyption/rsa.dart';
 import 'classes/themeProvider.dart';
 
+Future<void> requestPermissions() async {
+  final permissions = [
+    Permission.storage,
+    Permission.microphone,
+    Permission.manageExternalStorage,
+    Permission.nearbyWifiDevices,
+    Permission.location,
+    Permission.bluetooth,
+    Permission.bluetoothScan,
+    Permission.bluetoothAdvertise,
+    Permission.bluetoothConnect
+  ];
+
+  for (var permission in permissions) {
+    if (await permission.status.isDenied) {
+      final status = await permission.request();
+      if (status.isPermanentlyDenied) {
+        openAppSettings();
+        break;
+      }
+    }
+  }
+}
+
+
+
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Request permissions first
+  await requestPermissions();
+
   final keyStorage = KeyStorage();
 
-  // Check if keys already exist
   String? privateKeyPem = await keyStorage.getPrivateKey();
   String? publicKeyPem = await keyStorage.getPublicKey();
 
   if (privateKeyPem == null || publicKeyPem == null) {
-    // Generate RSA key pair
     final pair = generateRSAkeyPair(exampleSecureRandom());
     privateKeyPem = encodePrivateKeyToPem(pair.privateKey);
     publicKeyPem = encodePublicKeyToPem(pair.publicKey);
 
-    // Store keys
     await keyStorage.savePrivateKey(privateKeyPem);
     await keyStorage.savePublicKey(publicKeyPem);
   }
@@ -50,22 +79,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: themeProvider.themeMode,
-          debugShowCheckedModeBanner: false,
-          onGenerateRoute: generateRoute,
-          initialRoute: '/',
-        );
-      }
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: themeProvider.themeMode,
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: generateRoute,
+            initialRoute: '/',
+          );
+        }
     );
   }
 }
-
 
 Future<void> _authenticate(BuildContext context) async {
   final LocalAuthentication auth = LocalAuthentication();
@@ -110,4 +138,3 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     },
   );
 }
-
