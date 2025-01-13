@@ -26,22 +26,32 @@ class DevicesListScreen extends StatefulWidget {
 
 class _DevicesListScreenState extends State<DevicesListScreen> {
   bool isInit = false;
-
   bool isLoading = false;
-
   TextEditingController searchController = TextEditingController();
   List<Device> filteredDevices = [];
 
+  void refreshDeviceList() {
+    setState(() {
+      if (searchController.text.isEmpty) {
+        filteredDevices = Provider.of<Global>(context, listen: false).devices;
+      } else {
+        _filterDevices();
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     searchController.addListener(_filterDevices);
+    Provider.of<Global>(context, listen: false).addListener(refreshDeviceList);
+    filteredDevices = Provider.of<Global>(context, listen: false).devices;
   }
 
   @override
   void dispose() {
     searchController.removeListener(_filterDevices);
+    Provider.of<Global>(context, listen: false).removeListener(refreshDeviceList);
     searchController.dispose();
     super.dispose();
   }
@@ -59,12 +69,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if (filteredDevices.isEmpty && searchController.text.isEmpty) {
-      filteredDevices = Provider.of<Global>(context).devices;
-    }
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -91,11 +97,11 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           ),
           ListView.builder(
             // Builds a screen with list of devices in the proximity
-            itemCount:  filteredDevices.length,
+            itemCount: filteredDevices.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              // Getting a device from the provider
-              final device = Provider.of<Global>(context).devices[index];
+              // Get device from filteredDevices
+              final device = filteredDevices[index];
               return Container(
                 margin: const EdgeInsets.all(8.0),
                 child: Column(
@@ -120,7 +126,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                               getButtonStateName(device.state),
                               style: const TextStyle(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.bold
+                              ),
                             ),
                           ),
                         ),
@@ -130,19 +137,14 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                         // ChatPage.
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) {
-                              return ChatPage(
-                                converser: device.deviceName,
-                              );
-                            },
+                            builder: (context) => ChatPage(
+                              converser: device.deviceName,
+                            ),
                           ),
                         );
                       },
                     ),
-                    const Divider(
-                      height: 1,
-                      color: Colors.grey,
-                    ),
+                    const Divider(height: 1, color: Colors.grey),
                   ],
                 ),
               );
