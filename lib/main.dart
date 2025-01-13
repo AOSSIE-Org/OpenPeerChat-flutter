@@ -10,29 +10,66 @@ import 'encyption/key_storage.dart';
 import 'encyption/rsa.dart';
 import 'classes/themeProvider.dart';
 
-Future<void> requestPermissions() async {
-  final permissions = [
-    Permission.storage,
-    Permission.microphone,
-    Permission.manageExternalStorage,
-    Permission.nearbyWifiDevices,
-    Permission.location,
-    Permission.bluetooth,
-    Permission.bluetoothScan,
-    Permission.bluetoothAdvertise,
-    Permission.bluetoothConnect
-  ];
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 
-  for (var permission in permissions) {
-    if (await permission.status.isDenied) {
-      final status = await permission.request();
-      if (status.isPermanentlyDenied) {
-        openAppSettings();
-        break;
+Future<void> requestPermissions() async {
+  try {
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final sdkInt = androidInfo.version.sdkInt;
+
+      // Base permissions for all Android versions
+      final basePermissions = [
+        Permission.storage,
+        Permission.microphone,
+        Permission.location,
+        Permission.bluetooth,
+      ];
+
+      // Permissions for Android 12 and above
+      final modernPermissions = [
+        Permission.bluetoothScan,
+        Permission.bluetoothAdvertise,
+        Permission.bluetoothConnect,
+        Permission.nearbyWifiDevices,
+      ];
+
+      // Permissions for Android 10 and above
+      final storagePermissions = [
+        Permission.manageExternalStorage,
+      ];
+
+      final permissions = [...basePermissions];
+
+      if (sdkInt >= 31) { // Android 12 or higher
+        permissions.addAll(modernPermissions);
       }
+
+      if (sdkInt >= 29) { // Android 10 or higher
+        permissions.addAll(storagePermissions);
+      }
+
+      for (var permission in permissions) {
+        if (await permission.status.isDenied) {
+          final status = await permission.request();
+          if (status.isPermanentlyDenied) {
+            openAppSettings();
+            break;
+          }
+        }
+      }
+    } else {
+      // iOS permissions
+      await Permission.microphone.request();
+      await Permission.bluetooth.request();
+      await Permission.location.request();
     }
+  } catch (e) {
+    debugPrint('Permission request error: $e');
   }
 }
+
 
 
 
