@@ -96,6 +96,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
             ),
           ),
           ListView.builder(
+            // Builds a screen with list of devices in the proximity
             itemCount: filteredDevices.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
@@ -108,6 +109,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                     ListTile(
                       title: Text(device.deviceName),
                       trailing: GestureDetector(
+                        // GestureDetector act as onPressed() and enables
+                        // to connect/disconnect with any device
                         onTap: () => connectToDevice(device),
                         child: Container(
                           decoration: BoxDecoration(
@@ -130,6 +133,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                         ),
                       ),
                       onTap: () {
+                        // On clicking any device tile, we navigate to the
+                        // ChatPage.
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ChatPage(
