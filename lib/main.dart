@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'classes/global.dart';
 import 'encyption/key_storage.dart';
 import 'encyption/rsa.dart';
+import 'classes/themeProvider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +38,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => Global(),
         ),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),
     ),
@@ -48,10 +50,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: generateRoute,
-      initialRoute: '/',
+     final themeProvider = Provider.of<ThemeProvider>(context);
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: themeProvider.themeMode,
+          debugShowCheckedModeBanner: false,
+          onGenerateRoute: generateRoute,
+          initialRoute: '/',
+        );
+      }
     );
   }
 }
