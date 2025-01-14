@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 import 'package:provider/provider.dart';
 import '../classes/global.dart';
-
 import 'chat_page.dart';
 import '../p2p/adhoc_housekeeping.dart';
 
@@ -17,140 +16,316 @@ enum DeviceType { advertiser, browser }
 
 class DevicesListScreen extends StatefulWidget {
   const DevicesListScreen({Key? key, required this.deviceType}) : super(key: key);
-
   final DeviceType deviceType;
 
   @override
- State<DevicesListScreen> createState() => _DevicesListScreenState();
+  State<DevicesListScreen> createState() => _DevicesListScreenState();
 }
 
-class _DevicesListScreenState extends State<DevicesListScreen> {
-  bool isInit = false;
-  bool isLoading = false;
-  TextEditingController searchController = TextEditingController();
-  List<Device> filteredDevices = [];
+class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
-  void refreshDeviceList() {
-    setState(() {
-      if (searchController.text.isEmpty) {
-        filteredDevices = Provider.of<Global>(context, listen: false).devices;
-      } else {
-        _filterDevices();
-      }
-    });
-  }
+  final TextEditingController _searchController = TextEditingController();
+  late final Global _global;
+  List<Device> _filteredDevices = [];
+  bool _isLoading = false;
+  bool _isSearching = false;
+
+  /// Getters for filtered device lists
+  List<Device> get _connectedDevices =>
+      _filteredDevices
+          .where((device) => device.state == SessionState.connected)
+          .toList();
+
+  List<Device> get _availableDevices =>
+      _filteredDevices
+          .where((device) => device.state != SessionState.connected)
+          .toList();
 
   @override
   void initState() {
     super.initState();
-    searchController.addListener(_filterDevices);
-    Provider.of<Global>(context, listen: false).addListener(refreshDeviceList);
-    filteredDevices = Provider.of<Global>(context, listen: false).devices;
+    _global = context.read<Global>();
+    _searchController.addListener(_filterDevices);
+    _global.addListener(_refreshDeviceList);
+    _filteredDevices = _global.devices;
+
+    if (_filteredDevices.isEmpty) {
+      _startInitialScan();
+    }
   }
 
-  @override
-  void dispose() {
-    searchController.removeListener(_filterDevices);
-    Provider.of<Global>(context, listen: false).removeListener(refreshDeviceList);
-    searchController.dispose();
-    super.dispose();
-  }
-
-  void _filterDevices() {
-    setState(() {
-      if (searchController.text.isEmpty) {
-        filteredDevices = Provider.of<Global>(context, listen: false).devices;
-      } else {
-        filteredDevices = Provider.of<Global>(context, listen: false)
-            .devices
-            .where((device) => device.deviceName.toLowerCase().contains(searchController.text.toLowerCase()))
-            .toList();
+  /// Starts initial device scan with loading indicator
+  void _startInitialScan() {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _filterDevices();
+          _isLoading = false;
+        });
       }
     });
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
+  void dispose() {
+    _searchController.removeListener(_filterDevices);
+    _global.removeListener(_refreshDeviceList);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+
+  /// Refreshes the device list with loading state
+  Future<void> _refreshDeviceList() async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (mounted) {
+      setState(() {
+        _filterDevices();
+        _isLoading = false;
+      });
+    }
+  }
+
+
+  /// Filters devices based on search text
+  void _filterDevices() {
+    if (!mounted) return;
+    setState(() {
+      _filteredDevices = _global.devices
+          .where((device) =>
+          device.deviceName
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase()))
+          .toList();
+    });
+  }
+
+  /// Builds the search bar widget
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+          Expanded(
             child: TextField(
-              controller: searchController,
+              controller: _searchController,
+              autofocus: false,
               decoration: InputDecoration(
-                hintText: "Search...",
+                hintText: "Search devices...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade600,
-                  size: 20,
-                ),
+                prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
                 filled: true,
                 fillColor: Colors.grey.shade100,
-                contentPadding: const EdgeInsets.all(8),
+                contentPadding: const EdgeInsets.all(12),
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade100)),
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _isSearching = value.isNotEmpty;
+                  _filterDevices();
+                });
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            onPressed: _refreshDeviceList,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh devices',
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.grey.shade100,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
-          ListView.builder(
-            // Builds a screen with list of devices in the proximity
-            itemCount: filteredDevices.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              // Get device from filteredDevices
-              final device = filteredDevices[index];
-              return Container(
-                margin: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Text(device.deviceName),
-                      trailing: GestureDetector(
-                        // GestureDetector act as onPressed() and enables
-                        // to connect/disconnect with any device
-                        onTap: () => connectToDevice(device),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: getButtonColor(device.state),
-                          ),
-                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                          padding: const EdgeInsets.all(8.0),
-                          height: 35,
-                          width: 100,
-                          child: Center(
-                            child: Text(
-                              getButtonStateName(device.state),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        // On clicking any device tile, we navigate to the
-                        // ChatPage.
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ChatPage(
-                              converser: device.deviceName,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const Divider(height: 1, color: Colors.grey),
-                  ],
-                ),
-              );
-            },
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, List<Device> devices) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              devices.length.toString(),
+              style: TextStyle(color: Colors.grey.shade700),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDeviceListItem(Device device) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: device.state == SessionState.connected
+              ? Colors.green.shade100
+              : Colors.grey.shade100,
+          child: Icon(
+            Icons.devices,
+            color: device.state == SessionState.connected
+                ? Colors.green
+                : Colors.grey,
+          ),
+        ),
+        title: Text(
+          device.deviceName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          getButtonStateName(device.state),
+          style: TextStyle(
+            color: getButtonColor(device.state),
+          ),
+        ),
+        trailing: GestureDetector(
+          onTap: () => connectToDevice(device),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: getButtonColor(device.state),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              getButtonStateName(device.state),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  ChatPage(
+                    converser: device.deviceName,
+                  ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.devices_other, size: 64, color: Colors.grey.shade400),
+          const SizedBox(height: 16),
+          Text(
+            'No devices found nearby',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton.icon(
+            onPressed: _refreshDeviceList,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Scan Again'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Scaffold(
+      body: Consumer<Global>(
+        builder: (context, global, child) =>
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Column(
+                children: [
+                  _buildSearchBar(),
+                  Expanded(
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (_) => true,
+                      child: Stack(
+                        children: [
+                          if (_isLoading)
+                            const Center(child: CircularProgressIndicator())
+                          else
+                            if (_filteredDevices.isEmpty)
+                              _buildEmptyState()
+                            else
+                              SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (_connectedDevices.isNotEmpty) ...[
+                                      _buildSectionHeader('Connected Devices',
+                                          _connectedDevices),
+                                      ..._connectedDevices.map(
+                                          _buildDeviceListItem),
+                                    ],
+                                    if (_availableDevices.isNotEmpty) ...[
+                                      _buildSectionHeader('Available Devices',
+                                          _availableDevices),
+                                      ..._availableDevices.map(
+                                          _buildDeviceListItem),
+                                    ],
+                                    const SizedBox(height: 16),
+                                  ],
+                                ),
+                              ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
       ),
     );
   }
