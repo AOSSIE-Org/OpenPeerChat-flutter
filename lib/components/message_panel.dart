@@ -20,8 +20,8 @@ import 'view_file.dart';
 /// connected devices.
 
 class MessagePanel extends StatefulWidget {
-  const MessagePanel({Key? key, required this.converser}) : super(key: key);
-  final String converser;
+  const MessagePanel({Key? key, required this.converser,  this.onMessageSent}) : super(key: key);
+  final String converser;final VoidCallback? onMessageSent;
 
   @override
   State<MessagePanel> createState() => _MessagePanelState();

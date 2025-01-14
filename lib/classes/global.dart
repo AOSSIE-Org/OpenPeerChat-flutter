@@ -58,8 +58,10 @@ class Global extends ChangeNotifier {
       );
       conversations.putIfAbsent(sender, () => {});
       if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
+        print("Adding to conversations");
+        print("Message: ${message['type']}");
         decodedMessage['message'] = json.encode({
-          'type': 'file',
+          'type': message['type'],
           'filePath': filePath,
           'fileName': message['fileName']
         });

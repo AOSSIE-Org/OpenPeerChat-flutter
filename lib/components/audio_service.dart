@@ -35,22 +35,40 @@ class AudioService {
       if (Platform.isAndroid) {
         final androidInfo = await DeviceInfoPlugin().androidInfo;
         if (androidInfo.version.sdkInt >= 33) {
-          await Permission.audio.request();
-          await Permission.videos.request();
+          // Check status before requesting
+          if (await Permission.audio.status.isDenied) {
+            await Permission.audio.request();
+          }
+          if (await Permission.videos.status.isDenied) {
+            await Permission.videos.request();
+          }
         } else {
-          await Permission.storage.request();
-          await Permission.manageExternalStorage.request();
+          // For older Android versions
+          if (await Permission.storage.status.isDenied) {
+            await Permission.storage.request();
+          }
+          if (await Permission.manageExternalStorage.status.isDenied) {
+            await Permission.manageExternalStorage.request();
+          }
         }
       }
 
-      final micStatus = await Permission.microphone.request();
-      return micStatus.isGranted;
+      // Check microphone permission
+      if (await Permission.microphone.status.isDenied) {
+        final micStatus = await Permission.microphone.request();
+        if (micStatus.isPermanentlyDenied) {
+          // Provide user feedback
+          debugPrint('Microphone permission permanently denied');
+          return false;
+        }
+        return micStatus.isGranted;
+      }
+      return true;
     } catch (e) {
       debugPrint('Permission request error: $e');
       return false;
     }
   }
-
   Future<void> initRecorder() async {
     if (_isRecorderInitialized) return;
 
