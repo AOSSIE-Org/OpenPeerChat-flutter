@@ -1,48 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_nearby_connections_example/classes/themeProvider.dart';
 import 'package:provider/provider.dart';
-import 'home_screen.dart';
-import 'package:nanoid/nanoid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nanoid/nanoid.dart';
 import '../classes/global.dart';
-
-const String themePreferenceKey = 'themePreference';
-
-final ThemeData lightTheme = ThemeData(
-  brightness: Brightness.light,
-  primaryColor: Colors.blue,
-  scaffoldBackgroundColor: Colors.white,
-  textTheme: TextTheme(
-    displayLarge: TextStyle(
-      fontSize: 24.0,
-      fontWeight: FontWeight.bold,
-      color: Colors.black,
-    ),
-    bodyLarge: TextStyle(
-      fontSize: 16.0,
-      color: Colors.black87,
-    ),
-  ),
-);
-
-final ThemeData darkTheme = ThemeData(
-  brightness: Brightness.dark,
-  primaryColor: Colors.grey[900],
-  hintColor: Colors.blueAccent,
-  scaffoldBackgroundColor: Colors.grey[850],
-  textTheme: TextTheme(
-    displayLarge: TextStyle(
-      fontSize: 24.0,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    bodyLarge: TextStyle(
-      fontSize: 16.0,
-      color: Colors.white70,
-    ),
-  ),
-);
+import '../providers/theme_provider.dart';
+import 'home_screen.dart';
 
 class Profile extends StatefulWidget {
   final bool onLogin;
@@ -53,163 +16,240 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-
-  //initial theme of the system
-  ThemeMode _themeMode = ThemeMode.light;
-
-  // TextEditingController for the name of the user
   TextEditingController myName = TextEditingController();
-
-  // loading variable is used for UI purpose when the app is fetching
-  // user details
   bool loading = true;
-
-  // Custom generated id for the user
   var customLengthId = nanoid(6);
-
-  // Fetching details from saved profile
-  // If no profile is saved, then the new values are used
-  // else navigate to DeviceListScreen
-  Future getDetails() async {
-    // Obtain shared preferences.
-    final prefs = await SharedPreferences.getInstance();
-    final name = prefs.getString('p_name') ?? '';
-    final id = prefs.getString('p_id') ?? '';
-    setState(() {
-      myName.text = name;
-      customLengthId = id.isNotEmpty ? id : customLengthId;
-    });
-    if (name.isNotEmpty && id.isNotEmpty && widget.onLogin) {
-      navigateToHomeScreen();
-    } else {
-      setState(() {
-        loading = false;
-      });
-    }
-  }
-
-  // It is a general function to navigate to home screen.
-  // If we are first launching the app, we need to replace the profile page
-  // from the context and then open the home screen
-  // Otherwise we need to pop out the profile screen context
-  // from memory of the application. This is a flutter way
-  // to manage different contexts and screens.
-  void navigateToHomeScreen() {
-    Global.myName = myName.text;
-    if (!widget.onLogin) {
-      Global.myName = myName.text;
-      Navigator.pop(context);
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-      );
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _loadTheme();
-    // At the launch we are fetching details using the getDetails function
     getDetails();
   }
 
-  Future<void> _loadTheme() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? themeIndex = prefs.getInt(themePreferenceKey);
-    if (themeIndex != null) {
-      setState(() {
-        _themeMode = ThemeMode.values[themeIndex];
-      });
+  Future<void> getDetails() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final name = prefs.getString('p_name') ?? '';
+      final id = prefs.getString('p_id') ?? '';
+
+      if (mounted) {
+        setState(() {
+          myName.text = name;
+          customLengthId = id.isNotEmpty ? id : customLengthId;
+        });
+
+        if (name.isNotEmpty && id.isNotEmpty && widget.onLogin) {
+          navigateToHomeScreen();
+        } else {
+          setState(() {
+            loading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading profile: $e')),
+        );
+      }
     }
   }
 
-  Future<void> _saveTheme(ThemeMode mode) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(themePreferenceKey, mode.index);
+  void navigateToHomeScreen() {
+    Global.myName = myName.text;
+    if (!widget.onLogin) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
   }
 
-  void _toggleTheme(bool value) {
-    setState(() {
-      _themeMode = value ? ThemeMode.dark : ThemeMode.light;
-    });
-    _saveTheme(_themeMode);
+  Future<void> saveProfile() async {
+    if (myName.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid name')),
+      );
+      return;
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('p_name', myName.text.trim());
+      await prefs.setString('p_id', customLengthId);
+      navigateToHomeScreen();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving profile: $e')),
+      );
+    }
+  }
+
+  Widget buildThemeSelector() {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                'Theme Selection',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Container(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: ThemeProvider.availableThemes.length,
+                itemBuilder: (context, index) {
+                  String themeName = ThemeProvider.availableThemes.keys.elementAt(index);
+                  bool isSelected = themeName == themeProvider.currentTheme;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Material(
+                      elevation: isSelected ? 8 : 2,
+                      borderRadius: BorderRadius.circular(12),
+                      child: InkWell(
+                        onTap: () => themeProvider.setTheme(themeName),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: isSelected
+                                ? Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2,
+                            )
+                                : null,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isSelected
+                                    ? Icons.check_circle
+                                    : Icons.brightness_auto,
+                                color: ThemeProvider.availableThemes[themeName]!.primaryColor,
+                                size: 32,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                themeName,
+                                style: TextStyle(
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Profile',
-        ),
+        title: const Text('Profile'),
+        elevation: 0,
       ),
-      body: Visibility(
-        visible: loading,
-        replacement: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextFormField(
-                controller: myName,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.person),
-                  hintText: 'What do people call you?',
-                  labelText: 'Name *',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (String? value) {
-                  return (value != null &&
-                      value.contains('@') &&
-                      value.length > 3)
-                      ? 'Do not use the @ char and name length should be greater than 3'
-                      : null;
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Switch to dark theme',
-                  style: const TextStyle(
-                    fontSize: 20,
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Profile',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: myName,
+                          decoration: InputDecoration(
+                            labelText: 'Name',
+                            hintText: 'What do people call you?',
+                            prefixIcon: const Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Your ID: $customLengthId',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                Switch(
-                  value: themeProvider.themeMode == ThemeMode.dark,
-                  onChanged: (value) {
-                    themeProvider.toggleTheme(value);
-                  },
-                  activeColor: Colors.blueAccent,
-                  inactiveThumbColor: Colors.grey,
+                const SizedBox(height: 24),
+                buildThemeSelector(),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: saveProfile,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Save Profile',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
-            ElevatedButton(
-              onPressed: () async {
-                final prefs = await SharedPreferences.getInstance();
-                // saving the name and id to shared preferences
-                prefs.setString('p_name', myName.text);
-                prefs.setString('p_id', customLengthId);
-
-                // On pressing, move to the home screen
-                navigateToHomeScreen();
-              },
-              child: const Text("Save"),
-            )
-          ],
-        ),
-        child: const Center(
-          child: CircularProgressIndicator(),
+          ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    myName.dispose();
+    super.dispose();
   }
 }

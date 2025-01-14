@@ -46,6 +46,7 @@ class _MessagePanelState extends State<MessagePanel> {
       await _audioService.initRecorder();
     } catch (e) {
       // Show error dialog or snackbar to user
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),

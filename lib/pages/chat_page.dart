@@ -159,7 +159,6 @@ class ChatPageState extends State<ChatPage> {
     );
   }
   Widget _buildVoiceMessageBubble(Msg msg) {
-    final data = jsonDecode(msg.message);
     final bool isCurrentlyPlaying = _currentlyPlayingId == msg.id;
 
     return Container(
