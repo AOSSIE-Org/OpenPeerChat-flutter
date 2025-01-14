@@ -9,7 +9,7 @@ import '../classes/global.dart';
 import 'dart:convert';
 import 'package:pointycastle/asymmetric/api.dart';
 import '../components/view_file.dart';
-import '../encryption/rsa.dart';
+import '../encyption/rsa.dart';
 
 class ChatPage extends StatefulWidget {
   String converser;
@@ -60,6 +60,17 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.converser),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.download),
+            onPressed: () async {
+              await exportChatHistory();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Chat history exported successfully!')),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

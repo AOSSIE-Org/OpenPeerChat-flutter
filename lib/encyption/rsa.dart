@@ -1,9 +1,16 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:asn1lib/asn1lib.dart';
+import 'package:pointycastle/api.dart';
 import 'package:pointycastle/export.dart';
 import 'package:pointycastle/random/fortuna_random.dart';
 import 'dart:math';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey> generateRSAkeyPair(SecureRandom secureRandom, {int bitLength = 2048}) {
   final keyGen = RSAKeyGenerator()
@@ -109,4 +116,56 @@ RSAPublicKey parsePublicKeyFromPem(String pem) {
   final exponent = (topLevel.elements[1] as ASN1Integer).valueAsBigInteger;
 
   return RSAPublicKey(modulus, exponent);
+}
+Future<Database> initDatabase() async {
+  final databasePath = await getDatabasesPath();
+  final path = join(databasePath, 'chat_database.db');
+
+  return openDatabase(
+    path,
+    onCreate: (db, version) {
+      return db.execute(
+        'CREATE TABLE messages(id INTEGER PRIMARY KEY, content TEXT, mediaPath TEXT)',
+      );
+    },
+    version: 1,
+  );
+}
+
+Future<void> saveMessage(String message, {String? mediaPath}) async {
+  final db = await initDatabase();
+  await db.insert(
+    'messages',
+    {'content': message, 'mediaPath': mediaPath},
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
+}
+
+Future<List<Map<String, dynamic>>> retrieveMessages() async {
+  final db = await initDatabase();
+  return db.query('messages');
+}
+
+Future<void> exportChatHistory() async {
+  final pdf = pw.Document();
+  final messages = await retrieveMessages();
+
+  for (var message in messages) {
+    pdf.addPage(pw.Page(build: (pw.Context context) {
+      return pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(message['content']),
+          if (message['mediaPath'] != null)
+            pw.Text('Media: ${message['mediaPath']}'),
+        ],
+      );
+    }));
+  }
+
+  final directory = await getApplicationDocumentsDirectory();
+  final filePath = '${directory.path}/chat_history.pdf';
+  final file = File(filePath);
+  await file.writeAsBytes(await pdf.save());
+  print('Chat history exported to: $filePath');
 }
