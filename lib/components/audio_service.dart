@@ -1,4 +1,3 @@
-// lib/services/audio_service.dart
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +5,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+
 
 class RecordingPermissionException implements Exception {
   final String message;
@@ -13,62 +14,6 @@ class RecordingPermissionException implements Exception {
 
   @override
   String toString() => 'RecordingPermissionException: $message';
-}
-
-class PermissionService {
-  static Future<bool> handleMicrophonePermission(BuildContext context) async {
-    if (Platform.isIOS) {
-      final status = await Permission.microphone.status;
-      debugPrint('iOS Microphone Permission Status: $status');
-
-      if (status.isDenied) {
-        final result = await Permission.microphone.request();
-        debugPrint('iOS Permission Request Result: $result');
-        return result.isGranted;
-      }
-
-      if (status.isPermanentlyDenied) {
-        if (context.mounted) {
-          await _showiOSSettingsDialog(context);
-        }
-        return false;
-      }
-
-      return status.isGranted;
-    }
-
-    return true;
-  }
-
-  static Future<void> _showiOSSettingsDialog(BuildContext context) async {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: const Text('Microphone Access Required'),
-          content: const Text(
-              'OpenPeerChat needs access to your microphone to record voice messages.\n\n'
-                  'Please enable microphone access in Settings.'
-          ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              child: const Text('Settings'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                openAppSettings();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
 
 class AudioService {
@@ -82,29 +27,24 @@ class AudioService {
   bool _isRecording = false;
   String? _currentRecordingPath;
 
-  // Getters
   bool get isRecording => _isRecording;
   String? get currentRecordingPath => _currentRecordingPath;
 
   Future<bool> _requestPermissions() async {
     try {
-      final permissions = [Permission.microphone];
       if (Platform.isAndroid) {
-        permissions.add(Permission.storage);
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt >= 33) {
+          await Permission.audio.request();
+          await Permission.videos.request();
+        } else {
+          await Permission.storage.request();
+          await Permission.manageExternalStorage.request();
+        }
       }
 
-      debugPrint('Requesting permissions: $permissions');
-      final statuses = await permissions.request();
-
-      bool allGranted = true;
-      statuses.forEach((permission, status) {
-        debugPrint('Permission $permission status: $status');
-        if (status != PermissionStatus.granted) {
-          allGranted = false;
-        }
-      });
-
-      return allGranted;
+      final micStatus = await Permission.microphone.request();
+      return micStatus.isGranted;
     } catch (e) {
       debugPrint('Permission request error: $e');
       return false;
@@ -120,22 +60,17 @@ class AudioService {
 
       if (!permissionsGranted) {
         throw RecordingPermissionException(
-            'Required permissions were not granted. Please enable microphone access in your device settings.'
+            'Required permissions were not granted. Please enable necessary permissions in your device settings.'
         );
       }
 
-      if (!await _recorder.hasPermission()) {
-        throw RecordingPermissionException(
-            'Microphone permission not available. Please check your device settings.'
-        );
-      }
-
+      await _recorder.hasPermission();
       _isRecorderInitialized = true;
       debugPrint('Recorder initialized successfully');
     } catch (e) {
       _isRecorderInitialized = false;
       debugPrint('Recorder initialization failed: $e');
-      throw RecordingPermissionException(e.toString());
+      rethrow;
     }
   }
 
@@ -160,13 +95,11 @@ class AudioService {
       );
 
       _isRecording = true;
-      debugPrint('Started recording at: $_currentRecordingPath');
       return _currentRecordingPath!;
     } catch (e) {
       _isRecording = false;
       _currentRecordingPath = null;
-      debugPrint('Recording failed: $e');
-      throw RecordingPermissionException('Failed to start recording: $e');
+      rethrow;
     }
   }
 
@@ -178,11 +111,9 @@ class AudioService {
       _isRecording = false;
       final recordedPath = _currentRecordingPath;
       _currentRecordingPath = null;
-      debugPrint('Stopped recording. File saved at: $recordedPath');
       return recordedPath;
     } catch (e) {
-      debugPrint('Failed to stop recording: $e');
-      throw RecordingPermissionException('Failed to stop recording: $e');
+      rethrow;
     }
   }
 
@@ -191,8 +122,7 @@ class AudioService {
       await _player.setFilePath(path);
       await _player.play();
     } catch (e) {
-      debugPrint('Playback failed: $e');
-      throw RecordingPermissionException('Failed to play recording: $e');
+      rethrow;
     }
   }
 
@@ -200,8 +130,7 @@ class AudioService {
     try {
       await _player.stop();
     } catch (e) {
-      debugPrint('Failed to stop playback: $e');
-      throw RecordingPermissionException('Failed to stop playback: $e');
+      rethrow;
     }
   }
 
@@ -213,10 +142,8 @@ class AudioService {
       await _recorder.dispose();
       await _player.dispose();
       _isRecorderInitialized = false;
-      debugPrint('Audio service disposed successfully');
     } catch (e) {
-      debugPrint('Failed to dispose audio service: $e');
-      throw RecordingPermissionException('Failed to dispose recorder: $e');
+      rethrow;
     }
   }
 }

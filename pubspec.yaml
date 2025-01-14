@@ -35,6 +35,7 @@ dependencies:
   just_audio: ^0.9.42
   record: ^4.4.4
   audioplayers: ^6.1.0
+  device_info_plus: ^11.2.0
 
 
 dev_dependencies:
