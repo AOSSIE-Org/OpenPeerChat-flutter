@@ -193,7 +193,7 @@ class ChatPageState extends State<ChatPage> {
     );
   }
   Widget _buildVoiceMessageBubble(Msg msg) {
-    final data = jsonDecode(msg.message);
+    jsonDecode(msg.message);
     final bool isCurrentlyPlaying = _currentlyPlayingId == msg.id;
 
     return Container(
@@ -301,13 +301,18 @@ class ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _handleVoicePlayback(Msg msg) async {
+    // Capture the BuildContext before async operations
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
       final data = jsonDecode(msg.message);
       final String filePath = data['filePath'];
 
       if (_currentlyPlayingId == msg.id && _isPlaying) {
         await _audioPlayer.pause();
-        setState(() => _isPlaying = false);
+        if (mounted) {
+          setState(() => _isPlaying = false);
+        }
       } else {
         if (_currentlyPlayingId != msg.id) {
           await _audioPlayer.stop();
@@ -316,18 +321,22 @@ class ChatPageState extends State<ChatPage> {
         } else {
           await _audioPlayer.resume();
         }
-        setState(() {
-          _currentlyPlayingId = msg.id;
-          _isPlaying = true;
-        });
+        if (mounted) {
+          setState(() {
+            _currentlyPlayingId = msg.id;
+            _isPlaying = true;
+          });
+        }
       }
     } catch (e) {
       debugPrint('Error playing audio: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
+      // Use the captured scaffoldMessenger
+      scaffoldMessenger.showSnackBar(
         const SnackBar(content: Text('Error playing voice message')),
       );
     }
   }
+
   Widget _buildFileBubble(Msg msg) {
     dynamic data = jsonDecode(msg.message);
     if (data['type'] == 'voice') {

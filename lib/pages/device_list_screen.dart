@@ -30,18 +30,21 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
   late final Global _global;
   List<Device> _filteredDevices = [];
   bool _isLoading = false;
-  bool _isSearching = false;
 
   /// Getters for filtered device lists
-  List<Device> get _connectedDevices =>
-      _filteredDevices
-          .where((device) => device.state == SessionState.connected)
-          .toList();
+  List<Device> get _connectedDevices {
+    if (_filteredDevices.isEmpty) return [];
+    return _filteredDevices
+        .where((device) => device.state == SessionState.connected)
+        .toList();
+  }
 
-  List<Device> get _availableDevices =>
-      _filteredDevices
-          .where((device) => device.state != SessionState.connected)
-          .toList();
+  List<Device> get _availableDevices {
+    if (_filteredDevices.isEmpty) return [];
+    return _filteredDevices
+        .where((device) => device.state != SessionState.connected)
+        .toList();
+  }
 
   @override
   void initState() {
@@ -51,7 +54,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
     _global.addListener(_refreshDeviceList);
     _filteredDevices = _global.devices;
 
-    if (_filteredDevices.isEmpty) {
+    if (_filteredDevices.isEmpty && mounted) {
       _startInitialScan();
     }
   }
@@ -82,15 +85,25 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
   /// Refreshes the device list with loading state
   Future<void> _refreshDeviceList() async {
     if (!mounted) return;
+
     setState(() => _isLoading = true);
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      await Future.delayed(const Duration(milliseconds: 500));
 
-    if (mounted) {
-      setState(() {
-        _filterDevices();
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _filterDevices();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error refreshing devices: $e'))
+        );
+      }
     }
   }
 
@@ -98,18 +111,21 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
   /// Filters devices based on search text
   void _filterDevices() {
     if (!mounted) return;
+
+    final searchText = _searchController.text.toLowerCase();
     setState(() {
-      _filteredDevices = _global.devices
+      _filteredDevices = (_global.devices)
           .where((device) =>
-          device.deviceName
-              .toLowerCase()
-              .contains(_searchController.text.toLowerCase()))
+      device.deviceName.toLowerCase().contains(searchText))
           .toList();
     });
   }
 
   /// Builds the search bar widget
   Widget _buildSearchBar() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -118,25 +134,37 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
             child: TextField(
               controller: _searchController,
               autofocus: false,
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
+              ),
               decoration: InputDecoration(
                 hintText: "Search devices...",
-                hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                hintStyle: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: colorScheme.surfaceContainerHighest,
                 contentPadding: const EdgeInsets.all(12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(
+                    color: colorScheme.outline,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderSide: BorderSide(
+                    color: colorScheme.primary,
+                    width: 2,
+                  ),
                 ),
               ),
               onChanged: (value) {
                 setState(() {
-                  _isSearching = value.isNotEmpty;
                   _filterDevices();
                 });
               },
@@ -145,10 +173,13 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
           const SizedBox(width: 8),
           IconButton(
             onPressed: _refreshDeviceList,
-            icon: const Icon(Icons.refresh),
+            icon: Icon(
+              Icons.refresh,
+              color: colorScheme.onPrimaryContainer,
+            ),
             tooltip: 'Refresh devices',
             style: IconButton.styleFrom(
-              backgroundColor: Colors.grey.shade100,
+              backgroundColor: colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -158,6 +189,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
       ),
     );
   }
+
 
   Widget _buildSectionHeader(String title, List<Device> devices) {
     return Padding(
@@ -189,62 +221,75 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
   }
 
   Widget _buildDeviceListItem(Device device) {
+    final deviceName = device.deviceName;
+    final state = device.state;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        color: Theme.of(context).colorScheme.surface,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+        ),
       ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: device.state == SessionState.connected
+          backgroundColor: state == SessionState.connected
               ? Colors.green.shade100
               : Colors.grey.shade100,
           child: Icon(
             Icons.devices,
-            color: device.state == SessionState.connected
+            color: state == SessionState.connected
                 ? Colors.green
                 : Colors.grey,
           ),
         ),
         title: Text(
-          device.deviceName,
+          deviceName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          getButtonStateName(device.state),
+          getButtonStateName(state),
           style: TextStyle(
-            color: getButtonColor(device.state),
+            color: getButtonColor(state),
           ),
         ),
-        trailing: GestureDetector(
-          onTap: () => connectToDevice(device),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: getButtonColor(device.state),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              getButtonStateName(device.state),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        trailing: _buildConnectionButton(device),
+        onTap: () => _navigateToChatPage(deviceName),
+      ),
+    );
+  }
+
+  /// New method to handle chat navigation
+  void _navigateToChatPage(String deviceName) {
+    if (deviceName.isEmpty) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChatPage(converser: deviceName),
+      ),
+    );
+  }
+
+  /// New method to build connection button
+  Widget _buildConnectionButton(Device device) {
+    return GestureDetector(
+      onTap: () => connectToDevice(device),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: getButtonColor(device.state),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Text(
+          getButtonStateName(device.state),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) =>
-                  ChatPage(
-                    converser: device.deviceName,
-                  ),
-            ),
-          );
-        },
       ),
     );
   }

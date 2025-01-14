@@ -105,7 +105,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
-            Container(
+            SizedBox(
               height: 120,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,

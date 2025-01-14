@@ -1,12 +1,10 @@
-import 'package:provider/provider.dart';
-import '../database/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_nearby_connections_example/database/database_helper.dart';
+import 'package:provider/provider.dart';
 import '../classes/global.dart';
 import 'chat_page.dart';
 
-/// This is ChatListScreen. This screen lists all the Devices with which the
-/// device has chat with and keeps all the previous messages records.
-
+/// ChatListScreen: Lists all devices the user has chatted with and keeps a record of messages.
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({Key? key}) : super(key: key);
 
@@ -19,7 +17,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
   List<String> _conversers = [];
   List<String> _filteredConversers = [];
   bool _isLoading = false;
-  bool _isSearching = false;
+  bool _hasError = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -35,41 +34,92 @@ class _ChatListScreenState extends State<ChatListScreen> {
     super.dispose();
   }
 
-  /// Loads all conversations and updates the cache
+  /// Loads all conversations and handles errors
   Future<void> _loadConversations() async {
-    setState(() => _isLoading = true);
-    await Future.wait([
-      readAllUpdateConversation(context),
-      Future(() => readAllUpdateCache()),
-    ]);
-    _updateConversersList();
-    setState(() => _isLoading = false);
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+      _errorMessage = '';
+    });
+
+    try {
+      await readAllUpdateConversation(context);
+      readAllUpdateCache(); // This is called without await since it returns void
+      _updateConversersList();
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'Failed to load conversations: $e';
+      });
+      _showErrorSnackBar();
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
 
-
-  /// Updates the list of conversers from the global conversations
   void _updateConversersList() {
-    final conversations = Provider.of<Global>(context, listen: false).conversations;
+    if (!mounted) return;
+
+    final global = Provider.of<Global>(context, listen: false);
     setState(() {
-      _conversers = conversations.keys.toList();
+      _conversers =
+          global.conversations.keys.where((key) => key.isNotEmpty).toList();
       _filterConversers();
     });
   }
 
-  /// Filters conversers based on search text
   void _filterConversers() {
+    if (!mounted) return;
+
+    final searchText = _searchController.text.trim().toLowerCase();
     setState(() {
-      _isSearching = _searchController.text.isNotEmpty;
-      _filteredConversers = _conversers
-          .where((converser) =>
-          converser.toLowerCase().contains(_searchController.text.toLowerCase()))
+      _filteredConversers = searchText.isEmpty
+          ? List.from(_conversers)
+          : _conversers
+          .where((converser) => converser.toLowerCase().contains(searchText))
           .toList();
     });
   }
 
+
+  /// Shows a snackbar for errors
+  void _showErrorSnackBar() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_errorMessage),
+        backgroundColor: Colors.red,
+        action: SnackBarAction(
+          label: 'Retry',
+          textColor: Colors.white,
+          onPressed: _loadConversations,
+        ),
+      ),
+    );
+  }
+
+  /// Navigates to the chat page
+  void _navigateToChatPage(String converser) {
+    if (!mounted || converser.isEmpty) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatPage(converser: converser),
+      ),
+    ).then((_) => _loadConversations());
+  }
+
   /// Builds the search bar widget
   Widget _buildSearchBar() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -78,32 +128,47 @@ class _ChatListScreenState extends State<ChatListScreen> {
             child: TextField(
               controller: _searchController,
               autofocus: false,
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
+              ),
               decoration: InputDecoration(
-                hintText: "Search chats...",
-                hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                hintText: "Search conversations...",
+                hintStyle: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: colorScheme.surfaceContainerHighest,
                 contentPadding: const EdgeInsets.all(12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(
+                    color: colorScheme.outline,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderSide: BorderSide(
+                    color: colorScheme.primary,
+                    width: 2,
+                  ),
                 ),
               ),
-              onChanged: (value) => _filterConversers(),
             ),
           ),
           const SizedBox(width: 8),
           IconButton(
             onPressed: _loadConversations,
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh chats',
+            icon: Icon(
+              Icons.refresh,
+              color: colorScheme.onPrimaryContainer,
+            ),
+            tooltip: 'Refresh conversations',
             style: IconButton.styleFrom(
-              backgroundColor: Colors.grey.shade100,
+              backgroundColor: colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -114,73 +179,37 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 
-  /// Builds individual chat list item
+
+  /// Builds a chat list item
   Widget _buildChatListItem(String converser) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Theme
+            .of(context)
+            .colorScheme
+            .primaryContainer,
+        child: Icon(Icons.person, color: Theme
+            .of(context)
+            .colorScheme
+            .primary),
       ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.blue.shade100,
-          child: Icon(
-            Icons.person,
-            color: Colors.blue.shade700,
-          ),
-        ),
-        title: Text(
-          converser,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          'Tap to view chat',
-          style: TextStyle(color: Colors.grey.shade600),
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: Colors.grey.shade400,
-        ),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatPage(converser: converser),
-          ),
-        ),
-      ),
+      title: Text(
+          converser, style: const TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: const Text('Tap to view chat'),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () => _navigateToChatPage(converser),
     );
   }
 
-  /// Builds empty state widget
+  /// Builds the empty state widget
   Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline,
-              size: 64,
-              color: Colors.grey.shade400),
+          const Icon(Icons.chat_bubble_outline, size: 48, color: Colors.grey),
           const SizedBox(height: 16),
-          Text(
-            'No chats found',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Start a chat from the devices list',
-            style: TextStyle(
-              color: Colors.grey.shade500,
-            ),
-          ),
+          const Text('No conversations found'),
         ],
       ),
     );
@@ -189,27 +218,48 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          Expanded(
-            child: Stack(
-              children: [
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else if (_filteredConversers.isEmpty)
-                  _buildEmptyState()
-                else
-                  ListView.builder(
-                    itemCount: _filteredConversers.length,
-                    padding: const EdgeInsets.only(top: 8),
-                    itemBuilder: (context, index) =>
-                        _buildChatListItem(_filteredConversers[index]),
-                  ),
-              ],
-            ),
+      body: Consumer<Global>(
+        builder: (context, global, child) => GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Column(
+            children: [
+              _buildSearchBar(),
+              Expanded(
+                child: Stack(
+                  children: [
+                    if (_isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else if (_hasError)
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.error, size: 48, color: Colors.red),
+                            const SizedBox(height: 16),
+                            Text(_errorMessage),
+                            ElevatedButton(
+                              onPressed: _loadConversations,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
+                    else if (_filteredConversers.isEmpty)
+                        _buildEmptyState()
+                      else
+                        ListView.builder(
+                          itemCount: _filteredConversers.length,
+                          itemBuilder: (context, index) {
+                            return _buildChatListItem(_filteredConversers[index]);
+                          },
+                        ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections_example/pages/auth_fail.dart';
 import 'package:flutter_nearby_connections_example/pages/profile.dart';
@@ -77,8 +76,6 @@ Future<void> requestPermissions() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Request permissions first
   await requestPermissions();
 
   final keyStorage = KeyStorage();
@@ -117,58 +114,84 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
-          return MaterialApp(
-            theme: themeProvider.theme,
-            debugShowCheckedModeBanner: false,
-            onGenerateRoute: generateRoute,
-            initialRoute: '/',
-          );
-        }
+      builder: (context, themeProvider, _) {
+        return MaterialApp(
+          theme: themeProvider.theme,
+          debugShowCheckedModeBanner: false,
+          home: const AuthCheckPage(),
+        );
+      },
     );
   }
 }
 
-Future<void> _authenticate(BuildContext context) async {
-  final LocalAuthentication auth = LocalAuthentication();
-  bool authenticated = false;
+class AuthCheckPage extends StatefulWidget {
+  const AuthCheckPage({Key? key}) : super(key: key);
 
-  try {
-    authenticated = await auth.authenticate(
-      localizedReason: 'Please authenticate to proceed',
-      options: const AuthenticationOptions(
-        stickyAuth: true,
-        sensitiveTransaction: true,
-      ),
-    );
-  } catch (e) {
-    if (kDebugMode) {
-      print(e);
-    }
-  }
-  if (!context.mounted) return;
-  if (authenticated) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Profile(onLogin: true)),
-    );
-  } else {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => AuthFailedPage(onRetry: () => _authenticate(context))),
-    );
-  }
+  @override
+  AuthCheckPageState createState() => AuthCheckPageState();
 }
 
-Route<dynamic> generateRoute(RouteSettings settings) {
-  return MaterialPageRoute(
-    builder: (context) {
-      _authenticate(context);
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+class AuthCheckPageState extends State<AuthCheckPage> {
+  final LocalAuthentication _auth = LocalAuthentication();
+
+  @override
+  void initState() {
+    super.initState();
+    _authenticate();
+  }
+
+  Future<void> _authenticate() async {
+    try {
+      final authenticated = await _auth.authenticate(
+        localizedReason: 'Please authenticate to proceed',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: false,
         ),
       );
-    },
-  );
+
+      if (mounted) {
+        if (authenticated) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Profile(onLogin: true)),
+          );
+        } else {
+          _showAuthFailedPage();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showAuthFailedPage();
+      }
+    }
+  }
+
+  void _showAuthFailedPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AuthFailedPage(
+          onRetry: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AuthCheckPage()),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
 }
+
+

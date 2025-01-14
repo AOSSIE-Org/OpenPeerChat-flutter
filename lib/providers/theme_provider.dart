@@ -1,53 +1,69 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'theme_colors.dart';
+import 'theme_components.dart';
 
 class ThemeProvider with ChangeNotifier {
   static const String _themePreferenceKey = 'selected_theme';
 
-  // Define available themes
   static final Map<String, ThemeData> availableThemes = {
-    'Light': ThemeData(
-      brightness: Brightness.light,
-      primaryColor: Colors.blue,
-      colorScheme: ColorScheme.light(
-        primary: Colors.blue,
-        secondary: Colors.blueAccent,
-      ),
-    ),
-    'Dark': ThemeData(
-      brightness: Brightness.dark,
-      primaryColor: Colors.blueGrey[900],
-      colorScheme: ColorScheme.dark(
-        primary: Colors.blueGrey[900]!,
-        secondary: Colors.blueAccent,
-      ),
-    ),
-    'Nature': ThemeData(
-      brightness: Brightness.light,
-      primaryColor: Colors.green,
-      colorScheme: ColorScheme.light(
-        primary: Colors.green,
-        secondary: Colors.lightGreen,
-      ),
-    ),
-    'Ocean': ThemeData(
-      brightness: Brightness.light,
-      primaryColor: Colors.cyan,
-      colorScheme: ColorScheme.light(
-        primary: Colors.cyan,
-        secondary: Colors.lightBlue,
-      ),
-    ),
-    'Sunset': ThemeData(
-      brightness: Brightness.light,
-      primaryColor: Colors.orange,
-      colorScheme: ColorScheme.light(
-        primary: Colors.orange,
-        secondary: Colors.deepOrange,
-      ),
-    ),
+    'Light': _buildTheme(ThemeColors.lightColorScheme),
+    'Dark': _buildTheme(ThemeColors.darkColorScheme),
+    'Nature': _buildTheme(ThemeColors.natureColorScheme),
   };
+
+  static ThemeData _buildTheme(ColorScheme colorScheme) {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      brightness: colorScheme.brightness,
+
+      // Component Themes
+      inputDecorationTheme: ThemeComponents.inputDecorationTheme(colorScheme),
+      elevatedButtonTheme: ThemeComponents.elevatedButtonTheme(colorScheme),
+      cardTheme: ThemeComponents.cardTheme(colorScheme),
+      appBarTheme: ThemeComponents.appBarTheme(colorScheme),
+
+      // Dialog Theme
+      dialogTheme: DialogTheme(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: colorScheme.surface,
+        elevation: 3,
+      ),
+
+      // Bottom Sheet Theme
+      bottomSheetTheme: BottomSheetThemeData(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        backgroundColor: colorScheme.surface,
+      ),
+
+      // List Tile Theme
+      listTileTheme: ListTileThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        tileColor: colorScheme.surface,
+        iconColor: colorScheme.primary,
+      ),
+
+      // Floating Action Button Theme
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+
+      // Snackbar Theme
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: colorScheme.inverseSurface,
+        contentTextStyle: TextStyle(color: colorScheme.onInverseSurface),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
 
   String _currentTheme = 'Light';
 
