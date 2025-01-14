@@ -29,44 +29,55 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
   bool isLoading = false;
   TextEditingController searchController = TextEditingController();
   List<Device> filteredDevices = [];
-
-  void refreshDeviceList() {
-    setState(() {
-      if (searchController.text.isEmpty) {
-        filteredDevices = Provider.of<Global>(context, listen: false).devices;
-      } else {
-        _filterDevices();
-      }
-    });
-  }
+  Global? globalProvider;
 
   @override
-  void initState() {
-    super.initState();
-    searchController.addListener(_filterDevices);
-    Provider.of<Global>(context, listen: false).addListener(refreshDeviceList);
-    filteredDevices = Provider.of<Global>(context, listen: false).devices;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!isInit) {
+      globalProvider = Provider.of<Global>(context, listen: false);
+      globalProvider?.addListener(_handleGlobalUpdate);
+      _updateFilteredDevices();
+      isInit = true;
+    }
+  }
+
+  void _handleGlobalUpdate() {
+    if (mounted) {
+      _updateFilteredDevices();
+    }
+  }
+
+  void _updateFilteredDevices() {
+    if (mounted) {
+      setState(() {
+        if (searchController.text.isEmpty) {
+          filteredDevices = globalProvider?.devices ?? [];
+        } else {
+          _filterDevices();
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     searchController.removeListener(_filterDevices);
-    Provider.of<Global>(context, listen: false).removeListener(refreshDeviceList);
+    globalProvider?.removeListener(_handleGlobalUpdate);
     searchController.dispose();
     super.dispose();
   }
 
   void _filterDevices() {
-    setState(() {
-      if (searchController.text.isEmpty) {
-        filteredDevices = Provider.of<Global>(context, listen: false).devices;
-      } else {
-        filteredDevices = Provider.of<Global>(context, listen: false)
-            .devices
-            .where((device) => device.deviceName.toLowerCase().contains(searchController.text.toLowerCase()))
+    if (mounted && globalProvider != null) {
+      setState(() {
+        filteredDevices = globalProvider!.devices
+            .where((device) => device.deviceName
+            .toLowerCase()
+            .contains(searchController.text.toLowerCase()))
             .toList();
-      }
-    });
+      });
+    }
   }
 
   @override
