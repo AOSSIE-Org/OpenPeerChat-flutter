@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pointycastle/asymmetric/api.dart';
 import 'package:provider/provider.dart';
 import '../classes/global.dart';
 import '../classes/msg.dart';
@@ -157,56 +156,53 @@ class _MessagePanelState extends State<MessagePanel> {
   }
 
   void _sendMessage(BuildContext context) {
-    var msgId = nanoid(21);
-    if (myController.text.isEmpty) {
-      return;
-    }
-    // Encode the message to base64
+    if (myController.text.isEmpty) return;
 
-    String data = jsonEncode({
+    final msgId = nanoid(21);
+    final date = DateTime.now().toUtc().toString();
+    final message = myController.text;
+
+    // Encrypt message
+    final encryptedMessage = rsaEncrypt(
+        Global.myPublicKey!,
+        Uint8List.fromList(utf8.encode(message))
+    );
+
+    // Create payload data
+    final data = jsonEncode({
       "sender": Global.myName,
       "type": "text",
-      "data": myController.text,
+      "data": message,
+      "id": msgId,  // Add message ID
+      "timestamp": date  // Add timestamp
     });
 
-    String date = DateTime.now().toUtc().toString();
-
-    Global.cache[msgId] = Payload(
-      msgId,
-      Global.myName,
-      widget.converser,
-      data,
-      date,
-    );
-    insertIntoMessageTable(
-      Payload(
-        msgId,
-        Global.myName,
-        widget.converser,
-        data,
-        date,
-      ),
-    );
-
-    RSAPublicKey publicKey = Global.myPublicKey!;
-    // Encrypt the message
-    Uint8List encryptedMessage = rsaEncrypt(
-        publicKey, Uint8List.fromList(utf8.encode(myController.text)));
-
-    String myData = jsonEncode({
+    // Create encrypted data
+    final encryptedData = jsonEncode({
       "sender": Global.myName,
       "type": "text",
       "data": base64Encode(encryptedMessage),
+      "id": msgId,
+      "timestamp": date
     });
 
+    // Store in cache and database
+    final payload = Payload(msgId, Global.myName, widget.converser, data, date);
+    Global.cache[msgId] = payload;
+    insertIntoMessageTable(payload);
+
+    // Send to conversation
     Provider.of<Global>(context, listen: false).sentToConversations(
-      Msg(myData, "sent", date, msgId),
+      Msg(encryptedData, "sent", date, msgId),
       widget.converser,
     );
 
-    // refreshMessages();
     myController.clear();
+
+    // Notify parent of sent message
+    widget.onMessageSent?.call();
   }
+
 
   /// This function is used to navigate to the file preview page and check the file size.
   void _navigateToFilePreviewPage(BuildContext context) async {
