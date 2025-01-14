@@ -31,6 +31,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
   List<Device> _filteredDevices = [];
   bool _isLoading = false;
   bool _isSearching = false;
+  bool _isInit = false;
 
   /// Getters for filtered device lists
   List<Device> get _connectedDevices =>
@@ -44,15 +45,35 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
           .toList();
 
   @override
-  void initState() {
-    super.initState();
-    _global = context.read<Global>();
-    _searchController.addListener(_filterDevices);
-    _global.addListener(_refreshDeviceList);
-    _filteredDevices = _global.devices;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      _global = Provider.of<Global>(context, listen: false);
+      _global.addListener(_handleGlobalUpdate);
+      _updateFilteredDevices();
+      _isInit = true;
+      
+      if (_filteredDevices.isEmpty) {
+        _startInitialScan();
+      }
+    }
+  }
 
-    if (_filteredDevices.isEmpty) {
-      _startInitialScan();
+  void _handleGlobalUpdate() {
+    if (mounted) {
+      _updateFilteredDevices();
+    }
+  }
+
+  void _updateFilteredDevices() {
+    if (mounted) {
+      setState(() {
+        if (_searchController.text.isEmpty) {
+          _filteredDevices = _global.devices;
+        } else {
+          _filterDevices();
+        }
+      });
     }
   }
 
@@ -73,7 +94,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
   @override
   void dispose() {
     _searchController.removeListener(_filterDevices);
-    _global.removeListener(_refreshDeviceList);
+    _global.removeListener(_handleGlobalUpdate);
     _searchController.dispose();
     super.dispose();
   }
@@ -95,9 +116,9 @@ class _DevicesListScreenState extends State<DevicesListScreen> with AutomaticKee
   }
 
 
-  /// Filters devices based on search text
+ /// Filters devices based on search text
   void _filterDevices() {
-    if (!mounted) return;
+    if (!mounted || _global == null) return;
     setState(() {
       _filteredDevices = _global.devices
           .where((device) =>

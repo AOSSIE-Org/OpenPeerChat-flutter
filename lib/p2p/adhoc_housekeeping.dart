@@ -160,7 +160,7 @@ void broadcast(BuildContext context) async {
 
 
            finalData = {
-            "type": "file",
+            "type": message['type'],
             "data": encodedMessage,
             "fileName": message['fileName'],
           };

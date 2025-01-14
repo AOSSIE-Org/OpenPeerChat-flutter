@@ -8,7 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'classes/global.dart';
 import 'encyption/key_storage.dart';
 import 'encyption/rsa.dart';
-import 'classes/themeProvider.dart';
+import 'providers/theme_provider.dart';
 
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -116,13 +116,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
     return Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
+        builder: (context, themeProvider, _) {
           return MaterialApp(
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: themeProvider.themeMode,
+            theme: themeProvider.theme,
             debugShowCheckedModeBanner: false,
             onGenerateRoute: generateRoute,
             initialRoute: '/',

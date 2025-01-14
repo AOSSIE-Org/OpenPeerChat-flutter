@@ -20,8 +20,8 @@ import 'view_file.dart';
 /// connected devices.
 
 class MessagePanel extends StatefulWidget {
-  const MessagePanel({Key? key, required this.converser}) : super(key: key);
-  final String converser;
+  const MessagePanel({Key? key, required this.converser,  this.onMessageSent}) : super(key: key);
+  final String converser;final VoidCallback? onMessageSent;
 
   @override
   State<MessagePanel> createState() => _MessagePanelState();
@@ -46,6 +46,7 @@ class _MessagePanelState extends State<MessagePanel> {
       await _audioService.initRecorder();
     } catch (e) {
       // Show error dialog or snackbar to user
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),
