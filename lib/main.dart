@@ -70,11 +70,6 @@ Future<void> requestPermissions() async {
   }
 }
 
-
-
-
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -129,46 +124,76 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<void> _authenticate(BuildContext context) async {
-  final LocalAuthentication auth = LocalAuthentication();
-  bool authenticated = false;
+Route<dynamic> generateRoute(RouteSettings settings) {
+  if (settings.name == '/') {
+    return MaterialPageRoute(
+      builder: (context) => const AuthenticationPage(),
+    );
+  }
+  // Add other routes as needed
+  return MaterialPageRoute(
+    builder: (context) => const Scaffold(
+      body: Center(child: Text('Route not found')),
+    ),
+  );
+}
+class AuthenticationPage extends StatefulWidget {
+  const AuthenticationPage({Key? key}) : super(key: key);
 
-  try {
-    authenticated = await auth.authenticate(
-      localizedReason: 'Please authenticate to proceed',
-      options: const AuthenticationOptions(
-        stickyAuth: true,
-        sensitiveTransaction: true,
-      ),
-    );
-  } catch (e) {
-    if (kDebugMode) {
-      print(e);
-    }
-  }
-  if (!context.mounted) return;
-  if (authenticated) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Profile(onLogin: true)),
-    );
-  } else {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => AuthFailedPage(onRetry: () => _authenticate(context))),
-    );
-  }
+  @override
+  State<AuthenticationPage> createState() => _AuthenticationPageState();
 }
 
-Route<dynamic> generateRoute(RouteSettings settings) {
-  return MaterialPageRoute(
-    builder: (context) {
+class _AuthenticationPageState extends State<AuthenticationPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _authenticate(context);
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+    });
+  }
+
+  Future<void> _authenticate(BuildContext context) async {
+    final LocalAuthentication auth = LocalAuthentication();
+    bool authenticated = false;
+
+    try {
+      authenticated = await auth.authenticate(
+        localizedReason: 'Please authenticate to proceed',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          sensitiveTransaction: true,
         ),
       );
-    },
-  );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+
+    if (!context.mounted) return;
+
+    if (authenticated) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Profile(onLogin: true)),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AuthFailedPage(
+          onRetry: () => _authenticate(context),
+        )),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
 }
