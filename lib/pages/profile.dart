@@ -12,101 +12,131 @@ import 'home_screen.dart';
  main
 class Profile extends StatefulWidget {
   final bool onLogin;
-
   const Profile({Key? key, required this.onLogin}) : super(key: key);
+
   @override
   State<Profile> createState() => _ProfileState();
 }
 
-class _ProfileState extends State<Profile> {
-  TextEditingController myName = TextEditingController();
-  bool loading = true;
-  var customLengthId = nanoid(6);
+class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+
+  String _userId = '';
+  bool _isLoading = true;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    getDetails();
+    _setupAnimations();
+    _loadProfileData();
   }
 
-  Future<void> getDetails() async {
+  void _setupAnimations() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _animationController.forward();
+  }
+
+  Future<void> _loadProfileData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final name = prefs.getString('p_name') ?? '';
-      final id = prefs.getString('p_id') ?? '';
+      final savedId = prefs.getString('p_id') ?? '';
 
       if (mounted) {
         setState(() {
-          myName.text = name;
-          customLengthId = id.isNotEmpty ? id : customLengthId;
+          _nameController.text = name;
+          _userId = savedId.isNotEmpty ? savedId : nanoid(6);
+          _isLoading = false;
         });
 
-        if (name.isNotEmpty && id.isNotEmpty && widget.onLogin) {
-          navigateToHomeScreen();
-        } else {
-          setState(() {
-            loading = false;
-          });
+        if (name.isNotEmpty && savedId.isNotEmpty && widget.onLogin) {
+          Global.myName = name; // Ensure name is set before navigation
+          _navigateToHome();
         }
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading profile: $e')),
-        );
-      }
+      _handleError('Failed to load profile', e);
     }
   }
 
-  void navigateToHomeScreen() {
-    Global.myName = myName.text;
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSaving = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final name = _nameController.text.trim();
+
+      await prefs.setString('p_name', name);
+      await prefs.setString('p_id', _userId);
+
+      Global.myName = name; // Set global name before navigation
+      _navigateToHome();
+    } catch (e) {
+      _handleError('Failed to save profile', e);
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+
+  void _navigateToHome() {
     if (!widget.onLogin) {
       Navigator.pop(context);
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     }
   }
 
-  Future<void> saveProfile() async {
-    if (myName.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid name')),
-      );
-      return;
-    }
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('p_name', myName.text.trim());
-      await prefs.setString('p_id', customLengthId);
-      navigateToHomeScreen();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving profile: $e')),
-      );
-    }
+  void _handleError(String message, dynamic error) {
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$message: $error'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
-  Widget buildThemeSelector() {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'Theme Selection',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+  Widget _buildProfileCard() {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      elevation: 8,
+      shadowColor: colorScheme.shadow.withOpacity(0.2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Profile Details',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
                 ),
               ),
+
             ),
  feature/chat-history-export
             ElevatedButton(
@@ -149,40 +179,67 @@ class _ProfileState extends State<Profile> {
                               width: 2,
                             )
                                 : null,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                isSelected
-                                    ? Icons.check_circle
-                                    : Icons.brightness_auto,
-                                color: ThemeProvider.availableThemes[themeName]!.primaryColor,
-                                size: 32,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                themeName,
-                                style: TextStyle(
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: _nameController,
+                validator: (value) =>
+                value!.trim().isEmpty ? 'Name is required' : null,
+                decoration: InputDecoration(
+                  labelText: 'Display Name',
+                  hintText: 'Enter your display name',
+                  prefixIcon: Icon(Icons.person_outline,
+                      color: colorScheme.primary),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.fingerprint, color: colorScheme.primary),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Unique ID',
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
+
                           ),
                         ),
-                      ),
+                        Text(
+                          _userId,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
+
             ),
 
           ],
         );
       },
+
+            ],
+          ),
+        ),
+      ),
+
     );
   }
 
@@ -190,76 +247,60 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
-        elevation: 0,
+        title: const Text('Profile Setup'),
+        centerTitle: true,
       ),
-      body: loading
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Your Profile',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: myName,
-                          decoration: InputDecoration(
-                            labelText: 'Name',
-                            hintText: 'What do people call you?',
-                            prefixIcon: const Icon(Icons.person),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Your ID: $customLengthId',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
-                  ),
+          : FadeTransition(
+        opacity: _fadeAnimation,
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _buildProfileCard(),
+                    const SizedBox(height: 20),
+                    const ThemeSelector(),
+                    // Minimum spacing that ensures button visibility
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+                    _buildSaveButton(),
+                    // Safe area padding for bottom
+                    SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                buildThemeSelector(),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Save Profile',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: _isSaving ? null : _saveProfile,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
+        ),
+        child: _isSaving
+            ? const SizedBox(
+          height: 24,
+          width: 24,
+          child: CircularProgressIndicator(),
+        )
+            : const Text(
+          'Save Profile',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -267,7 +308,185 @@ class _ProfileState extends State<Profile> {
 
   @override
   void dispose() {
-    myName.dispose();
+    _nameController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
+}
+class ThemeSelector extends StatelessWidget {
+  const ThemeSelector({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Choose Base Theme',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        BaseThemeSelector(),
+
+        const SizedBox(height: 24),
+
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Choose Color Scheme (Optional)',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ColorSchemeSelector(),
+      ],
+    );
+  }
+}
+
+class BaseThemeSelector extends StatelessWidget {
+  const BaseThemeSelector({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: ThemeProvider.baseThemes.keys.map((themeName) {
+          final isSelected = themeName == themeProvider.baseTheme;
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: ThemeOption(
+              name: themeName,
+              isSelected: isSelected,
+              onTap: () => themeProvider.setBaseTheme(themeName),
+              color: themeName == 'Light'
+                  ? Colors.blue.shade100
+                  : Colors.grey.shade800,
+              secondaryColor: themeName == 'Light'
+                  ? Colors.blue.shade200
+                  : Colors.grey.shade900,
+            ),
+
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class ColorSchemeSelector extends StatelessWidget {
+  const ColorSchemeSelector({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: ThemeProvider.colorSchemes.entries.map((entry) {
+          final isSelected = entry.key == themeProvider.colorSchemeName;
+          final scheme = isDark
+              ? ThemeProvider.getDarkScheme(entry.key)
+              : entry.value;
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: ThemeOption(
+              name: entry.key,
+              isSelected: isSelected,
+              onTap: () => themeProvider.setColorScheme(entry.key),
+              color: scheme.primary,
+              secondaryColor: scheme.secondary,
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class ThemeOption extends StatelessWidget {
+  final String name;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final Color color;
+  final Color secondaryColor;
+
+  const ThemeOption({
+    Key? key,
+    required this.name,
+    required this.isSelected,
+    required this.onTap,
+    required this.color,
+    required this.secondaryColor,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme
+        .of(context)
+        .colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [color, secondaryColor],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? colorScheme.primary : Colors.transparent,
+            width: 2,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: colorScheme.shadow.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              name,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: color.computeLuminance() > 0.5 ? Colors.black : Colors
+                    .white,
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                size: 16,
+                color: color.computeLuminance() > 0.5 ? Colors.black : Colors
+                    .white,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }
