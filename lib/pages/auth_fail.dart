@@ -7,25 +7,81 @@ class AuthFailedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Authentication Failed'),
+        title: Row(
+          children: [
+            Icon(Icons.security_outlined,
+                color: colorScheme.error),
+            const SizedBox(width: 8),
+            Text(
+              'Authentication Failed',
+              style: TextStyle(color: colorScheme.error),
+            ),
+          ],
+        ),
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
       ),
-      body: Center(
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Authentication didn\'t succeed.\nPlease try again.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18),
+              // Error Animation
+              Container(
+                height: 200,
+                width: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colorScheme.errorContainer.withOpacity(0.1),
+                ),
+                child: Icon(
+                  Icons.error_outline_rounded,
+                  size: 100,
+                  color: colorScheme.error,
+                ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: onRetry,
-                child: const Text('Try Again'),
+              const SizedBox(height: 32),
+
+              // Error Message
+              Text(
+                'Authentication Failed',
+                style: textTheme.headlineSmall?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Please try again!",
+                textAlign: TextAlign.center,
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurface.withOpacity(0.8),
+                ),
+              ),
+              const SizedBox(height: 48),
+
+              // Retry Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Try Again'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -34,4 +90,3 @@ class AuthFailedPage extends StatelessWidget {
     );
   }
 }
-
