@@ -4,9 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nanoid/nanoid.dart';
 import '../classes/global.dart';
+import feature/chat-history-export
+import '../services/communication_service.dart';
+
 import '../providers/theme_provider.dart';
 import 'home_screen.dart';
-
+ main
 class Profile extends StatefulWidget {
   final bool onLogin;
   const Profile({Key? key, required this.onLogin}) : super(key: key);
@@ -133,6 +136,50 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   color: colorScheme.primary,
                 ),
               ),
+
+            ),
+ feature/chat-history-export
+            ElevatedButton(
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                // saving the name and id to shared preferences
+                prefs.setString('p_name', myName.text);
+                prefs.setString('p_id', customLengthId);
+                CommunicationService.broadcastProfileUpdate(customLengthId, myName.text);
+                // On pressing, move to the home screen
+                navigateToHomeScreen();
+              },
+              child: const Text("Save"),
+            )
+
+            Container(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: ThemeProvider.availableThemes.length,
+                itemBuilder: (context, index) {
+                  String themeName = ThemeProvider.availableThemes.keys.elementAt(index);
+                  bool isSelected = themeName == themeProvider.currentTheme;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Material(
+                      elevation: isSelected ? 8 : 2,
+                      borderRadius: BorderRadius.circular(12),
+                      child: InkWell(
+                        onTap: () => themeProvider.setTheme(themeName),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: isSelected
+                                ? Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2,
+                            )
+                                : null,
+
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
@@ -166,6 +213,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           'Your Unique ID',
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
+
                           ),
                         ),
                         Text(
@@ -180,10 +228,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   ],
                 ),
               ),
+
+            ),
+
+          ],
+        );
+      },
+
             ],
           ),
         ),
       ),
+
     );
   }
 

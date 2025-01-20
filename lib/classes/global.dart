@@ -28,6 +28,8 @@ class Global extends ChangeNotifier {
   static Map<String, dynamic> cache = {};
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  static var profileNameStream;
+
 
   void sentToConversations(Msg msg, String converser, {bool addToTable = true}) {
 
