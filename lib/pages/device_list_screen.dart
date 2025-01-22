@@ -26,45 +26,62 @@ class DevicesListScreen extends StatefulWidget {
 
 class _DevicesListScreenState extends State<DevicesListScreen> {
   bool isInit = false;
-
   bool isLoading = false;
-
   TextEditingController searchController = TextEditingController();
   List<Device> filteredDevices = [];
-
+  Global? globalProvider;
 
   @override
-  void initState() {
-    super.initState();
-    searchController.addListener(_filterDevices);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!isInit) {
+      globalProvider = Provider.of<Global>(context, listen: false);
+      globalProvider?.addListener(_handleGlobalUpdate);
+      _updateFilteredDevices();
+      isInit = true;
+    }
+  }
+
+  void _handleGlobalUpdate() {
+    if (mounted) {
+      _updateFilteredDevices();
+    }
+  }
+
+  void _updateFilteredDevices() {
+    if (mounted) {
+      setState(() {
+        if (searchController.text.isEmpty) {
+          filteredDevices = globalProvider?.devices ?? [];
+        } else {
+          _filterDevices();
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     searchController.removeListener(_filterDevices);
+    globalProvider?.removeListener(_handleGlobalUpdate);
     searchController.dispose();
     super.dispose();
   }
 
   void _filterDevices() {
-    setState(() {
-      if (searchController.text.isEmpty) {
-        filteredDevices = Provider.of<Global>(context, listen: false).devices;
-      } else {
-        filteredDevices = Provider.of<Global>(context, listen: false)
-            .devices
-            .where((device) => device.deviceName.toLowerCase().contains(searchController.text.toLowerCase()))
+    if (mounted && globalProvider != null) {
+      setState(() {
+        filteredDevices = globalProvider!.devices
+            .where((device) => device.deviceName
+            .toLowerCase()
+            .contains(searchController.text.toLowerCase()))
             .toList();
-      }
-    });
+      });
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
-    if (filteredDevices.isEmpty && searchController.text.isEmpty) {
-      filteredDevices = Provider.of<Global>(context).devices;
-    }
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -91,11 +108,11 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
           ),
           ListView.builder(
             // Builds a screen with list of devices in the proximity
-            itemCount:  filteredDevices.length,
+            itemCount: filteredDevices.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              // Getting a device from the provider
-              final device = Provider.of<Global>(context).devices[index];
+              // Get device from filteredDevices
+              final device = filteredDevices[index];
               return Container(
                 margin: const EdgeInsets.all(8.0),
                 child: Column(
@@ -120,7 +137,8 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                               getButtonStateName(device.state),
                               style: const TextStyle(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.bold
+                              ),
                             ),
                           ),
                         ),
@@ -130,19 +148,14 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                         // ChatPage.
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) {
-                              return ChatPage(
-                                converser: device.deviceName,
-                              );
-                            },
+                            builder: (context) => ChatPage(
+                              converser: device.deviceName,
+                            ),
                           ),
                         );
                       },
                     ),
-                    const Divider(
-                      height: 1,
-                      color: Colors.grey,
-                    ),
+                    const Divider(height: 1, color: Colors.grey),
                   ],
                 ),
               );

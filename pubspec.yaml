@@ -31,11 +31,18 @@ dependencies:
   open_filex: ^4.5.0
   permission_handler: ^11.3.1
   path_provider: ^2.1.4
+
   web_socket_channel: ^2.2.0
   nanoid: ^1.0.0
   flutter_sound: any
   just_audio: ^0.9.14
   pdf: ^3.11.1
+
+  just_audio: ^0.9.42
+  record: ^4.4.4
+  audioplayers: ^6.1.0
+  device_info_plus: ^11.2.0
+
 
 
 dev_dependencies:

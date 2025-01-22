@@ -51,14 +51,25 @@ class Global extends ChangeNotifier {
       print("Received Message: $message");
     }
 
-    // File decoding and saving
+
     if (message['type'] == 'file') {
       String filePath = await decodeAndStoreFile(
           message['data'], message['fileName']);
+
+    //file decoding and saving
+    if (message['type'] == 'voice' || message['type'] == 'file') {
+      final String filePath = await decodeAndStoreFile(
+        message['data'],
+        message['fileName'],
+        isVoice: message['type'] == 'voice',
+      );
+
       conversations.putIfAbsent(sender, () => {});
       if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
+        print("Adding to conversations");
+        print("Message: ${message['type']}");
         decodedMessage['message'] = json.encode({
-          'type': 'file',
+          'type': message['type'],
           'filePath': filePath,
           'fileName': message['fileName']
         });
@@ -82,7 +93,7 @@ class Global extends ChangeNotifier {
     }
   }
 
-  Future<String> decodeAndStoreFile(String encodedFile, String fileName) async {
+  Future<String> decodeAndStoreFile(String encodedFile, String fileName, {bool isVoice = false}) async {
     Uint8List fileBytes = base64.decode(encodedFile);
 
     Directory documents;
@@ -91,9 +102,17 @@ class Global extends ChangeNotifier {
     } else {
       documents = await getApplicationDocumentsDirectory();
     }
+
     PermissionStatus status = await Permission.storage.request();
+
+    final String subDir = isVoice ? 'voice_messages' : 'files';
     if (status.isGranted) {
-      final path = '${documents.path}/$fileName';
+
+      final Directory finalDir = Directory('${documents.path}/$subDir');
+      if (!await finalDir.exists()) {
+        await finalDir.create(recursive: true);
+      }
+      final path ='${finalDir.path}/$fileName';
       File(path).writeAsBytes(fileBytes);
       if (kDebugMode) {
         print("File saved at: $path");

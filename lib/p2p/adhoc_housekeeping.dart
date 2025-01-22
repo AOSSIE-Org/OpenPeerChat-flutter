@@ -144,7 +144,7 @@ void broadcast(BuildContext context) async {
             "data": encodedMessage,
           };
         }
-        else if (message['type'] == 'file') {
+        else if (message['type'] == 'voice' || message['type'] == 'file') {
           File file = File(message['filePath']);
           Uint8List encryptedBytes = await file.readAsBytes();
 
@@ -160,7 +160,7 @@ void broadcast(BuildContext context) async {
 
 
            finalData = {
-            "type": "file",
+            "type": message['type'],
             "data": encodedMessage,
             "fileName": message['fileName'],
           };

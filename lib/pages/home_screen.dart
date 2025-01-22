@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         key: Global.scaffoldKey,
         appBar: AppBar(
           title: const Text("AOSSIE"),
+            centerTitle: false,
           actions: [
             IconButton(
               icon: const Icon(Icons.person),
