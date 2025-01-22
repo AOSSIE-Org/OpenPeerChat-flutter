@@ -225,11 +225,14 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 },
               ),
             ),
-            AnimatedContainer(
-              duration: Duration.zero,
-              child: MessagePanel(
-                converser: widget.converser,
-                focusNode: _focusNode,
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0), // Add padding above MessagePanel
+              child: AnimatedContainer(
+                duration: Duration.zero,
+                child: MessagePanel(
+                  converser: widget.converser,
+                  focusNode: _focusNode,
+                ),
               ),
             ),
           ],
