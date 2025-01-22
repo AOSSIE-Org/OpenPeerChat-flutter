@@ -11,7 +11,6 @@ import '../database/database_helper.dart';
 import '../p2p/adhoc_housekeeping.dart';
 import 'msg.dart';
 
-
 class Global extends ChangeNotifier {
   static RSAPrivateKey? myPrivateKey;
   static RSAPublicKey? myPublicKey;
@@ -28,16 +27,19 @@ class Global extends ChangeNotifier {
   static Map<String, dynamic> cache = {};
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  static double fileTransferProgress = 0.0; // Progress percentage
+  static double transferSpeed = 0.0; // Speed in bytes/second
+  static int estimatedTimeRemaining = 0; // Time in seconds
+  static bool isTransferActive = false;
+
+  static var profileNameStream;
 
   void sentToConversations(Msg msg, String converser, {bool addToTable = true}) {
-
-
     conversations.putIfAbsent(converser, () => {});
     conversations[converser]![msg.id] = msg;
     if (addToTable) {
       insertIntoConversationsTable(msg, converser);
     }
-
     notifyListeners();
     broadcast(scaffoldKey.currentContext!);
   }
@@ -49,6 +51,11 @@ class Global extends ChangeNotifier {
       print("Received Message: $message");
     }
 
+
+    if (message['type'] == 'file') {
+      String filePath = await decodeAndStoreFile(
+          message['data'], message['fileName']);
+
     //file decoding and saving
     if (message['type'] == 'voice' || message['type'] == 'file') {
       final String filePath = await decodeAndStoreFile(
@@ -56,6 +63,7 @@ class Global extends ChangeNotifier {
         message['fileName'],
         isVoice: message['type'] == 'voice',
       );
+
       conversations.putIfAbsent(sender, () => {});
       if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
         print("Adding to conversations");
@@ -72,8 +80,7 @@ class Global extends ChangeNotifier {
         insertIntoConversationsTable(msg, sender);
         notifyListeners();
       }
-    }
-    else {
+    } else {
       conversations.putIfAbsent(sender, () => {});
       if (!conversations[sender]!.containsKey(decodedMessage['id'])) {
         var msg = Msg(
@@ -89,14 +96,10 @@ class Global extends ChangeNotifier {
   Future<String> decodeAndStoreFile(String encodedFile, String fileName, {bool isVoice = false}) async {
     Uint8List fileBytes = base64.decode(encodedFile);
 
-    //to send files encrypted using RSA
-    // Uint8List fileData = rsaDecrypt(Global.myPrivateKey!, fileBytes);
-
-    Directory documents ;
+    Directory documents;
     if (Platform.isAndroid) {
       documents = (await getExternalStorageDirectory())!;
-    }
-    else {
+    } else {
       documents = await getApplicationDocumentsDirectory();
     }
 
@@ -115,15 +118,33 @@ class Global extends ChangeNotifier {
         print("File saved at: $path");
       }
       return path;
-    }
-    else {
+    } else {
       throw const FileSystemException('Storage permission not granted');
     }
   }
 
+  void updateFileTransferProgress(int bytesTransferred, int totalBytes) {
+    fileTransferProgress = (bytesTransferred / totalBytes) * 100;
+
+    // Calculate transfer speed
+    transferSpeed = bytesTransferred / 1024; // Speed in KB/s
+
+    // Estimate time remaining
+    estimatedTimeRemaining =
+        ((totalBytes - bytesTransferred) / transferSpeed).round();
+
+    notifyListeners();
+  }
+
+  void resetFileTransferProgress() {
+    fileTransferProgress = 0.0;
+    transferSpeed = 0.0;
+    estimatedTimeRemaining = 0;
+    isTransferActive = false;
+    notifyListeners();
+  }
 
   void updateDevices(List<Device> devices) {
-
     this.devices = devices;
     notifyListeners();
   }

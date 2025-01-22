@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart'; // ADDED
 import 'package:flutter/services.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -15,10 +16,6 @@ import '../encyption/rsa.dart';
 import 'audio_service.dart';
 import 'view_file.dart';
 
-/// This component is used in the ChatPage.
-/// It is the message bar where the message is typed on and sent to
-/// connected devices.
-
 class MessagePanel extends StatefulWidget {
   const MessagePanel({Key? key, required this.converser,  this.onMessageSent}) : super(key: key);
   final String converser;final VoidCallback? onMessageSent;
@@ -30,13 +27,36 @@ class MessagePanel extends StatefulWidget {
 class _MessagePanelState extends State<MessagePanel> {
   TextEditingController myController = TextEditingController();
   File _selectedFile = File('');
+
+  FlutterSoundRecorder? _recorder; // ADDED
+  bool _isRecording = false; // ADDED
+  String? _recordedFilePath; // ADDED
+
   late final AudioService _audioService;
   bool _isRecording = false;
   String? _currentRecordingPath;
 
+
   @override
   void initState() {
     super.initState();
+    _recorder = FlutterSoundRecorder(); // ADDED
+    _initializeRecorder(); // ADDED
+  }
+
+  @override
+  void dispose() {
+    _recorder?.closeRecorder(); // ADDED
+    _recorder = null; // ADDED
+    super.dispose();
+  }
+
+  // ADDED: Initialize audio recorder
+  Future<void> _initializeRecorder() async {
+    await _recorder?.openRecorder();
+    await _recorder?.setSubscriptionDuration(const Duration(milliseconds: 100));
+  }
+
     _audioService = AudioService();
     _initializeAudio();
   }
@@ -102,10 +122,40 @@ class _MessagePanelState extends State<MessagePanel> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8.0),
+
+      child: TextFormField(
+        maxLines: null,
+        controller: myController,
+        decoration: InputDecoration(
+          icon: const Icon(Icons.person),
+          hintText: 'Send Message?',
+          labelText: 'Send Message',
+          suffixIcon: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () => _navigateToFilePreviewPage(context),
+                icon: const Icon(Icons.attach_file),
+              ),
+              IconButton(
+                onPressed: _toggleRecording, // ADDED
+                icon: Icon(
+                  _isRecording ? Icons.mic_off : Icons.mic, // ADDED
+                  color: _isRecording ? Colors.red : null, // ADDED
+                ),
+              ),
+              IconButton(
+                onPressed: () => _sendMessage(context),
+                icon: const Icon(
+                  Icons.send,
+                ),
+
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
@@ -140,6 +190,7 @@ class _MessagePanelState extends State<MessagePanel> {
               decoration: BoxDecoration(
                 color: _isRecording ? Colors.red.withOpacity(0.1) : null,
                 shape: BoxShape.circle,
+
               ),
               child: Icon(
                 _isRecording ? Icons.mic : Icons.mic_none,
@@ -161,7 +212,6 @@ class _MessagePanelState extends State<MessagePanel> {
     if (myController.text.isEmpty) {
       return;
     }
-    // Encode the message to base64
 
     String data = jsonEncode({
       "sender": Global.myName,
@@ -189,7 +239,6 @@ class _MessagePanelState extends State<MessagePanel> {
     );
 
     RSAPublicKey publicKey = Global.myPublicKey!;
-    // Encrypt the message
     Uint8List encryptedMessage = rsaEncrypt(
         publicKey, Uint8List.fromList(utf8.encode(myController.text)));
 
@@ -204,20 +253,75 @@ class _MessagePanelState extends State<MessagePanel> {
       widget.converser,
     );
 
-    // refreshMessages();
     myController.clear();
   }
 
-  /// This function is used to navigate to the file preview page and check the file size.
+  // ADDED: Start and stop audio recording
+  Future<void> _toggleRecording() async {
+    if (_isRecording) {
+      final path = await _recorder?.stopRecorder();
+      setState(() {
+        _isRecording = false;
+        _recordedFilePath = path;
+      });
+      if (path != null) {
+        _sendAudioMessage(context, path); // Send the recorded audio
+      }
+    } else {
+      await _recorder?.startRecorder(
+        codec: Codec.aacMP4,
+        toFile: 'audio_${DateTime.now().millisecondsSinceEpoch}.m4a',
+      );
+      setState(() {
+        _isRecording = true;
+      });
+    }
+  }
+
+  // ADDED: Send recorded audio as a message
+  void _sendAudioMessage(BuildContext context, String filePath) {
+    var msgId = nanoid(21);
+    String fileName = filePath.split('/').last;
+
+    String data = jsonEncode({
+      "sender": Global.myName,
+      "type": "audio",
+      "fileName": fileName,
+      "filePath": filePath,
+    });
+
+    String date = DateTime.now().toUtc().toString();
+    Global.cache[msgId] = Payload(
+      msgId,
+      Global.myName,
+      widget.converser,
+      data,
+      date,
+    );
+    insertIntoMessageTable(
+      Payload(
+        msgId,
+        Global.myName,
+        widget.converser,
+        data,
+        date,
+      ),
+    );
+
+    Provider.of<Global>(context, listen: false).sentToConversations(
+      Msg(data, "sent", date, msgId),
+      widget.converser,
+    );
+  }
+
+  // Existing file picker and sender logic
   void _navigateToFilePreviewPage(BuildContext context) async {
-    //max size of file is 30 MB
     double sizeKbs = 0;
     const int maxSizeKbs = 30 * 1024;
     FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if(result != null) {
+    if (result != null) {
       sizeKbs = result.files.single.size / 1024;
     }
-
 
     if (sizeKbs > maxSizeKbs) {
       if (!context.mounted) return;
@@ -230,10 +334,8 @@ class _MessagePanelState extends State<MessagePanel> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  //file size in MB
                   title: Text('File Size: ${(sizeKbs / 1024).ceil()} MB'),
-                  subtitle: const Text(
-                      'File size should not exceed 30 MB'),
+                  subtitle: const Text('File size should not exceed 30 MB'),
                 ),
               ],
             ),
@@ -251,7 +353,6 @@ class _MessagePanelState extends State<MessagePanel> {
       return;
     }
 
-//this function is used to open the file preview dialog
     if (result != null) {
       setState(() {
         _selectedFile = File(result.files.single.path!);
@@ -266,12 +367,11 @@ class _MessagePanelState extends State<MessagePanel> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-
-                  title: Text('File Name: ${_selectedFile.path
-                      .split('/')
-                      .last}', overflow: TextOverflow.ellipsis,),
-                  subtitle: Text(
-                      'File Size: ${(sizeKbs / 1024).floor()} MB'),
+                  title: Text(
+                    'File Name: ${_selectedFile.path.split('/').last}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text('File Size: ${(sizeKbs / 1024).floor()} MB'),
                 ),
                 ElevatedButton(
                   onPressed: () => FilePreview.openFile(_selectedFile.path),
@@ -280,7 +380,6 @@ class _MessagePanelState extends State<MessagePanel> {
               ],
             ),
             actions: [
-
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -289,10 +388,9 @@ class _MessagePanelState extends State<MessagePanel> {
               ),
               IconButton(
                 onPressed: () {
-          Navigator.pop(context);
-          _sendFileMessage(context, _selectedFile);
-
-          },
+                  Navigator.pop(context);
+                  _sendFileMessage(context, _selectedFile);
+                },
                 icon: const Icon(
                   Icons.send,
                 ),
@@ -303,6 +401,9 @@ class _MessagePanelState extends State<MessagePanel> {
       );
     }
   }
+
+
+  void _sendFileMessage(BuildContext context, File file) async {
 
 
   void _sendVoiceMessage(File audioFile) async {
@@ -331,6 +432,7 @@ class _MessagePanelState extends State<MessagePanel> {
 
   /// This function is used to send the file message.
   void _sendFileMessage(BuildContext context, File file) async{
+
     var msgId = nanoid(21);
 
     String fileName = _selectedFile.path.split('/').last;
@@ -365,7 +467,5 @@ class _MessagePanelState extends State<MessagePanel> {
       Msg(data, "sent", date, msgId),
       widget.converser,
     );
-
   }
-
 }

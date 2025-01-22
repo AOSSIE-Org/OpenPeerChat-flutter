@@ -4,8 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nanoid/nanoid.dart';
 import '../classes/global.dart';
+
+import '../services/communication_service.dart';
+
 import '../providers/theme_provider.dart';
 import 'home_screen.dart';
+
 
 class Profile extends StatefulWidget {
   final bool onLogin;
@@ -218,6 +222,20 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 ),
               ),
             ),
+
+            ElevatedButton(
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                // saving the name and id to shared preferences
+                prefs.setString('p_name', myName.text);
+                prefs.setString('p_id', customLengthId);
+                CommunicationService.broadcastProfileUpdate(customLengthId, myName.text);
+                // On pressing, move to the home screen
+                navigateToHomeScreen();
+              },
+              child: const Text("Save"),
+            )
+
           ],
         ),
       ),
