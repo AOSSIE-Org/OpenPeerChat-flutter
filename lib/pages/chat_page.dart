@@ -22,6 +22,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
   List<Msg> messageList = [];
+  double fileTransferProgress = 0.0;
+  bool isTransferring = false;
 
   @override
   void initState() {
@@ -51,6 +53,29 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  Future<void> _startFileTransfer(String filePath) async {
+    setState(() {
+      isTransferring = true;
+      fileTransferProgress = 0.0;
+    });
+
+    // Simulating file transfer with a loop for progress update
+    for (int i = 0; i <= 100; i++) {
+      await Future.delayed(const Duration(milliseconds: 50)); // Simulate transfer delay
+      setState(() {
+        fileTransferProgress = i / 100.0;
+      });
+    }
+
+    setState(() {
+      isTransferring = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('File transfer completed successfully!')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     messageList = _getMessageList(context);
@@ -62,11 +87,11 @@ class _ChatPageState extends State<ChatPage> {
         title: Text(widget.converser),
         actions: [
           IconButton(
-            icon: Icon(Icons.download),
+            icon: const Icon(Icons.download),
             onPressed: () async {
               await exportChatHistory();
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Chat history exported successfully!')),
+                const SnackBar(content: Text('Chat history exported successfully!')),
               );
             },
           ),
@@ -87,6 +112,12 @@ class _ChatPageState extends State<ChatPage> {
                     },
                   ),
           ),
+          if (isTransferring)
+            LinearProgressIndicator(
+              value: fileTransferProgress,
+              backgroundColor: Colors.grey.shade200,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
           MessagePanel(converser: widget.converser),
         ],
       ),
@@ -186,7 +217,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
         IconButton(
           icon: const Icon(Icons.file_open, color: Colors.black87),
-          onPressed: () => FilePreview.openFile(filePath),
+          onPressed: () => _startFileTransfer(filePath),
         ),
       ],
     );
