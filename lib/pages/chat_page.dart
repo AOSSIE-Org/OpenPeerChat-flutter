@@ -403,6 +403,6 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   }
 
   String dateFormatter({required String timeStamp}) {
-    DateTime dateTime = DateTime.parse(timeStamp);
+    DateTime dateTime = DateTime.parse(timeStamp).toLocal();
     return DateFormat.jm().format(dateTime);
 }}
