@@ -20,8 +20,16 @@ import 'view_file.dart';
 /// connected devices.
 
 class MessagePanel extends StatefulWidget {
-  const MessagePanel({Key? key, required this.converser,  this.onMessageSent}) : super(key: key);
-  final String converser;final VoidCallback? onMessageSent;
+  const MessagePanel({
+    Key? key,
+    required this.converser,
+    this.onMessageSent,
+    required this.focusNode,
+  }) : super(key: key);
+
+  final String converser;
+  final VoidCallback? onMessageSent;
+  final FocusNode focusNode;
 
   @override
   State<MessagePanel> createState() => _MessagePanelState();
@@ -121,6 +129,7 @@ class _MessagePanelState extends State<MessagePanel> {
           Expanded(
             child: TextField(
               controller: myController,
+              focusNode: widget.focusNode,
               maxLines: null,
               decoration: const InputDecoration(
                 hintText: 'Type a message',
