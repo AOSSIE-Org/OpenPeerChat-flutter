@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:bubble/bubble.dart';
@@ -14,9 +15,14 @@ import '../encyption/rsa.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key, required this.converser}) : super(key: key);
+  final String converserName;
+  final String converserId;
 
-  final String converser;
+  const ChatPage({
+    Key? key,
+    required this.converserName,
+    required this.converserId,
+  }) : super(key: key);
 
   @override
   ChatPageState createState() => ChatPageState();
@@ -29,9 +35,12 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   String? _currentlyPlayingId;
   bool _isPlaying = false;
   final ScrollController _scrollController = ScrollController();
-  bool _isFirstBuild = true;  // Add this flag
+  bool _isFirstBuild = true;
   final FocusNode _focusNode = FocusNode();
   int _previousMessageCount = 0;
+  late final Global globalProvider;
+
+  String _currentConverserName = '';
 
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -42,6 +51,9 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    globalProvider = Provider.of<Global>(context, listen: false);
+    _currentConverserName = globalProvider.getUserName(widget.converserId);
+    globalProvider.addListener(_handleNameUpdate);
 
     // Audio player setup
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
@@ -70,8 +82,20 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
   }
 
+  void _handleNameUpdate() {
+    if (!mounted) return;
+    final newName = globalProvider.getUserName(widget.converserId);
+
+    if (newName != _currentConverserName) {
+      setState(() => _currentConverserName = newName);
+      globalProvider.handleProfileUpdate(widget.converserId, newName);
+    }
+  }
+
+
   @override
   void dispose() {
+    globalProvider.removeListener(_handleNameUpdate);
     _scrollController.dispose();
     _audioPlayer.dispose();
     _focusNode.dispose();
@@ -105,10 +129,10 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if (Provider.of<Global>(context).conversations[widget.converser] != null) {
+    if (Provider.of<Global>(context).conversations[widget.converserId] != null) {
       messageList = [];
       Provider.of<Global>(context)
-          .conversations[widget.converser]!
+          .conversations[widget.converserId]!  // Use converserId consistently
           .forEach((key, value) {
         messageList.add(value);
       });
@@ -137,9 +161,12 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.converser),
-      ),
+        appBar: AppBar(
+          title: Selector<Global, String>(
+            selector: (_, global) => global.getUserName(widget.converserId),
+            builder: (_, name, __) => Text(name),
+          ),
+        ),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
@@ -230,7 +257,8 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
               child: AnimatedContainer(
                 duration: Duration.zero,
                 child: MessagePanel(
-                  converser: widget.converser,
+                  converserName: _currentConverserName,
+                  converserId: widget.converserId,
                   focusNode: _focusNode,
                 ),
               ),
@@ -240,6 +268,21 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       ),
     );
   }
+
+  Widget _buildMessageHeader(Msg msg) {
+    final senderName = msg.msgtype == 'sent'
+        ? Global.myName
+        : Provider.of<Global>(context).getUserName(msg.senderKey);
+    return Text(
+      senderName,
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 12,
+      ),
+    );
+  }
+
+
 
   Widget _buildVoiceMessageBubble(Msg msg) {
     final data = jsonDecode(msg.message);
@@ -276,10 +319,15 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
+            child:Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildMessageHeader(msg),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
                 // Waveform/Progress Bar
                 Container(
                   height: 28,
@@ -343,7 +391,9 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 ),
               ],
             ),
-          ),
+          ]
+            ),
+          )
         ],
       ),
     );

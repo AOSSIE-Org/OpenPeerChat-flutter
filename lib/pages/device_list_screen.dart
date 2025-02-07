@@ -32,6 +32,12 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
   Global? globalProvider;
 
   @override
+  void initState() {
+    super.initState();
+    searchController.addListener(_filterDevices);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!isInit) {
@@ -72,12 +78,30 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     if (mounted && globalProvider != null) {
       setState(() {
         filteredDevices = globalProvider!.devices
-            .where((device) => device.deviceName
+            .where((device) => parseDeviceInfo(device.deviceName)['name']!
             .toLowerCase()
             .contains(searchController.text.toLowerCase()))
             .toList();
       });
     }
+  }
+
+  String getCurrentName(String deviceName) {
+    var deviceInfo = parseDeviceInfo(deviceName);
+    String primaryKey = deviceInfo['primaryKey'] ?? '';
+    // Get the latest name from Global
+    return Provider.of<Global>(context, listen: true)
+        .getUserName(primaryKey);
+  }
+
+  // Update the getCurrentName method to use StreamBuilder
+  Widget buildDeviceName(String deviceName) {
+    var deviceInfo = parseDeviceInfo(deviceName);
+    String primaryKey = deviceInfo['primaryKey'] ?? '';
+    return Selector<Global, String>(
+      selector: (_, global) => global.getUserName(primaryKey),
+      builder: (_, name, __) => Text(name),
+    );
   }
 
   @override
@@ -86,43 +110,44 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.all(16),
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
                 hintText: "Search...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade600,
-                  size: 20,
-                ),
+                prefixIcon: Icon(Icons.search, color: Colors.grey.shade600, size: 20),
                 filled: true,
                 fillColor: Colors.grey.shade100,
                 contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade100)),
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Colors.grey.shade100),
+                ),
               ),
             ),
           ),
           ListView.builder(
-            // Builds a screen with list of devices in the proximity
             itemCount: filteredDevices.length,
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              // Get device from filteredDevices
               final device = filteredDevices[index];
               return Container(
                 margin: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
                     ListTile(
-                      title: Text(device.deviceName),
+                      title: buildDeviceName(device.deviceName), // Use the new method here
+                      subtitle: Text(
+                        parseDeviceInfo(device.deviceName)['primaryKey'] ?? '',
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600
+                        ),
+                      ),
                       trailing: GestureDetector(
-                        // GestureDetector act as onPressed() and enables
-                        // to connect/disconnect with any device
-                        onTap: () => connectToDevice(device),
+                        onTap: () => connectToDevice(device, context),
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
@@ -136,20 +161,21 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
                             child: Text(
                               getButtonStateName(device.state),
                               style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                         ),
                       ),
                       onTap: () {
-                        // On clicking any device tile, we navigate to the
-                        // ChatPage.
+                        var deviceInfo = parseDeviceInfo(device.deviceName);
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ChatPage(
-                              converser: device.deviceName,
+                              converserName: Provider.of<Global>(context, listen: false)
+                                  .getUserName(deviceInfo['primaryKey'] ?? ''),
+                              converserId: deviceInfo['primaryKey'] ?? '',
                             ),
                           ),
                         );

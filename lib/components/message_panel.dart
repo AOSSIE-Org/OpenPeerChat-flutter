@@ -22,12 +22,14 @@ import 'view_file.dart';
 class MessagePanel extends StatefulWidget {
   const MessagePanel({
     Key? key,
-    required this.converser,
+    required this.converserName,
+    required this.converserId,
     this.onMessageSent,
     required this.focusNode,
   }) : super(key: key);
 
-  final String converser;
+  final String converserName;
+  final String converserId;
   final VoidCallback? onMessageSent;
   final FocusNode focusNode;
 
@@ -41,12 +43,26 @@ class _MessagePanelState extends State<MessagePanel> {
   late final AudioService _audioService;
   bool _isRecording = false;
   String? _currentRecordingPath;
+  late String _currentConverserName;
+  late Global _globalProvider;
 
   @override
   void initState() {
     super.initState();
+    _currentConverserName = widget.converserName;
+    _globalProvider = Provider.of<Global>(context, listen: false);
+    _globalProvider.addListener(_handleNameUpdate);
     _audioService = AudioService();
     _initializeAudio();
+  }
+
+  void _handleNameUpdate() {
+    if (!mounted) return;
+
+    final newName = _globalProvider.getUserName(widget.converserId);
+    if (newName != _currentConverserName) {
+      setState(() => _currentConverserName = newName);
+    }
   }
 
   Future<void> _initializeAudio() async {
@@ -104,6 +120,7 @@ class _MessagePanelState extends State<MessagePanel> {
 
   @override
   void dispose() {
+    _globalProvider.removeListener(_handleNameUpdate);
     myController.dispose();
     _audioService.dispose();
     super.dispose();
@@ -165,35 +182,42 @@ class _MessagePanelState extends State<MessagePanel> {
     );
   }
 
+// Update the Payload creation for text messages with primary keys
   void _sendMessage(BuildContext context) {
     var msgId = nanoid(21);
-    if (myController.text.isEmpty) {
-      return;
-    }
-    // Encode the message to base64
+    if (myController.text.isEmpty) return;
 
+    // Encode the message to base64
     String data = jsonEncode({
       "sender": Global.myName,
+      "senderId": Global.primaryKey,
       "type": "text",
       "data": myController.text,
     });
 
+
     String date = DateTime.now().toUtc().toString();
+
 
     Global.cache[msgId] = Payload(
       msgId,
       Global.myName,
-      widget.converser,
+      widget.converserName,
       data,
       date,
+      senderId: Global.primaryKey,
+      receiverId: widget.converserId,
     );
+
     insertIntoMessageTable(
       Payload(
         msgId,
         Global.myName,
-        widget.converser,
+        widget.converserName,
         data,
         date,
+        senderId: Global.primaryKey,
+        receiverId: widget.converserId,
       ),
     );
 
@@ -204,16 +228,23 @@ class _MessagePanelState extends State<MessagePanel> {
 
     String myData = jsonEncode({
       "sender": Global.myName,
+      "senderId": Global.primaryKey,
       "type": "text",
       "data": base64Encode(encryptedMessage),
     });
 
     Provider.of<Global>(context, listen: false).sentToConversations(
-      Msg(myData, "sent", date, msgId),
-      widget.converser,
+      Msg(
+        myData,
+        "sent",
+        date,
+        msgId,
+        senderKey: Global.primaryKey,
+        receiverKey: widget.converserId,  // Use converserId instead of converser
+      ),
+      widget.converserId,  // Use converserId for conversation mapping
     );
 
-    // refreshMessages();
     myController.clear();
   }
 
@@ -320,21 +351,37 @@ class _MessagePanelState extends State<MessagePanel> {
 
     final String data = jsonEncode({
       "sender": Global.myName,
+      "senderId": Global.primaryKey,
       "type": "voice",
       "fileName": fileName,
       "filePath": audioFile.path,
     });
 
     final String date = DateTime.now().toUtc().toString();
-    final payload = Payload(msgId, Global.myName, widget.converser, data, date);
+    final payload = Payload(
+      msgId,
+      Global.myName,
+      widget.converserName,  // Use converserName
+      data,
+      date,
+      senderId: Global.primaryKey,
+      receiverId: widget.converserId,  // Use converserId
+    );
 
     Global.cache[msgId] = payload;
-     insertIntoMessageTable(payload);
+    insertIntoMessageTable(payload);
 
     if (!mounted) return;
     Provider.of<Global>(context, listen: false).sentToConversations(
-      Msg(data, "sent", date, msgId),
-      widget.converser,
+      Msg(
+        data,
+        "sent",
+        date,
+        msgId,
+        senderKey: Global.primaryKey,
+        receiverKey: widget.converserId,
+      ),
+      widget.converserId,
     );
   }
 
@@ -347,6 +394,7 @@ class _MessagePanelState extends State<MessagePanel> {
 
     String data = jsonEncode({
       "sender": Global.myName,
+      "senderId": Global.primaryKey,  // Add senderId
       "type": "file",
       "fileName": fileName,
       "filePath": filePath,
@@ -356,25 +404,36 @@ class _MessagePanelState extends State<MessagePanel> {
     Global.cache[msgId] = Payload(
       msgId,
       Global.myName,
-      widget.converser,
+      widget.converserName,  // Use converserName
       data,
       date,
+      senderId: Global.primaryKey,
+      receiverId: widget.converserId,  // Use converserId
     );
+
     insertIntoMessageTable(
       Payload(
         msgId,
         Global.myName,
-        widget.converser,
+        widget.converserName,
         data,
         date,
+        senderId: Global.primaryKey,
+        receiverId: widget.converserId,
       ),
     );
 
     Provider.of<Global>(context, listen: false).sentToConversations(
-      Msg(data, "sent", date, msgId),
-      widget.converser,
+      Msg(
+        data,
+        "sent",
+        date,
+        msgId,
+        senderKey: Global.primaryKey,
+        receiverKey: widget.converserId,  // Use converserId
+      ),
+      widget.converserId,  // Use converserId
     );
-
   }
 
 }
