@@ -18,10 +18,16 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- Optional: Add this permission if you want to save your recordings in public folders -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Add these new permissions for android 13+ -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <application
         android:label="openpeerchat_flutter"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
