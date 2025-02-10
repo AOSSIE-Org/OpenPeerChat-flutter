@@ -21,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -40,18 +41,22 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    readAllUpdateConversation(context);
-    init(context);
+    if (!_isInitialized) {
+      _isInitialized = true;
+      readAllUpdateConversation(context);
+      init(context);
+    }
   }
 
   @override
   void dispose() {
-    Global.deviceSubscription!.cancel();
-    Global.receivedDataSubscription!.cancel();
-    Global.nearbyService!.stopBrowsingForPeers();
-    Global.nearbyService!.stopAdvertisingPeer();
+    Global.deviceSubscription?.cancel();
+    Global.receivedDataSubscription?.cancel();
+    Global.nearbyService?.stopBrowsingForPeers();
+    Global.nearbyService?.stopAdvertisingPeer();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {

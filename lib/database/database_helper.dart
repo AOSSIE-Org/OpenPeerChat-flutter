@@ -12,19 +12,24 @@ import 'message_db.dart';
 /// retrieval and saving of messages in the database.
 
 Future<void> readAllUpdateConversation(BuildContext context) async {
-  List<ConversationFromDB> conversations ;
-  var value = await MessageDB.instance.readAllFromConversationsTable();
-  conversations = value;
+  List<ConversationFromDB> conversations = await MessageDB.instance.readAllFromConversationsTable();
   for (var element in conversations) {
     if (!context.mounted) return;
     Provider.of<Global>(context, listen: false).sentToConversations(
-      Msg(element.msg, element.type, element.timestamp, element.id),
+      Msg(
+          element.msg,
+          element.type,
+          element.timestamp,
+          element.id,
+          senderKey: element.senderKey,
+          receiverKey: element.receiverKey
+      ),
       element.converser,
       addToTable: false,
     );
-    Msg(element.msg, element.type, element.timestamp, element.id);
   }
 }
+
 
 void readAllUpdatePublicKey() {
   List<PublicKeyFromDB> publicKey;
@@ -64,7 +69,15 @@ void insertIntoMessageTable(dynamic msg) {
 // Inserting message to the conversation table in the database
 void insertIntoConversationsTable(Msg msg, String converser) {
   MessageDB.instance.insertIntoConversationsTable(ConversationFromDB(
-      msg.id, msg.msgtype, msg.message, msg.timestamp, msg.ack, converser));
+      msg.id,
+      msg.msgtype,
+      msg.message,
+      msg.timestamp,
+      msg.ack,
+      converser,
+      senderKey: msg.senderKey,
+      receiverKey: msg.receiverKey
+  ));
 }
 
 void deleteFromMessageTable(String id) {
@@ -79,29 +92,34 @@ void updateMessageTable(String id, dynamic msg) {
   }
 }
 
-Ack convertToAck(MessageFromDB msg) {
-  String id = msg.id;
-  return Ack(id);
-}
-
+// Updated Payload conversion to include sender and receiver IDs
 Payload convertToPayload(MessageFromDB message) {
   String id = message.id;
   String payload = message.msg;
   var json = jsonDecode(payload);
   return Payload(
-      id, json['sender'], json['receiver'], json['message'], json['timestamp']);
+      id,
+      json['sender'] ?? '',
+      json['receiver'] ?? '',
+      json['message'] ?? '',
+      json['timestamp'] ?? DateTime.now().toUtc().toString(),
+      senderId: json['senderId'] ?? '',
+      receiverId: json['receiverId'] ?? ''
+  );
 }
 
 MessageFromDB convertFromPayload(Payload msg) {
   String id = msg.id;
   String type = 'Payload';
-  Map<String, String> message = {
+  Map<String, dynamic> message = {
     "id": msg.id,
     "type": msg.type,
     "message": msg.message,
     "timestamp": msg.timestamp,
     "sender": msg.sender,
-    "receiver": msg.receiver
+    "receiver": msg.receiver,
+    "senderId": msg.senderId,
+    "receiverId": msg.receiverId
   };
   return MessageFromDB(id, type, jsonEncode(message));
 }
@@ -112,6 +130,39 @@ MessageFromDB convertFromAck(Ack msg) {
   Map<String, String> message = {
     "id": msg.id,
     "type": msg.type,
+    "senderKey": msg.senderKey
   };
   return MessageFromDB(id, type, jsonEncode(message));
+}
+
+Future<int> updateUserDisplayNameInDB(BuildContext context, String userId, String newDisplayName) async {
+  try {
+    // Update database
+    final updateCount = await MessageDB.instance.updateUserDisplayName(userId, newDisplayName);
+
+    // Update global state
+    Provider.of<Global>(context, listen: false).handleProfileUpdate(userId, newDisplayName);
+
+    return updateCount;
+  } catch (e) {
+    debugPrint('Error updating display name: $e');
+    rethrow;
+  }
+}
+
+// Add this function to load user names on app start
+Future<void> loadUserNames(BuildContext context) async {
+  final userNames = await MessageDB.instance.getAllUserNames();
+  for (var userName in userNames) {
+    Provider.of<Global>(context, listen: false)
+        .updateUserProfile(userName.primaryKey, userName.displayName);
+  }
+}
+
+Ack convertToAck(MessageFromDB msg) {
+  var json = jsonDecode(msg.msg);
+  return Ack(
+      msg.id,
+      senderKey: json['senderKey'] ?? '',
+  );
 }

@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:nanoid/nanoid.dart';
 import '../classes/global.dart';
+import '../database/message_db.dart';
+import '../p2p/adhoc_housekeeping.dart';
 import '../providers/theme_provider.dart';
 import 'home_screen.dart';
 
@@ -21,6 +22,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
 
+
   String _userId = '';
   bool _isLoading = true;
   bool _isSaving = false;
@@ -29,7 +31,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _setupAnimations();
-    _loadProfileData();
+    // This schedules _loadProfileData() after the widget is built.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadProfileData();
+    });
   }
 
   void _setupAnimations() {
@@ -44,28 +49,30 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     _animationController.forward();
   }
 
+
   Future<void> _loadProfileData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final name = prefs.getString('p_name') ?? '';
-      final savedId = prefs.getString('p_id') ?? '';
 
       if (mounted) {
         setState(() {
           _nameController.text = name;
-          _userId = savedId.isNotEmpty ? savedId : nanoid(6);
+          _userId = Global.primaryKey; // Global.primaryKey was set in main.dart
           _isLoading = false;
         });
 
-        if (name.isNotEmpty && savedId.isNotEmpty && widget.onLogin) {
-          Global.myName = name; // Ensure name is set before navigation
-          _navigateToHome();
+        if (name.isNotEmpty && widget.onLogin) {
+          Global.myName = name;
+          _navigateToHome(); // Navigates to HomeScreen
         }
       }
     } catch (e) {
       _handleError('Failed to load profile', e);
     }
   }
+
+
 
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
@@ -74,19 +81,36 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     try {
       final prefs = await SharedPreferences.getInstance();
       final name = _nameController.text.trim();
+      final oldName = Global.myName;
 
-      await prefs.setString('p_name', name);
-      await prefs.setString('p_id', _userId);
+      if (name != oldName) {
+        await prefs.setString('p_name', name);
+        Global.myName = name;
 
-      Global.myName = name; // Set global name before navigation
-      _navigateToHome();
+        if (!context.mounted) return;
+
+        // Use the corrected database update method
+        await MessageDB.instance.updateUserDisplayName(Global.primaryKey, name);
+
+        // Update global state properly
+        final global = Provider.of<Global>(context, listen: false);
+        global.handleProfileUpdate(Global.primaryKey, name);
+        global.updateLocalProfile(name, context);
+
+        // Initialize sync with proper context check
+        if (context.mounted) {
+          initializeProfileSync(context);
+          broadcastProfileUpdate(context);
+        }
+
+        _navigateToHome();
+      }
     } catch (e) {
       _handleError('Failed to save profile', e);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
   }
-
 
   void _navigateToHome() {
     if (!widget.onLogin) {

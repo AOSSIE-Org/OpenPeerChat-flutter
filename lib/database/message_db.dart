@@ -7,9 +7,7 @@ import 'model.dart';
 
 class MessageDB {
   static final MessageDB instance = MessageDB._init();
-
   static Database? _database;
-
   MessageDB._init();
 
   Future<Database> get database async {
@@ -21,17 +19,101 @@ class MessageDB {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 2, onCreate: _createDB);
+    return await openDatabase(path, version: 3, onCreate: _createDB, onUpgrade: _onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
-    await db.execute(
-        'CREATE TABLE $messagesTableName(_id PRIMARY KEY, type TEXT NOT NULL,msg TEXT NOT NULL);');
-    await db.execute(
-        'CREATE TABLE $conversationsTableName(_id PRIMARY KEY, converser TEXT NOT NULL,type TEXT NOT NULL,msg TEXT NOT NULL,timestamp TEXT NOT NULL, ack TEXT NOT NULL);');
-    await db.execute(
-        'CREATE TABLE $publicKeyTableName( ${PublicKeyFields.converser} TEXT NOT NULL,${PublicKeyFields.publicKey} TEXT NOT NULL);');
+    await db.execute('''
+      CREATE TABLE $messagesTableName(
+        _id PRIMARY KEY, 
+        type TEXT NOT NULL,
+        msg TEXT NOT NULL
+      );
+    ''');
+
+    await db.execute('''
+      CREATE TABLE $conversationsTableName(
+        _id PRIMARY KEY, 
+        converser TEXT NOT NULL,
+        type TEXT NOT NULL,
+        msg TEXT NOT NULL,
+        timestamp TEXT NOT NULL, 
+        ack TEXT NOT NULL,
+        senderKey TEXT NOT NULL,
+        receiverKey TEXT NOT NULL
+      );
+      CREATE INDEX idx_sender_receiver ON $conversationsTableName(senderKey, receiverKey);
+    ''');
+
+    await db.execute('''
+      CREATE TABLE $publicKeyTableName(
+        ${PublicKeyFields.converser} TEXT NOT NULL,
+        ${PublicKeyFields.publicKey} TEXT NOT NULL,
+        PRIMARY KEY (${PublicKeyFields.converser})
+      );
+    ''');
+
+    await db.execute('''
+    CREATE TABLE $userNamesTableName(
+      ${UserNameFields.primaryKey} TEXT PRIMARY KEY,
+      ${UserNameFields.displayName} TEXT NOT NULL,
+      ${UserNameFields.lastUpdated} TEXT NOT NULL
+    );
+  ''');
   }
+
+  Future<void> upsertUserName(String primaryKey, String displayName) async {
+    final db = await instance.database;
+    final userNameData = UserNameFromDB(
+      primaryKey,
+      displayName,
+      DateTime.now().toIso8601String(),
+    );
+
+    await db.insert(
+      userNamesTableName,
+      userNameData.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<UserNameFromDB>> getAllUserNames() async {
+    final db = await instance.database;
+    final results = await db.query(userNamesTableName);
+    return results.map((json) => UserNameFromDB.fromJson(json)).toList();
+  }
+
+  Future<UserNameFromDB?> getUserName(String primaryKey) async {
+    final db = await instance.database;
+    final results = await db.query(
+      userNamesTableName,
+      where: '${UserNameFields.primaryKey} = ?',
+      whereArgs: [primaryKey],
+      limit: 1,
+    );
+
+    if (results.isNotEmpty) {
+      return UserNameFromDB.fromJson(results.first);
+    }
+    return null;
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE $conversationsTableName ADD COLUMN senderKey TEXT DEFAULT ""');
+      await db.execute('ALTER TABLE $conversationsTableName ADD COLUMN receiverKey TEXT DEFAULT ""');
+    }
+
+    // Add user names table if it doesn't exist
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS $userNamesTableName(
+      ${UserNameFields.primaryKey} TEXT PRIMARY KEY,
+      ${UserNameFields.displayName} TEXT NOT NULL,
+      ${UserNameFields.lastUpdated} TEXT NOT NULL
+    );
+  ''');
+  }
+
   Future<void> insertPublicKey(PublicKeyFromDB publicKey) async {
     final db = await instance.database;
 
@@ -60,17 +142,30 @@ class MessageDB {
     }
   }
 
-
-  void insertIntoMessagesTable(MessageFromDB message) async {
+// Add method to update display names while maintaining IDs
+  Future<int> updateUserDisplayName(String userId, String newDisplayName) async {
     final db = await instance.database;
-    await db.insert(messagesTableName, message.toJson());
-    return;
+    return db.update(
+      userNamesTableName,
+      {
+        UserNameFields.displayName: newDisplayName,
+        UserNameFields.lastUpdated: DateTime.now().toIso8601String()
+      },
+      where: '${UserNameFields.primaryKey} = ?',
+      whereArgs: [userId],
+    );
   }
 
-  void insertIntoConversationsTable(ConversationFromDB message) async {
+  Future<void> insertIntoMessagesTable(MessageFromDB message) async {
     final db = await instance.database;
-    await db.insert(conversationsTableName, message.toJson());
-    return;
+    await db.insert(messagesTableName, message.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> insertIntoConversationsTable(ConversationFromDB message) async {
+    final db = await instance.database;
+    await db.insert(conversationsTableName, message.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   // Function to get last message id from the database
@@ -90,19 +185,17 @@ class MessageDB {
     return MessageFromDB.fromJson(message[0]).id;
   }
 
-  Future<MessageFromDB?> readFromMessagesTable(int id) async {
+  // Existing methods with updated return types
+  Future<List<MessageFromDB>> readAllFromMessagesTable() async {
     final db = await instance.database;
-    final maps = await db.query(
-      messagesTableName,
-      columns: MessageTableFields.values,
-      where: '${MessageTableFields.id}=?',
-      whereArgs: [id],
-    );
-    if (maps.isNotEmpty) {
-      return MessageFromDB.fromJson(maps.first);
-    } else {
-      return null;
-    }
+    final result = await db.query(messagesTableName);
+    return result.map((json) => MessageFromDB.fromJson(json)).toList();
+  }
+
+  Future<List<ConversationFromDB>> readAllFromConversationsTable() async {
+    final db = await instance.database;
+    final result = await db.query(conversationsTableName);
+    return result.map((json) => ConversationFromDB.fromJson(json)).toList();
   }
 
   Future<ConversationFromDB?> readFromConversationsTable(int id) async {
@@ -120,18 +213,13 @@ class MessageDB {
     }
   }
 
-  Future<List<MessageFromDB>> readAllFromMessagesTable() async {
-    final db = await instance.database;
-    final result = await db.query(
-      messagesTableName,
-    );
-    return result.map((json) => MessageFromDB.fromJson(json)).toList();
-  }
-
-  Future<List<ConversationFromDB>> readAllFromConversationsTable() async {
+  // Updated query methods to include sender and receiver keys
+  Future<List<ConversationFromDB>> getConversationsByUser(String userKey) async {
     final db = await instance.database;
     final result = await db.query(
       conversationsTableName,
+      where: 'senderKey = ? OR receiverKey = ?',
+      whereArgs: [userKey, userKey],
     );
     return result.map((json) => ConversationFromDB.fromJson(json)).toList();
   }

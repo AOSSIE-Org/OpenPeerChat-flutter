@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
-
 class RecordingPermissionException implements Exception {
   final String message;
   RecordingPermissionException(this.message);
@@ -21,8 +20,8 @@ class AudioService {
   factory AudioService() => _instance;
   AudioService._internal();
 
-  final Record _recorder = Record();
-  final AudioPlayer _player = AudioPlayer();
+  final AudioRecorder _recorder = AudioRecorder(); // Updated to AudioRecorder
+  final player = AudioPlayer();
   bool _isRecorderInitialized = false;
   bool _isRecording = false;
   String? _currentRecordingPath;
@@ -35,7 +34,6 @@ class AudioService {
       if (Platform.isAndroid) {
         final androidInfo = await DeviceInfoPlugin().androidInfo;
         if (androidInfo.version.sdkInt >= 33) {
-          // Check status before requesting
           if (await Permission.audio.status.isDenied) {
             await Permission.audio.request();
           }
@@ -43,7 +41,6 @@ class AudioService {
             await Permission.videos.request();
           }
         } else {
-          // For older Android versions
           if (await Permission.storage.status.isDenied) {
             await Permission.storage.request();
           }
@@ -53,11 +50,9 @@ class AudioService {
         }
       }
 
-      // Check microphone permission
       if (await Permission.microphone.status.isDenied) {
         final micStatus = await Permission.microphone.request();
         if (micStatus.isPermanentlyDenied) {
-          // Provide user feedback
           debugPrint('Microphone permission permanently denied');
           return false;
         }
@@ -69,6 +64,7 @@ class AudioService {
       return false;
     }
   }
+
   Future<void> initRecorder() async {
     if (_isRecorderInitialized) return;
 
@@ -105,13 +101,13 @@ class AudioService {
       Directory tempDir = await getTemporaryDirectory();
       _currentRecordingPath = '${tempDir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
-      await _recorder.start(
-        path: _currentRecordingPath!,
+      final config = RecordConfig(
         encoder: AudioEncoder.aacLc,
         bitRate: 128000,
-        samplingRate: 44100,
+        sampleRate: 44100,
       );
 
+      await _recorder.start(config, path: _currentRecordingPath!);
       _isRecording = true;
       return _currentRecordingPath!;
     } catch (e) {
@@ -137,8 +133,9 @@ class AudioService {
 
   Future<void> playRecording(String path) async {
     try {
-      await _player.setFilePath(path);
-      await _player.play();
+      // Using proper AudioSource as per documentation
+      await player.setAudioSource(AudioSource.uri(Uri.parse(path)));
+      await player.play();
     } catch (e) {
       rethrow;
     }
@@ -146,7 +143,7 @@ class AudioService {
 
   Future<void> stopPlaying() async {
     try {
-      await _player.stop();
+      await player.stop();
     } catch (e) {
       rethrow;
     }
@@ -158,7 +155,7 @@ class AudioService {
         await stopRecording();
       }
       await _recorder.dispose();
-      await _player.dispose();
+      await player.dispose();
       _isRecorderInitialized = false;
     } catch (e) {
       rethrow;
