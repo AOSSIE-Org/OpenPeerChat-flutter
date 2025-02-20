@@ -36,6 +36,9 @@ dependencies:
   record: ^4.4.4
   audioplayers: ^6.1.0
   device_info_plus: ^11.2.0
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  share_plus: ^10.1.4
 
 
 dev_dependencies:

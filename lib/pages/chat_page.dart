@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-
+import '../components/chat_export.dart'; // Import the export function
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +12,8 @@ import 'package:pointycastle/asymmetric/api.dart';
 import '../components/view_file.dart';
 import '../encyption/rsa.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key, required this.converser}) : super(key: key);
@@ -29,7 +31,7 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   String? _currentlyPlayingId;
   bool _isPlaying = false;
   final ScrollController _scrollController = ScrollController();
-  bool _isFirstBuild = true;  // Add this flag
+  bool _isFirstBuild = true; // Add this flag
   final FocusNode _focusNode = FocusNode();
   int _previousMessageCount = 0;
 
@@ -39,6 +41,7 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "$twoDigitMinutes:$twoDigitSeconds";
   }
+
   @override
   void initState() {
     super.initState();
@@ -85,7 +88,6 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     _scrollToBottom();
   }
 
-
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -96,12 +98,10 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     }
   }
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +129,8 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
     Map<String, List<Msg>> groupedMessages = {};
     for (var msg in messageList) {
-      String date = DateFormat('dd/MM/yyyy').format(DateTime.parse(msg.timestamp));
+      String date =
+          DateFormat('dd/MM/yyyy').format(DateTime.parse(msg.timestamp));
       if (groupedMessages[date] == null) {
         groupedMessages[date] = [];
       }
@@ -139,6 +140,28 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.converser),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            onPressed: () async {
+              try {
+                final file = await generatePdf(converser: widget.converser);
+                if (mounted) {
+                  _showExportOptions(context, file.path);
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to export chat. Please try again.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+        ],
       ),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
@@ -148,85 +171,99 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
               child: messageList.isEmpty
                   ? const Center(child: Text('No messages yet'))
                   : ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _scrollController,
-                itemCount: groupedMessages.keys.length,
-                itemBuilder: (BuildContext context, int index) {
-                  String date = groupedMessages.keys.elementAt(index);
-                  return Column(
-                    children: [
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            date,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                      ...groupedMessages[date]!.map((msg) {
-                        String displayMessage = msg.message;
-                        if (Global.myPrivateKey != null) {
-                          RSAPrivateKey privateKey = Global.myPrivateKey!;
-                          dynamic data = jsonDecode(msg.message);
-                          if (data['type'] == 'text') {
-                            Uint8List encryptedBytes = base64Decode(data['data']);
-                            Uint8List decryptedBytes = rsaDecrypt(privateKey, encryptedBytes);
-                            displayMessage = utf8.decode(decryptedBytes);
-                          }
-                        }
-                        return Align(
-                          alignment: msg.msgtype == 'sent'
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          child: Bubble(
-                            style: BubbleStyle(
-                              nip: BubbleNip.no,
-                              radius: const Radius.circular(18),
-                              color: msg.msgtype == 'sent'
-                                  ? const Color(0xffd1c4e9)
-                                  : const Color(0xff80DEEA),
-                              elevation: 2,
-                              shadowColor: Colors.black.withOpacity(0.1),
-                              padding: const BubbleEdges.all(12),
-                              margin: BubbleEdges.only(
-                                top: 10,
-                                left: msg.msgtype == 'sent' ? 40.0 : 10,
-                                right: msg.msgtype == 'received' ? 40.0 : 10,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      itemCount: groupedMessages.keys.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        String date = groupedMessages.keys.elementAt(index);
+                        return Column(
+                          children: [
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Text(
+                                  date,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Flexible(
-                                  child: msg.message.contains('file')
-                                      ? _buildFileBubble(msg)
-                                      : Text(
-                                    displayMessage,
-                                    style: const TextStyle(color: Colors.black87),
+                            ...groupedMessages[date]!.map(
+                              (msg) {
+                                String displayMessage = msg.message;
+                                if (Global.myPrivateKey != null) {
+                                  RSAPrivateKey privateKey =
+                                      Global.myPrivateKey!;
+                                  dynamic data = jsonDecode(msg.message);
+                                  if (data['type'] == 'text') {
+                                    Uint8List encryptedBytes =
+                                        base64Decode(data['data']);
+                                    Uint8List decryptedBytes =
+                                        rsaDecrypt(privateKey, encryptedBytes);
+                                    displayMessage =
+                                        utf8.decode(decryptedBytes);
+                                  }
+                                }
+                                return Align(
+                                  alignment: msg.msgtype == 'sent'
+                                      ? Alignment.centerRight
+                                      : Alignment.centerLeft,
+                                  child: Bubble(
+                                    style: BubbleStyle(
+                                      nip: BubbleNip.no,
+                                      radius: const Radius.circular(18),
+                                      color: msg.msgtype == 'sent'
+                                          ? const Color(0xffd1c4e9)
+                                          : const Color(0xff80DEEA),
+                                      elevation: 2,
+                                      shadowColor:
+                                          Colors.black.withOpacity(0.1),
+                                      padding: const BubbleEdges.all(12),
+                                      margin: BubbleEdges.only(
+                                        top: 10,
+                                        left: msg.msgtype == 'sent' ? 40.0 : 10,
+                                        right: msg.msgtype == 'received'
+                                            ? 40.0
+                                            : 10,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Flexible(
+                                          child: msg.message.contains('file')
+                                              ? _buildFileBubble(msg)
+                                              : Text(
+                                                  displayMessage,
+                                                  style: const TextStyle(
+                                                      color: Colors.black87),
+                                                ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          dateFormatter(
+                                              timeStamp: msg.timestamp),
+                                          style: const TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  dateFormatter(timeStamp: msg.timestamp),
-                                  style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
+                                );
+                              },
                             ),
-                          ),
+                          ],
                         );
-                      }),
-                    ],
-                  );
-                },
-              ),
+                      },
+                    ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 10.0), // Add padding above MessagePanel
+              padding: const EdgeInsets.only(
+                  top: 10.0), // Add padding above MessagePanel
               child: AnimatedContainer(
                 duration: Duration.zero,
                 child: MessagePanel(
@@ -294,14 +331,16 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                         return FutureBuilder<Duration?>(
                           future: _audioPlayer.getDuration(),
                           builder: (context, durationSnapshot) {
-                            final totalDuration = durationSnapshot.data?.inMilliseconds ?? 1;
+                            final totalDuration =
+                                durationSnapshot.data?.inMilliseconds ?? 1;
                             return LinearProgressIndicator(
                               value: isCurrentlyPlaying && snapshot.hasData
-                                  ? snapshot.data!.inMilliseconds / totalDuration
+                                  ? snapshot.data!.inMilliseconds /
+                                      totalDuration
                                   : 0,
-                              backgroundColor: msg.msgtype == 'sent'
-                                  ? Colors.deepPurple.withOpacity(0.1)
-                                  : Colors.cyan.withOpacity(0.1),
+                              backgroundColor: msg.msgtype != 'sent'
+                                  ? Colors.cyan.withOpacity(0.1)
+                                  : Colors.deepPurple.withOpacity(0.1),
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 msg.msgtype == 'sent'
                                     ? Colors.deepPurple
@@ -377,6 +416,7 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       );
     }
   }
+
   Widget _buildFileBubble(Msg msg) {
     dynamic data = jsonDecode(msg.message);
     if (data['type'] == 'voice') {
@@ -408,4 +448,49 @@ class ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   String dateFormatter({required String timeStamp}) {
     DateTime dateTime = DateTime.parse(timeStamp).toLocal();
     return DateFormat.jm().format(dateTime);
-}}
+  }
+}
+
+void _showExportOptions(BuildContext context, String filePath) {
+  showModalBottomSheet(
+    context: context,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Export Chat",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.visibility, color: Colors.blue),
+              title: const Text("Open PDF"),
+              onTap: () {
+                OpenFilex.open(filePath);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share, color: Colors.green),
+              title: const Text("Share PDF"),
+              onTap: () {
+                Share.shareXFiles([XFile(filePath)], text: "Chat History");
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      );
+    },
+  );
+}
